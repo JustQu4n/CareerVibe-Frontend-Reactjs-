@@ -16,13 +16,13 @@ const useGetAllJobs = () => {
       setError(null);
       try {
         const res = await axios.get(
-          `${JOB_API_ENDPOINT}/get?keyword=${searchedQuery}`,
+          `${JOB_API_ENDPOINT}/?keyword=${searchedQuery}`,
           {
             withCredentials: true,
           }
         );
-        console.log("API Response:", res.data);
-        if (res.data.status) {
+        console.log("API Response Job:", res.data);
+        if (res.data.success) {
           // Updated success check
           dispatch(setAllJobs(res.data.jobs));
         } else {

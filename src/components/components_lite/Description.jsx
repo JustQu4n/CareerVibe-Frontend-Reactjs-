@@ -7,6 +7,7 @@ import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setSingleJob } from "@/redux/jobSlice";
 import { toast } from "sonner";
+import { ClipLoader } from "react-spinners";
 
 const Description = () => {
   const params = useParams();
@@ -18,6 +19,7 @@ const Description = () => {
   const [error, setError] = useState(null);
   const { user } = useSelector((store) => store.auth);
 
+  console.log("Single Job in Description:", singleJob);
   const isIntiallyApplied =
     singleJob?.application?.some(
       (application) => application.applicant === user?._id
@@ -51,11 +53,11 @@ const Description = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`${JOB_API_ENDPOINT}/get/${jobId}`, {
+        const res = await axios.get(`${JOB_API_ENDPOINT}/${jobId}`, {
           withCredentials: true,
         });
-        console.log("API Response:", res.data);
-        if (res.data.status) {
+        console.log("API Response Get Detail Job:", res.data);
+        if (res.data.success) {
           dispatch(setSingleJob(res.data.job));
           setIsApplied(
             res.data.job.applications.some(
@@ -78,7 +80,10 @@ const Description = () => {
   console.log("single jobs", singleJob);
 
   if (!singleJob) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center py-10">
+              <ClipLoader color="#2563eb" size={50} />
+              <span className="ml-3 text-blue-600 font-medium">Loading jobs...</span>
+            </div>;
   }
 
   return (
@@ -97,9 +102,9 @@ const Description = () => {
               <Badge className={" text-[#6B3AC2]  font-bold"} variant={"ghost"}>
                 {singleJob?.location}
               </Badge>
-              <Badge className={" text-black font-bold"} variant={"ghost"}>
+              {/* <Badge className={" text-black font-bold"} variant={"ghost"}>
                 {singleJob?.jobType}
-              </Badge>
+              </Badge> */}
             </div>
           </div>
           <div>
@@ -148,19 +153,23 @@ const Description = () => {
           <h1 className="font-bold my-1 ">
             Total Applicants:{" "}
             <span className=" pl-4 font-normal text-gray-800">
-              {singleJob?.applications?.length}
+              {singleJob?.applications?.length} No of Applicants
             </span>
           </h1>
           <h1 className="font-bold my-1 ">
             Job Type:
             <span className=" pl-4 font-normal text-gray-800">
-              {singleJob?.jobType}
+              {singleJob?.job_type
+                ? singleJob.job_type === "full_time"
+                  ? "Full Time"
+                  : "Remote"
+                : "N/A"}
             </span>
           </h1>
           <h1 className="font-bold my-1 ">
             Post Date:
             <span className=" pl-4 font-normal text-gray-800">
-              {singleJob?.createdAt.split("T")[0]}
+              {singleJob?.updated_at ? singleJob.updated_at.split("T")[0] : "N/A"}
             </span>
           </h1>
         </div>

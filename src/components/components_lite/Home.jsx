@@ -8,6 +8,7 @@ import Footer from "./Footer";
 import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
+import { ClipLoader } from "react-spinners";
 
 const Home = () => {
   const { loading, error } = useGetAllJobs(); // Trigger data fetch
@@ -27,9 +28,14 @@ const Home = () => {
     <div>
       <Navbar />
       <Header />
-      <Categories />
-      {loading && <p>Loading jobs...</p>}
-      {error && <p>Error: {error}</p>}
+      {/* <Categories /> */}
+      {loading && (
+        <div className="flex justify-center items-center py-10">
+          <ClipLoader color="#2563eb" size={50} />
+          <span className="ml-3 text-blue-600 font-medium">Loading jobs...</span>
+        </div>
+      )}
+      {error && <p className="text-red-500 text-center py-5">Error: {error}</p>}
       {!loading && !error && <LatestJobs jobs={jobs} />}
       <Footer />
     </div>

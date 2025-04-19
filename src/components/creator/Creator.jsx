@@ -4,58 +4,63 @@ import amreshsir from './amreshsir.jpg'; // Import the local image
 import ankit from './Ankit.jpg';
 import ritik from './ritik.jpg';
 import gaurav from './gaurav.jpg';
+import Footer from '../components_lite/Footer'
 
 const Creator = () => {
   return (
     <div>
       <Navbar />
-      <div className="flex flex-col items-center justify-center h-screen max-w-7xl mx-auto p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center w-full">
-          {/* Image Section */}
-          <div className="flex justify-center">
-            <img src={amreshsir} alt="Amresh Sir" className="h-80 object-cover rounded-lg shadow-md" />
+      <div className="bg-white min-h-screen py-12 px-6 md:px-16 text-gray-800">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center">
+          Giới thiệu về Find Job
+        </h1>
+        <p className="text-lg mb-8 text-center text-gray-600">
+          Find Job là nền tảng kết nối giữa ứng viên và nhà tuyển dụng, giúp bạn dễ dàng tìm thấy công việc phù hợp với kỹ năng và đam mê của mình.
+        </p>
+
+        <div className="grid md:grid-cols-2 gap-10 items-center">
+          <div className="space-y-5">
+            <h2 className="text-2xl font-semibold text-indigo-500">
+              Sứ mệnh của chúng tôi
+            </h2>
+            <p>
+              Chúng tôi hướng đến việc xây dựng một hệ sinh thái tuyển dụng thông minh, giúp ứng viên tìm việc hiệu quả và nhà tuyển dụng tiếp cận được nhân tài nhanh chóng.
+            </p>
+
+            <h2 className="text-2xl font-semibold text-indigo-500">
+              Những gì chúng tôi cung cấp
+            </h2>
+            <ul className="list-disc list-inside space-y-2">
+              <li>Tìm kiếm việc làm theo kỹ năng và vị trí</li>
+              <li>Hệ thống gợi ý việc làm bằng AI</li>
+              <li>Chatbot hỗ trợ tạo CV & phỏng vấn</li>
+              <li>Kết nối nhanh chóng với nhà tuyển dụng</li>
+            </ul>
           </div>
-          {/* Text Section */}
-          <div>
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Dr. Amresh Kumar</h2>
-            <p className="text-gray-600 mb-2">Dr. Amresh Kumar completed his <strong>B.Tech in Electronics and Communication Engineering (ECE)</strong> from <strong>Shivnand Singh Institution of Technology and Management, Aligarh</strong>, in <strong>2002</strong>.</p>
-            <p className="text-gray-600 mb-2">After graduation, he joined <strong>Koderma Mines Institution</strong> as a <strong>part-time lecturer</strong>. He then pursued his <strong>M.Tech in Electrical Engineering</strong> from <strong>BIT Sindri, Dhanbad</strong>.</p>
-            <p className="text-gray-600 mb-2">He was later selected as an <strong>Assistant Professor</strong> in the <strong>Electronics and Communication Engineering (ECE) Department</strong> at <strong>MIT Muzaffarpur</strong>. During his tenure there, he also completed his <strong>Ph.D. in Electrical Engineering</strong> from <strong>Bihar University, Muzaffarpur, in 2016</strong>.</p>
-            <p className="text-gray-600">Following his Ph.D., he was transferred to <strong>Rashtrakavi Ramdhari Singh Dinkar College of Engineering (RRSDCE)</strong> as an <strong>Assistant Professor in the Electrical and Electronics Engineering (EEE) Department</strong>, where he continues to serve till date.</p>
+
+          <div className="">
+            <img
+              src="https://media.licdn.com/dms/image/v2/C561BAQGnoaNjsBLsQg/company-background_10000/company-background_10000/0/1590217283917/jobseeker_hub_cover?e=2147483647&v=beta&t=izGlJYuYMvsHNLdu5MgxzoZzZotna4k65zE2r2yTjD0"
+              alt="About Find Job"
+             
+            />
           </div>
         </div>
-      </div>
-      
-      <hr className="w-full border-gray-300 my-6" />
-      
-      <div className="text-center p-6">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Developers and Designers</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {/* Developer 1 - Ankit Pathak */}
-          <a href="https://ankitpathak.vercel.app/" target="_blank" rel="noopener noreferrer" className="block text-center">
-            <img src={ankit} alt="Ankit Pathak" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Ankit Pathak</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125035</p>
-            <p className="text-gray-600 text-sm">Full Stack Developer</p>
-          </a>
-          {/* Developer 2 - Ritik Shrivastava */}
-          <a href="#" className="block text-center">
-            <img src={ritik} alt="Ritik Shrivastava" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Ritik Shrivastava</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125043</p>
-            <p className="text-gray-600 text-sm">UI/UX Designer</p>
-          </a>
-          {/* Developer 3 - Gaurav Kumar */}
-          <a href="#" className="block text-center">
-            <img src={gaurav} alt="Gaurav Kumar" className="mx-auto rounded-lg shadow-md" />
-            <h3 className="text-lg font-semibold text-gray-700 mt-2">Gaurav Kumar</h3>
-            <p className="text-gray-600 text-sm">Registration No: 21110125023</p>
-            <p className="text-gray-600 text-sm">Research</p>
-          </a>
+
+        <div className="mt-16 text-center">
+          <h3 className="text-xl font-semibold mb-2 text-indigo-600">
+            Cùng nhau xây dựng sự nghiệp mơ ước
+          </h3>
+          <p className="text-gray-600">
+            Hãy để Find Job đồng hành cùng bạn trên hành trình nghề nghiệp.
+          </p>
         </div>
       </div>
     </div>
-  )
+    <Footer />
+    </div>
+  );
 }
 
 export default Creator

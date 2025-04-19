@@ -31,12 +31,12 @@ const Job1 = ({ job }) => {
       <div className="flex items-center gap-2 my-2">
         <Button className="p-6" variant="outline" size="icon">
           <Avatar>
-            <AvatarImage src={job?.company?.logo} />
+            <AvatarImage src={job?.company_id?.logo_url} />
           </Avatar>
         </Button>
         <div>
-          <h1 className="font-medium text-lg">{job?.company?.name}</h1>
-          <p className="text-sm text-gray-500">India</p>
+          <h1 className="font-medium text-lg">{job?.company_id?.name}</h1>
+          <p className="text-sm text-gray-500">{job?.company_id?.address}</p>
         </div>
       </div>
 
@@ -46,10 +46,10 @@ const Job1 = ({ job }) => {
       </div>
       <div className="flex items-center gap-2 mt-4">
         <Badge className={"text-blue-700 font-bold"} variant="ghost">
-          {job?.position} Positions
+          {job?.experience} Positions
         </Badge>
         <Badge className={"text-[#F83002] font-bold"} variant="ghost">
-          {job?.jobType}
+          {job?.level}
         </Badge>
         <Badge className={"text-[#7209b7] font-bold"} variant="ghost">
           {job?.salary}LPA

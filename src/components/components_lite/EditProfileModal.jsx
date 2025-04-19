@@ -20,10 +20,10 @@ const EditProfileModal = ({ open, setOpen }) => {
   const { user } = useSelector((store) => store.auth);
 
   const [input, setInput] = useState({
-    fullname: user?.fullname, // Corrected from fullnamename to fullname
+    fullname: user?.jobseeker?.full_name, // Corrected from fullnamename to fullname
     email: user?.email,
-    phoneNumber: user?.phoneNumber,
-    bio: user?.profile?.bio,
+    phoneNumber: user?.jobseeker?.phone,
+    bio: user?.jobseeker?.bio,
     skills: user?.profile?.skills?.map((skill) => skill),
     file: user?.profile?.resume,
   });
@@ -140,19 +140,6 @@ const EditProfileModal = ({ open, setOpen }) => {
                   id="bio"
                   value={input.bio}
                   name="bio"
-                  onChange={changeEventHandler}
-                  className="col-span-3 border border-gray-300 rounded-md p-2"
-                />
-              </div>
-              {/* skills */}
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="skills" className="text-right">
-                  Skills
-                </Label>
-                <input
-                  id="skills"
-                  name="skills"
-                  value={input.skills}
                   onChange={changeEventHandler}
                   className="col-span-3 border border-gray-300 rounded-md p-2"
                 />

@@ -87,7 +87,7 @@ const Navbar = () => {
                 </li>
                 <li>
                   {" "}
-                  <Link to={""}>Recruiter</Link>
+                  <Link to={""}>Recruiter site</Link>
                 </li>
               </>
             )}
@@ -110,6 +110,7 @@ const Navbar = () => {
               <PopoverTrigger asChild>
                 <Avatar className="cursor-pointer">
                   <AvatarImage
+                  className="object-cover"
                     src={
                       user?.jobseeker?.avatar ||
                       "https://avatar.iran.liara.run/public/boy"
@@ -122,6 +123,7 @@ const Navbar = () => {
                 <div className="flex items-center gap-4 space-y-2">
                   <Avatar className="cursor-pointer">
                     <AvatarImage
+                    className="object-cover"
                       src={
                         user?.jobseeker?.avatar ||
                         "https://avatar.iran.liara.run/public/boy"
