@@ -34,7 +34,9 @@ const Jobs = () => {
 
   return (
     <div>
-      <Navbar />
+      <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
+        <Navbar />
+      </div>
       <div className="max-w-7xl mx-auto mt-5">
         <div className="flex gap-5">
           <div className="w-1/5">

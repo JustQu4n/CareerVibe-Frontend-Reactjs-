@@ -20,6 +20,8 @@ import ProtectedRoute from "./components/admincomponent/ProtectedRoute";
 import Creator from "./components/creator/Creator.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import RecruiterSite from "./components/components_lite/RecruiterSite";
+import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -30,6 +32,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/register",
     element: <Register />,
+  },
+  {
+    path: "/register-recruiter",
+    element: <RegisterRecruiter/>,
   },
   {
     path: "/description/:id",
@@ -62,6 +68,10 @@ const appRouter = createBrowserRouter([
   {
     path:"/Creator",
     element: <Creator/>
+  },
+  {
+    path:"/RecruiteSite",
+    element: <RecruiterSite/>
   },
 
   // /admin

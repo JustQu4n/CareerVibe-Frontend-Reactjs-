@@ -4,6 +4,10 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
+import { BriefcaseBusiness } from "lucide-react";
+import { FileUser } from "lucide-react";
+import { CircleUser } from "lucide-react";
+import { Building2 } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "sonner";
 import axios from "axios"; // Import axios
@@ -57,7 +61,7 @@ const Navbar = () => {
           </h1>
         </div>
         <div className="flex items-center gap-10">
-          <ul className="flex font-medium items-center gap-6">
+          <ul className="flex font-semibold text-lg items-center gap-6">
             {user && user.role === "Recruiter" ? (
               <>
                 <li>
@@ -83,11 +87,15 @@ const Navbar = () => {
                 </li>
                 <li>
                   {" "}
-                  <Link to={"/Creator"}>About</Link>
+                  <Link to={"/"}>Career Tools</Link>
                 </li>
                 <li>
                   {" "}
-                  <Link to={""}>Recruiter site</Link>
+                  <Link to={"/RecruiteSite"}>Recruiter site</Link>
+                </li>
+                <li>
+                  {" "}
+                  <Link to={"/Creator"}>About</Link>
                 </li>
               </>
             )}
@@ -107,23 +115,11 @@ const Navbar = () => {
             </div>
           ) : (
             <Popover>
-              <PopoverTrigger asChild>
-                <Avatar className="cursor-pointer">
-                  <AvatarImage
-                  className="object-cover"
-                    src={
-                      user?.jobseeker?.avatar ||
-                      "https://avatar.iran.liara.run/public/boy"
-                    }
-                    alt="@shadcn"
-                  />
-                </Avatar>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
-                <div className="flex items-center gap-4 space-y-2">
+              <div className="flex items-center gap-3">
+                <PopoverTrigger asChild>
                   <Avatar className="cursor-pointer">
                     <AvatarImage
-                    className="object-cover"
+                      className="object-cover"
                       src={
                         user?.jobseeker?.avatar ||
                         "https://avatar.iran.liara.run/public/boy"
@@ -131,12 +127,34 @@ const Navbar = () => {
                       alt="@shadcn"
                     />
                   </Avatar>
+                </PopoverTrigger>
+                <div>
+                  <h3 className="font-semibold">
+                    {user?.jobseeker?.full_name || user?.employer?.full_name}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {user?.role === "job_seeker" ? "JobSeeker" : "Recruiter"}
+                  </p>
+                </div>
+              </div>
+              <PopoverContent className="w-80">
+                <div className="flex items-center gap-4 space-y-2">
+                  <Avatar className="cursor-pointer">
+                    <AvatarImage
+                      className="object-cover"
+                      src={
+                        user?.jobseeker?.avatar ||
+                        user?.employer?.avatar ||
+                        "https://avatar.iran.liara.run/public/boy"
+                      }
+                      alt="@shadcn"
+                    />
+                  </Avatar>
                   <div>
                     <h3 className="font-medium">
-                      {user?.jobseeker?.full_name}
+                      {user?.jobseeker?.full_name || user?.employer?.full_name}
                     </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {/* {user?.profile?.bio} */}
+                    <p className="text-sm text-muted-foreground max-w-[200px] truncate">
                       {user?.email}
                     </p>
                   </div>
@@ -145,16 +163,45 @@ const Navbar = () => {
                 <div className="flex flex-col my-2 text-gray-600  ">
                   {user && user.role === "job_seeker" && (
                     <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <User2></User2>
+                      <CircleUser size={28} strokeWidth={1.75} />
                       <Button variant="link">
                         {" "}
                         <Link to={"/Profile"}> Profile</Link>{" "}
                       </Button>
                     </div>
                   )}
+                  {user && user.role === "employer" && (
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                     <Building2 size={28} strokeWidth={1.75} />
+                      <Button variant="link">
+                        {" "}
+                        <Link to={"/admin/companies"}> Your Company</Link>{" "}
+                      </Button>
+                    </div>
+                  )}
+                  {user?.role === "employer" && (
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                      <BriefcaseBusiness size={28} strokeWidth={1.75} />
+                      <Button variant="link">
+                        {" "}
+                        <Link to={"/admin/jobs"}> Your Job Posts</Link>{" "}
+                      </Button>
+                    </div>
+                  )}
+                  {user && user.role === "employer" && (
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                     <FileUser size={28} strokeWidth={1.75} />
+                      <Button variant="link">
+                        {" "}
+                        <Link to={"/admin/companies"}>
+                          Management Application
+                        </Link>{" "}
+                      </Button>
+                    </div>
+                  )}
 
                   <div className="flex w-fit items-center gap-2 cursor-pointer">
-                    <LogOut></LogOut>
+                    <LogOut size={28} strokeWidth={1.75}></LogOut>
                     <Button onClick={logoutHandler} variant="link">
                       Logout
                     </Button>

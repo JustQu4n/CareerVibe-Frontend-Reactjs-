@@ -1,90 +1,113 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components_lite/Navbar";
 import { Navigate, useNavigate } from "react-router-dom";
-import { RadioGroup } from "../ui/radio-group";
 import { Link } from "react-router-dom";
 import axios from "axios";
-// import { toast } from "sonner";
 import { toast } from "react-toastify";
 import { USER_API_ENDPOINT } from "@/utils/data.js";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading, setUser } from "@/redux/authSlice";
 
-const Login = () => {
-  const [input, setInput] = useState({
-    email: "",
-    password: "",
-  });
-  const [showPassword, setShowPassword] = useState(false);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-  const { loading, user } = useSelector((store) => store.auth);
-  const changeEventHandler = (e) => {
-    setInput({ ...input, [e.target.name]: e.target.value });
-  };
-  const ChangeFilehandler = (e) => {
-    setInput({ ...input, file: e.target.files?.[0] });
-  };
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
-
-    try {
-      dispatch(setLoading(true)); // Start loading
-      const res = await axios.post(
-        `${USER_API_ENDPOINT}/login-jobseeker`,
-        input,
-        {
-          headers: { "Content-Type": "application/json" },
-          withCredentials: true,
-        }
-      );
-      if (res.data.success) {
-        console.log("Full response data:", res.data); // Log the entire response
-
-        // Access the nested user data correctly
-        const userData = res.data.data?.user;
-        console.log("User data extracted:", userData);
-
-        if (userData) {
-          // Also include the jobSeeker data to have full profile info
-          const fullUserData = {
-            ...userData,
-            jobseeker: res.data.data?.jobSeeker,
-            token: res.data.data?.token,
-          };
-          console.log("Full user data:", fullUserData); // Log the full user data
-
-          dispatch(setUser(fullUserData));
-
-          setTimeout(() => {
+const RecruiterSite = () => {
+      const [input, setInput] = useState({
+          email: "",
+          password: "",
+        });
+        const [showPassword, setShowPassword] = useState(false);
+        const navigate = useNavigate();
+        const dispatch = useDispatch();
+        const { loading, user } = useSelector((store) => store.auth);
+        const changeEventHandler = (e) => {
+          setInput({ ...input, [e.target.name]: e.target.value });
+        };
+        const ChangeFilehandler = (e) => {
+          setInput({ ...input, file: e.target.files?.[0] });
+        };
+      
+        const submitHandler = async (e) => {
+          e.preventDefault();
+      
+          try {
+            dispatch(setLoading(true)); // Start loading
+            const res = await axios.post(
+              `${USER_API_ENDPOINT}/login-employer`,
+              input,
+              {
+                headers: { "Content-Type": "application/json" },
+                withCredentials: true,
+              }
+            );
+            if (res.data.success) {
+              console.log("Full response data:", res.data); // Log the entire response
+      
+              // Access the nested user data correctly
+              const userData = res.data.data?.user;
+              console.log("User data extracted:", userData);
+      
+              if (userData) {
+                // Also include the jobSeeker data to have full profile info
+                const fullUserData = {
+                  ...userData,
+                  employer: res.data.data?.employer,
+                  token: res.data.data?.token,
+                };
+                console.log("Full user data:", fullUserData); // Log the full user data
+      
+                dispatch(setUser(fullUserData));
+      
+                setTimeout(() => {
+                  navigate("/");
+                  toast.success("Login successful");
+                }, 300);
+              } else {
+                toast.warning("User data not found in response");
+              }
+            }
+          } catch (error) {
+            toast.error("Login failed");
+          } finally {
+            dispatch(setLoading(false)); // End loading
+          }
+        };
+      
+        useEffect(() => {
+          if (user) {
             navigate("/");
-            toast.success("Login successful");
-          }, 300);
-        } else {
-          toast.warning("User data not found in response");
-        }
-      }
-    } catch (error) {
-      toast.error("Login failed");
-    } finally {
-      dispatch(setLoading(false)); // End loading
-    }
-  };
-
-  useEffect(() => {
-    if (user) {
-      navigate("/");
-    }
-  }, []);
-
+          }
+        }, []);
+  // return (
+  //   <div>
+  //     <Navbar />
+  //     <div className="p-10 text-black bg-blue-50 pb-12 h-full rounded-l-2xl">
+  //       <h1 className="text-4xl font-bold mb-6">
+  //         Tuyển dụng dễ dàng cùng FindJob
+  //       </h1>
+  //       <p className="text-lg">
+  //         Chúng tôi giúp nhà tuyển dụng kết nối nhanh chóng với ứng viên tiềm
+  //         năng trong lĩnh vực IT. Nền tảng hỗ trợ đăng tin tuyển dụng, quản lý
+  //         ứng viên và hơn thế nữa.
+  //       </p>
+  //      <Link to={"/login-recruiter"}><h1>Login Recruiter</h1></Link>
+  //     </div>
+  //   </div>
+  // );
   return (
     <div>
       <Navbar></Navbar>
 
       <form onSubmit={submitHandler}>
         <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
-          <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+          <div className=" m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
+          <div className="flex-1  text-center hidden lg:flex">
+              <div
+                className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
+                style={{
+                  backgroundImage:
+                    "url('https://media.licdn.com/dms/image/v2/C561BAQGnoaNjsBLsQg/company-background_10000/company-background_10000/0/1590217283917/jobseeker_hub_cover?e=2147483647&v=beta&t=izGlJYuYMvsHNLdu5MgxzoZzZotna4k65zE2r2yTjD0')",
+                }}
+              ></div>
+            </div>
             <div className="lg:w-1/2 xl:w-5/12 p-6 sm:p-12">
               <div>
                 <img
@@ -95,7 +118,7 @@ const Login = () => {
               </div>
               <div className="mt-12 flex flex-col items-center">
                 <h1 className="text-2xl xl:text-2xl font-bold">
-                  Login for JobSeeker
+                  Login for Employee
                 </h1>
                 <div className="w-full flex-1 mt-8">
                   <div className="mx-auto max-w-lg">
@@ -198,7 +221,7 @@ const Login = () => {
                         <Link to="/forgot-password">Forgot Password?</Link>
                       </p>
                       <p className="mt-2 text-xs text-blue-600 hover:text-gray-700 cursor-pointer">
-                        <Link to="/register">Create new Account</Link>
+                        <Link to="/register-recruiter">Create new Account</Link>
                       </p>
                     </div>
                   </div>
@@ -260,15 +283,7 @@ const Login = () => {
                 </div>
               </div>
             </div>
-            <div className="flex-1  text-center hidden lg:flex">
-              <div
-                className="m-12 xl:m-16 w-full bg-contain bg-center bg-no-repeat"
-                style={{
-                  backgroundImage:
-                    "url('https://media.licdn.com/dms/image/v2/C561BAQGnoaNjsBLsQg/company-background_10000/company-background_10000/0/1590217283917/jobseeker_hub_cover?e=2147483647&v=beta&t=izGlJYuYMvsHNLdu5MgxzoZzZotna4k65zE2r2yTjD0')",
-                }}
-              ></div>
-            </div>
+
           </div>
         </div>
       </form>
@@ -276,4 +291,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default RecruiterSite;

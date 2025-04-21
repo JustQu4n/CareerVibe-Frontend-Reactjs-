@@ -16,7 +16,9 @@ const Browse = () => {
   }, []);
   return (
     <div>
-      <Navbar />
+      <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
+        <Navbar />
+      </div>
       <div className="max-w-7xl mx-auto my-10">
         <h1 className="font-bold text-xl my-10 ">
           Search Results {allJobs.length}

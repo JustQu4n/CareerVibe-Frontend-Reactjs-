@@ -9,7 +9,9 @@ import Footer from '../components_lite/Footer'
 const Creator = () => {
   return (
     <div>
-      <Navbar />
+      <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
+        <Navbar />
+      </div>
       <div className="bg-white min-h-screen py-12 px-6 md:px-16 text-gray-800">
       <div className="max-w-5xl mx-auto">
         <h1 className="text-4xl font-bold text-indigo-600 mb-6 text-center">

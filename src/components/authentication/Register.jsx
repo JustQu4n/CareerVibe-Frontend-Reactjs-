@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components_lite/Navbar";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { RadioGroup } from "../ui/radio-group";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { USER_API_ENDPOINT } from "@/utils/data";
