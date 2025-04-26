@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "../components_lite/Navbar";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
-import CompaniesTable from "./CompaniesTable";
-import { useNavigate } from "react-router-dom";
+
 
 import useGetAllCompanies from "@/hooks/usegetAllCompanies";
-import { useDispatch } from "react-redux";
-import { setSearchCompanyByText } from "@/redux/companyslice";
+import { useDispatch, useSelector } from "react-redux";
 
 const Companies = () => {
-  const navigate = useNavigate();
-
-  useGetAllCompanies();
+  const { user } = useSelector((state) => state.auth);
   const [input, setInput] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -21,9 +15,6 @@ const Companies = () => {
   const toggleShowMore = () => setShowMore(!showMore);
   const dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(setSearchCompanyByText(input));
-  }, [input]);
   return (
     <div>
       <Navbar />
@@ -47,23 +38,23 @@ const Companies = () => {
       <div className="flex flex-col md:flex-row items-center md:items-start bg-blue-50 p-6 rounded-md">
         {/* Logo */}
         <img
-          src="https://kimtingroup.com/images/logo.png"
+        src={user?.company?.logo || "https://via.placeholder.com/150"}
           alt="Company Logo"
           className="w-20 h-20 rounded-md object-cover mr-6 border"
         />
 
         {/* Info */}
         <div className="flex-1 space-y-2 mt-4 md:mt-0">
-          <h1 className="text-lg font-bold uppercase">TẬP ĐOÀN KIM TÍN</h1>
+          <h1 className="text-lg font-bold uppercase">{user?.company?.name}</h1>
           <p className="text-sm text-gray-600">
-            <strong>Địa điểm:</strong> 69 Nguyễn Thị, Phường 13, Quận 5, TP. HCM
+            <strong>Địa điểm:</strong> {user?.company?.address}
           </p>
 
           <div className="text-sm text-gray-600 space-y-1">
             <p><strong>Thông tin công ty</strong></p>
             <p>👥 Quy mô công ty: 1.000 - 4.999</p>
             <p>🏢 Loại hình hoạt động: Cổ phần</p>
-            <p>🌐 Website: <a href="https://kimtingroup.com" className="text-blue-600 hover:underline">https://kimtingroup.com</a></p>
+            <p>🌐 Website: <a href="https://kimtingroup.com" className="text-blue-600 hover:underline">{user?.company?.domain}</a></p>
           </div>
         </div>
 

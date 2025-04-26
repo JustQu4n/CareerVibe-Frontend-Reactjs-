@@ -22,6 +22,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import RecruiterSite from "./components/components_lite/RecruiterSite";
 import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
+import JobPostDetails from "./components/admincomponent/JobPostDetails";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -72,6 +73,10 @@ const appRouter = createBrowserRouter([
   {
     path:"/RecruiteSite",
     element: <RecruiterSite/>
+  },
+  {
+    path: "/details/:id",
+    element: <JobPostDetails />
   },
 
   // /admin

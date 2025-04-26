@@ -3,21 +3,10 @@ import Navbar from "../components_lite/Navbar";
 import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
-import AdminJobsTable from "./AdminJobsTable";
-import useGetAllAdminJobs from "@/hooks/useGetAllAdminJobs";
-import { setSearchJobByText } from "@/redux/jobSlice";
+import JobPostList from "./JobPostList";
 
 const AdminJobs = () => {
-  useGetAllAdminJobs();
   const navigate = useNavigate();
-
-  const [input, setInput] = useState("");
-  const dispatch = useDispatch();
-
-  useEffect(() => {
-    dispatch(setSearchJobByText(input));
-  }, [input]);
   return (
     <div>
       <Navbar />
@@ -26,14 +15,13 @@ const AdminJobs = () => {
           <Input
             className="w-fit"
             placeholder="Filter by Name & Jobs"
-            onChange={(e) => setInput(e.target.value)}
           ></Input>
           <Button onClick={() => navigate("/admin/jobs/create")}>
             Post new Job
           </Button>
         </div>
         <div>
-          <AdminJobsTable />
+          <JobPostList />
         </div>
       </div>
     </div>

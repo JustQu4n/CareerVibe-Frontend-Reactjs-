@@ -50,6 +50,7 @@ const RecruiterSite = () => {
                 const fullUserData = {
                   ...userData,
                   employer: res.data.data?.employer,
+                  company: res.data.data?.company,
                   token: res.data.data?.token,
                 };
                 console.log("Full user data:", fullUserData); // Log the full user data

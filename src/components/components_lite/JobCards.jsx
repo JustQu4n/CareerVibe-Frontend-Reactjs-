@@ -8,7 +8,7 @@ const JobCards = ({job}) => {
   const navigate = useNavigate();
  
   return (
-    <div onClick={()=>navigate(`/description/${job._id}`)} className="p-5 rounded-md shadow-xl bg-white  border border-gray-200 cursor-pointer hover:shadow-2xl hover:shadow-blue-200 ">
+    <div onClick={()=>navigate(`/details/${job._id}`)} className="p-5 rounded-md shadow-xl bg-white  border border-gray-200 cursor-pointer hover:shadow-2xl hover:shadow-blue-200 ">
       <div>
 
         <h1 className="text-lg font-medium"> {job.name} </h1>
