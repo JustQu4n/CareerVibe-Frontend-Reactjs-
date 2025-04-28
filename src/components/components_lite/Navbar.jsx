@@ -166,7 +166,16 @@ const Navbar = () => {
                       <CircleUser size={28} strokeWidth={1.75} />
                       <Button variant="link">
                         {" "}
-                        <Link to={"/Profile"}> Profile</Link>{" "}
+                        <Link to={"/profile"}> Profile</Link>{" "}
+                      </Button>
+                    </div>
+                  )}
+                  {user && user.role === "job_seeker" && (
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                       <FileUser size={28} strokeWidth={1.75} />
+                      <Button variant="link">
+                        {" "}
+                        <Link to={"/jobseeker-applications"}> Manager Applications</Link>{" "}
                       </Button>
                     </div>
                   )}
@@ -193,7 +202,7 @@ const Navbar = () => {
                      <FileUser size={28} strokeWidth={1.75} />
                       <Button variant="link">
                         {" "}
-                        <Link to={"/admin/companies"}>
+                        <Link to={"/admin/jobs/applicants"}>
                           Management Application
                         </Link>{" "}
                       </Button>

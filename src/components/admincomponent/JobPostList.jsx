@@ -110,7 +110,7 @@ const JobPostList = () => {
               
              <div className="flex gap-4">
                <Link
-             to={`/jobs/${job._id}`}
+             to={`/details/${job._id}`}
              className="text-sm px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
                >
              View

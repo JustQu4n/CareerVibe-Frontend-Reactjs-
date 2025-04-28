@@ -9,6 +9,8 @@ import useGetAllJobs from "@/hooks/useGetAllJobs";
 import { useNavigate } from "react-router-dom";
 import { toast } from 'react-toastify';
 import { ClipLoader } from "react-spinners";
+import Hero from "./Hero";
+import JobCategoriesAndTrends from "./JobCategoriesAndTrends";
 
 const Home = () => {
   const { loading, error } = useGetAllJobs(); // Trigger data fetch
@@ -29,7 +31,9 @@ const Home = () => {
       <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
         <Navbar />
       </div>
-      <Header />
+      { /*<Header />*/}
+      <Hero />
+      <JobCategoriesAndTrends />
       {/* <Categories /> */}
       {loading && (
         <div className="flex justify-center items-center py-10">

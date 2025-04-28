@@ -1,17 +1,10 @@
 import React, { useState } from "react";
 import Navbar from "./Navbar";
-import { Avatar, AvatarImage } from "../ui/avatar";
-import { Button } from "../ui/button";
-import { Contact, Mail, Pen } from "lucide-react";
 import { Badge } from "../ui/badge";
-import AppliedJob from "./AppliedJob";
 import EditProfileModal from "./EditProfileModal";
 import { useSelector } from "react-redux";
 import useGetAppliedJobs from "@/hooks/useGetAllAppliedJobs";
-import ProfileCard from "../profile_ui/profileCard";
-import ContactInfo from "../profile_ui/ContactInfo";
-import Education from "../profile_ui/Education";
-import PersonalProfile from "../profile_ui/PersonalProfile";
+import JobseekerApplications from "./JobseekerApplications";
 
 const isResume = true;
 const Profile = () => {
@@ -226,8 +219,8 @@ const Profile = () => {
                     </svg>
                   </a>
                 </div>
-                <h2 className="text-xl font-bold mb-4">Job Applied</h2>
-                <AppliedJob />
+                 {/*<h2 className="text-xl font-bold mb-4">Job Applied</h2>
+               <JobseekerApplications />*/}
               </div>
             </div>
           </div>

@@ -8,8 +8,7 @@ export const fetchJobPostsByEmployer = createAsyncThunk(
   "jobPosts/fetchByEmployer",
   async (employerId, { rejectWithValue, getState }) => {
     try {
-      const { auth } = getState();
-      const token = auth.user?.token;
+      const token = localStorage.getItem("token");
 
       if (!token) return rejectWithValue("Authentication required.");
 

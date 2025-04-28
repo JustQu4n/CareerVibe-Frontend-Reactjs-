@@ -9,7 +9,6 @@ import TermsofService from "./components/components_lite/TermsofService.jsx";
 import Jobs from "./components/components_lite/Jobs.jsx";
 import Browse from "./components/components_lite/Browse.jsx";
 import Profile from "./components/components_lite/Profile.jsx";
-import Description from "./components/components_lite/Description.jsx";
 import Companies from "./components/admincomponent/Companies";
 import CompanyCreate from "./components/admincomponent/CompanyCreate";
 import CompanySetup from "./components/admincomponent/CompanySetup";
@@ -23,6 +22,8 @@ import 'react-toastify/dist/ReactToastify.css';
 import RecruiterSite from "./components/components_lite/RecruiterSite";
 import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 import JobPostDetails from "./components/admincomponent/JobPostDetails";
+import JobseekerApplications from "./components/components_lite/JobseekerApplications";
+import JobPostViewDetails from "./components/components_lite/JobPostViewDetails";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -39,12 +40,16 @@ const appRouter = createBrowserRouter([
     element: <RegisterRecruiter/>,
   },
   {
-    path: "/description/:id",
-    element: <Description />,
+    path: "/view-job-detail/:id",
+    element: <JobPostViewDetails />,
   },
   {
-    path: "/Profile",
+    path: "/profile",
     element: <Profile />,
+  },
+  {
+    path: "/jobseeker-applications",
+    element: <JobseekerApplications />,
   },
   {
     path: "/PrivacyPolicy",
@@ -123,7 +128,7 @@ const appRouter = createBrowserRouter([
     ),
   },
   {
-    path: "/admin/jobs/:id/applicants",
+    path: "/admin/jobs/applicants",
     element: (
       <ProtectedRoute>
         <Applicants />
