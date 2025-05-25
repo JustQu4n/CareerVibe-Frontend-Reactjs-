@@ -27,6 +27,36 @@ export const fetchJobPostsByEmployer = createAsyncThunk(
   }
 );
 
+// --- Thunk: Create a job post ---
+export const createJobPost = createAsyncThunk(
+  "jobPosts/create",
+  async (jobData, { rejectWithValue, getState }) => {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) return rejectWithValue("Authentication required.");
+
+      const res = await axios.post(
+        "http://localhost:5000/api/employer/jobposts",
+        jobData,
+        {
+          headers: { 
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json"
+          },
+          withCredentials: true,
+        }
+      );
+
+      return res.data.job;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.message || "Failed to create job post"
+      );
+    }
+  }
+);
+
 // --- Thunk: Update a job post ---
 export const updateJobPostById = createAsyncThunk(
   "jobPosts/updateById",
@@ -72,7 +102,34 @@ export const deleteJobPostById = createAsyncThunk(
     }
   }
 );
-
+// Thunk to fetch related job posts
+export const fetchRelatedJobs = createAsyncThunk(
+  "job/fetchRelatedJobs",
+  async (jobId, { rejectWithValue }) => {
+    try {
+      // Make the API request
+      const response = await axios.get(
+        `http://localhost:5000/api/job-posts/jobs/${jobId}/related`, 
+        {
+          withCredentials: true
+        }
+      );
+      
+      // Check if the response is successful
+      if (response.data.success) {
+        console.log("Related jobs fetched successfully:", response.data.relatedJobs);
+        return response.data.relatedJobs;
+      } else {
+        return rejectWithValue(response.data.message || "Failed to fetch related jobs");
+      }
+    } catch (error) {
+      console.error("Error fetching related jobs:", error);
+      return rejectWithValue(
+        error.response?.data?.message || "An error occurred while fetching related jobs"
+      );
+    }
+  }
+);
 
 // --- Slice ---
 const jobPostSlice = createSlice({
@@ -80,10 +137,18 @@ const jobPostSlice = createSlice({
   initialState: {
     jobs: [],
     filteredJobs: [],
+    initialState: [],
+    relatedJobs: [],
     loading: false,
     error: null,
   },
   reducers: {
+    addJobPost: (state, action) => {
+      state.push(action.payload);
+    },
+        setRelatedJobs: (state, action) => {
+      state.relatedJobs = action.payload;
+    },
     clearJobPosts: (state) => {
       state.jobs = [];
       state.filteredJobs = [];
@@ -114,7 +179,28 @@ const jobPostSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       })
-
+      .addCase(fetchRelatedJobs.pending, (state) => {
+        state.loadingRelated = true;
+        state.errorRelated = null;
+      })
+      .addCase(fetchRelatedJobs.fulfilled, (state, action) => {
+        state.loadingRelated = false;
+        state.relatedJobs = action.payload;
+      })
+      .addCase(fetchRelatedJobs.rejected, (state, action) => {
+        state.loadingRelated = false;
+        state.errorRelated = action.payload;
+      })
+      // Add these to your extraReducers builder chain
+.addCase(createJobPost.fulfilled, (state, action) => {
+  state.loading = false;
+  state.jobs.push(action.payload);
+  state.filteredJobs = state.jobs;
+})
+.addCase(createJobPost.rejected, (state, action) => {
+  state.loading = false;
+  state.error = action.payload;
+})
       // Update
       .addCase(updateJobPostById.fulfilled, (state, action) => {
         const updated = action.payload;
@@ -141,7 +227,7 @@ const jobPostSlice = createSlice({
 });
 
 // Export actions
-export const { clearJobPosts, clearJobPostsError, filterJobPostsByTitle } =
+export const { clearJobPosts, clearJobPostsError, filterJobPostsByTitle, addJobPost } =
   jobPostSlice.actions;
 
 // Export reducer

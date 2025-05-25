@@ -6,6 +6,7 @@ import { FaMapMarkerAlt, FaMoneyBillWave, FaClock, FaTable, FaList } from "react
 import EditJobModal from "./EditJobModal";
 import {
   updateJobPostById,
+  deleteJobPostById,
 } from "../../redux/jobPostSlice";
 import { toast } from "react-toastify";
 import { Link } from "react-router-dom";
@@ -33,7 +34,18 @@ const JobPostList = () => {
       dispatch(fetchJobPostsByEmployer(employerId));
     }
   }, [dispatch, employerId]);
-
+  const handleDelete = (job) => {
+    if (window.confirm("Are you sure you want to delete this job post?")) {
+      dispatch(deleteJobPostById({ jobId: job._id, user_id: user.id, company_id: user.company.id }))
+        .unwrap() 
+        .then(() => {
+          toast.success("Job deleted successfully");
+        })
+        .catch((err) => {     
+          toast.error(err || "Failed to delete job");
+        });
+    }
+  };
   const toggleViewMode = () => {
     setViewMode(viewMode === 'list' ? 'table' : 'list');
   };
@@ -89,7 +101,7 @@ const JobPostList = () => {
             {job.status}
               </span>
             </div>
-            <p className="text-gray-600 mt-2">{job.description}</p>
+            <p className="text-gray-600 mt-2 max-w-[1000px] truncate">{job.description}</p>
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
               <span className="flex items-center gap-1">
             <FaMapMarkerAlt /> {job.location}
@@ -123,7 +135,7 @@ const JobPostList = () => {
                </button>
                <button
              className="text-sm px-3 py-1 rounded-lg bg-blue-500 text-white hover:bg-blue-600 transition"
-             onClick={() => handleEditClick(job)}
+             onClick={() => handleDelete(job)}
                >
              Delete
                </button>

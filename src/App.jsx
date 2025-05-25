@@ -24,6 +24,10 @@ import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 import JobPostDetails from "./components/admincomponent/JobPostDetails";
 import JobseekerApplications from "./components/components_lite/JobseekerApplications";
 import JobPostViewDetails from "./components/components_lite/JobPostViewDetails";
+import JobPostDetailApplication from "./components/components_lite/employer_components/DetailJobPostApplication";
+import ApplyForm from "./components/components_lite/ApplyForm";
+import DetailCompany from "./components/components_lite/DetailCompany";
+import CreateJobPost from "./components/admincomponent/CreateJobPost";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -83,6 +87,14 @@ const appRouter = createBrowserRouter([
     path: "/details/:id",
     element: <JobPostDetails />
   },
+  {
+    path: "/apply/:id",
+    element: <ApplyForm />
+  },
+  {
+    path: "/company-details/:id",
+    element: <DetailCompany />,
+  },
 
   // /admin
   {
@@ -123,7 +135,7 @@ const appRouter = createBrowserRouter([
     element: (
       <ProtectedRoute>
         {" "}
-        <PostJob />{" "}
+        <CreateJobPost />{" "}
       </ProtectedRoute>
     ),
   },
@@ -132,6 +144,16 @@ const appRouter = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Applicants />
+        {/* <ManagementApplication /> */}
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/jobs/applicants/:id",
+    element: (
+      <ProtectedRoute>
+        {/* <Applicants /> */}
+        <JobPostDetailApplication />
       </ProtectedRoute>
     ),
   },

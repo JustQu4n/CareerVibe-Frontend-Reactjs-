@@ -2,10 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployerApplications } from "../../redux/applicationSlice";
 import Navbar from "../components_lite/Navbar";
+import { useNavigate } from 'react-router-dom';
 import { FaUserTie, FaRegClock, FaCheck, FaTimes, FaRegCalendarAlt, FaSearch, FaFilter, FaEye, FaFileAlt, FaEnvelope } from "react-icons/fa";
 
 const Applicants = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { applications, loading, error } = useSelector((state) => state.applications);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
@@ -212,8 +214,26 @@ const Applicants = () => {
             </div>
           </div>
         </div>
-
+        {/* List Jobpost */}
+        <div className="mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {applications.map((application) => (
+            <div
+              key={application.job_post_id?._id}
+              className="border rounded-xl shadow-md p-4 hover:bg-gray-50 cursor-pointer transition"
+              onClick={() => navigate(`/admin/jobs/applicants/${application.job_post_id?._id}`)}
+            >
+              <h2 className="text-xl font-bold">{application.job_post_id?.title}</h2>
+              <p className="text-gray-600">{application.job_post_id?.location}</p>
+              <p className="mt-2 text-sm text-gray-500">{applications.length} applicants</p>
+            </div>
+          ))}
+        </div>
+      </div>
         {/* Applicants Table */}
+        <div className="mb-4 flex items-center justify-between">
+          <h2>Recent Applications</h2>
+        </div>
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             {filteredApplications.length === 0 ? (

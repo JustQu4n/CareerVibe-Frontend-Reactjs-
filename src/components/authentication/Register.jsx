@@ -144,7 +144,9 @@ const Register = () => {
   }, []);
   return (
     <div>
-      <Navbar></Navbar>
+     <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
+        <Navbar />
+      </div>
       <form onSubmit={submitHandler}>
         <div className="min-h-screen bg-gray-100 text-gray-900 flex justify-center">
           <div className="max-w-screen-xl m-0 sm:m-10 bg-white shadow sm:rounded-lg flex justify-center flex-1">
