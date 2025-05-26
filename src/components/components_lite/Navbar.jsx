@@ -4,7 +4,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { Avatar, AvatarImage } from "../ui/avatar";
 import { Button } from "../ui/button";
 import { LogOut, User2 } from "lucide-react";
-import { BriefcaseBusiness } from "lucide-react";
+import { BriefcaseBusiness, BellRing } from "lucide-react";
 import { FileUser } from "lucide-react";
 import { CircleUser } from "lucide-react";
 import { Building2 } from "lucide-react";
@@ -114,110 +114,149 @@ const Navbar = () => {
               </Link>
             </div>
           ) : (
-            <Popover>
-              <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+              {/* Notification Bell (Added) */}
+              <Popover>
                 <PopoverTrigger asChild>
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage
-                      className="object-cover"
-                      src={
-                        user?.jobseeker?.avatar ||
-                        "https://avatar.iran.liara.run/public/boy"
-                      }
-                      alt="@shadcn"
-                    />
-                  </Avatar>
+                  <div className="relative cursor-pointer">
+                    <BellRing className="h-6 w-6 text-gray-600 hover:text-gray-900 transition-colors" />
+                    <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-red-500 flex items-center justify-center text-[10px] text-white font-bold">
+                      3
+                    </span>
+                  </div>
                 </PopoverTrigger>
-                <div>
-                  <h3 className="font-semibold">
-                    {user?.jobseeker?.full_name || user?.employer?.full_name}
-                  </h3>
-                  <p className="text-sm text-muted-foreground">
-                    {user?.role === "job_seeker" ? "JobSeeker" : "Recruiter"}
-                  </p>
-                </div>
-              </div>
-              <PopoverContent className="w-80">
-                <div className="flex items-center gap-4 space-y-2">
-                  <Avatar className="cursor-pointer">
-                    <AvatarImage
-                      className="object-cover"
-                      src={
-                        user?.jobseeker?.avatar ||
-                        user?.employer?.avatar ||
-                        "https://avatar.iran.liara.run/public/boy"
-                      }
-                      alt="@shadcn"
-                    />
-                  </Avatar>
+                <PopoverContent className="w-100">
+                  <div className="p-4">
+                    <h2 className="font-semibold mb-2">Notifications</h2> 
+                    <ul className="space-y-2">
+                      <li className="flex items-center justify-between">  
+                        <span>New job application received</span>
+                        <span className="text-xs text-gray-500">2 mins ago</span>
+                      </li>
+                      <li className="flex items-center justify-between">
+                        <span>New message from recruiter</span>
+                        <span className="text-xs text-gray-500">5 mins ago</span>
+                      </li>
+                      <li className="flex items-center justify-between">
+                        <span>Interview scheduled for next week</span>
+                        <span className="text-xs text-gray-500">10 mins ago</span>
+                      </li>
+                    </ul>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              <Popover>
+                <div className="flex items-center gap-3">
+                  <PopoverTrigger asChild>
+                    <Avatar className="cursor-pointer">
+                      <AvatarImage
+                        className="object-cover"
+                        src={
+                          user?.jobseeker?.avatar ||
+                          "https://avatar.iran.liara.run/public/boy"
+                        }
+                        alt="@shadcn"
+                      />
+                    </Avatar>
+                  </PopoverTrigger>
                   <div>
-                    <h3 className="font-medium">
+                    <h3 className="font-semibold">
                       {user?.jobseeker?.full_name || user?.employer?.full_name}
                     </h3>
-                    <p className="text-sm text-muted-foreground max-w-[200px] truncate">
-                      {user?.email}
+                    <p className="text-sm text-muted-foreground">
+                      {user?.role === "job_seeker" ? "JobSeeker" : "Recruiter"}
                     </p>
                   </div>
                 </div>
-
-                <div className="flex flex-col my-2 text-gray-600  ">
-                  {user && user.role === "job_seeker" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <CircleUser size={28} strokeWidth={1.75} />
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/profile"}> Profile</Link>{" "}
-                      </Button>
+                <PopoverContent className="w-80">
+                  <div className="flex items-center gap-4 space-y-2">
+                    <Avatar className="cursor-pointer">
+                      <AvatarImage
+                        className="object-cover"
+                        src={
+                          user?.jobseeker?.avatar ||
+                          user?.employer?.avatar ||
+                          "https://avatar.iran.liara.run/public/boy"
+                        }
+                        alt="@shadcn"
+                      />
+                    </Avatar>
+                    <div>
+                      <h3 className="font-medium">
+                        {user?.jobseeker?.full_name ||
+                          user?.employer?.full_name}
+                      </h3>
+                      <p className="text-sm text-muted-foreground max-w-[200px] truncate">
+                        {user?.email}
+                      </p>
                     </div>
-                  )}
-                  {user && user.role === "job_seeker" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                       <FileUser size={28} strokeWidth={1.75} />
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/jobseeker-applications"}> Manager Applications</Link>{" "}
-                      </Button>
-                    </div>
-                  )}
-                  {user && user.role === "employer" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                     <Building2 size={28} strokeWidth={1.75} />
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/admin/companies"}> Your Company</Link>{" "}
-                      </Button>
-                    </div>
-                  )}
-                  {user?.role === "employer" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                      <BriefcaseBusiness size={28} strokeWidth={1.75} />
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/admin/jobs"}> Your Job Posts</Link>{" "}
-                      </Button>
-                    </div>
-                  )}
-                  {user && user.role === "employer" && (
-                    <div className="flex w-fit items-center gap-2 cursor-pointer">
-                     <FileUser size={28} strokeWidth={1.75} />
-                      <Button variant="link">
-                        {" "}
-                        <Link to={"/admin/jobs/applicants"}>
-                          Management Application
-                        </Link>{" "}
-                      </Button>
-                    </div>
-                  )}
-
-                  <div className="flex w-fit items-center gap-2 cursor-pointer">
-                    <LogOut size={28} strokeWidth={1.75}></LogOut>
-                    <Button onClick={logoutHandler} variant="link">
-                      Logout
-                    </Button>
                   </div>
-                </div>
-              </PopoverContent>
-            </Popover>
+
+                  <div className="flex flex-col my-2 text-gray-600  ">
+                    {user && user.role === "job_seeker" && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <CircleUser size={28} strokeWidth={1.75} />
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/profile"}> Profile</Link>{" "}
+                        </Button>
+                      </div>
+                    )}
+                    {user && user.role === "job_seeker" && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <FileUser size={28} strokeWidth={1.75} />
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/jobseeker-applications"}>
+                            {" "}
+                            Manager Applications
+                          </Link>{" "}
+                        </Button>
+                      </div>
+                    )}
+                    {user && user.role === "employer" && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <Building2 size={28} strokeWidth={1.75} />
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/admin/companies"}>
+                            {" "}
+                            Your Company
+                          </Link>{" "}
+                        </Button>
+                      </div>
+                    )}
+                    {user?.role === "employer" && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <BriefcaseBusiness size={28} strokeWidth={1.75} />
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/admin/jobs"}> Your Job Posts</Link>{" "}
+                        </Button>
+                      </div>
+                    )}
+                    {user && user.role === "employer" && (
+                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                        <FileUser size={28} strokeWidth={1.75} />
+                        <Button variant="link">
+                          {" "}
+                          <Link to={"/admin/jobs/applicants"}>
+                            Management Application
+                          </Link>{" "}
+                        </Button>
+                      </div>
+                    )}
+
+                    <div className="flex w-fit items-center gap-2 cursor-pointer">
+                      <LogOut size={28} strokeWidth={1.75}></LogOut>
+                      <Button onClick={logoutHandler} variant="link">
+                        Logout
+                      </Button>
+                    </div>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           )}
         </div>
       </div>

@@ -28,6 +28,7 @@ import JobPostDetailApplication from "./components/components_lite/employer_comp
 import ApplyForm from "./components/components_lite/ApplyForm";
 import DetailCompany from "./components/components_lite/DetailCompany";
 import CreateJobPost from "./components/admincomponent/CreateJobPost";
+import CandidateProfile from "./components/components_lite/employer_components/CandidateProfile.jsx";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -152,11 +153,18 @@ const appRouter = createBrowserRouter([
     path: "/admin/jobs/applicants/:id",
     element: (
       <ProtectedRoute>
-        {/* <Applicants /> */}
         <JobPostDetailApplication />
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/admin/jobs/applicants/candidate-profile/:applicationId",
+    element: (
+      <ProtectedRoute>
+        <CandidateProfile />
+      </ProtectedRoute>
+    ),
+  }
 ]);
 
 function App() {
