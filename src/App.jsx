@@ -29,6 +29,8 @@ import ApplyForm from "./components/components_lite/ApplyForm";
 import DetailCompany from "./components/components_lite/DetailCompany";
 import CreateJobPost from "./components/admincomponent/CreateJobPost";
 import CandidateProfile from "./components/components_lite/employer_components/CandidateProfile.jsx";
+import ChatPopup from "./components/components_lite/chatbot/ChatPopup.jsx";
+import { useSelector } from "react-redux";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -168,10 +170,14 @@ const appRouter = createBrowserRouter([
 ]);
 
 function App() {
+  // const userId = '67d0ed58633f1ffa7c87a445'; 
+ const { user } = useSelector((store) => store.auth);
+ const userId = user?.id;
   return (
     <div>
       <RouterProvider router={appRouter}></RouterProvider>
       <ToastContainer position="top-right" autoClose={3000} />
+      <ChatPopup userId={userId} />
     </div>
   );
 }
