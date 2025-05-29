@@ -83,11 +83,11 @@ const Navbar = () => {
                 </li>
                 <li>
                   {" "}
-                  <Link to={"/Jobs"}>Jobs</Link>
+                  <Link to={"/"}>Jobs</Link>
                 </li>
                 <li>
                   {" "}
-                  <Link to={"/"}>Career Tools</Link>
+                  <Link to={"/cv-tools"}>Career Tools</Link>
                 </li>
                 <li>
                   {" "}
@@ -108,7 +108,7 @@ const Navbar = () => {
               </Link>
               <Link to={"/register"}>
                 {" "}
-                <Button className="bg-red-600  hover:bg-red-700">
+                <Button className="bg-blue-600  hover:bg-blue-700">
                   Register
                 </Button>
               </Link>
@@ -194,7 +194,7 @@ const Navbar = () => {
 
                   <div className="flex flex-col my-2 text-gray-600  ">
                     {user && user.role === "job_seeker" && (
-                      <div className="flex w-fit items-center gap-2 cursor-pointer">
+                      <div className="flex w-fit items-center gap-2 cursor-pointer ">
                         <CircleUser size={28} strokeWidth={1.75} />
                         <Button variant="link">
                           {" "}

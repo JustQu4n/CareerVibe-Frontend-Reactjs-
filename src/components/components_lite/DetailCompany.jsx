@@ -1,52 +1,106 @@
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import axios from 'axios';
 import { ChevronRight, Calendar, Users, Briefcase, Building } from 'lucide-react';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import JobCard from './JobCard'; // Assuming you have a JobCard component
 
 const DetailCompany = () => {
-    // Mock data for the company
-  const company = {
-    name: "Twitter",
-    logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Logo_of_Twitter.svg/512px-Logo_of_Twitter.svg.png",
-    category: "Information Technology (IT)",
-    description: "Fusce et erat at nibh maximus fermentum. Mauris ac justo nibh. Praesent nec lorem lorem. Donec ullamcorper lacus mollis tortor pretium malesuada. In quis porta nisi, quis fringilla orci. Donec porttitor, odio a efficitur blandit, orci nisi porta elit, eget vulputate quam nibh ut tellus. Sed ut posuere risus, vitae commodo velit. Nullam in lorem dolor. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae; Nulla tincidunt ac quam quis vehicula. Quisque sagittis ullamcorper magna. Vivamus elementum eu leo et gravida. Sed dignissim placerat diam, sit laoreet eros rutrum sit amet. Donec imperdiet in leo et imperdiet. In hac habitasse platea dictumst. Sed quis nisl molestie diam ullamcorper condimentum. Sed aliquet, arcu eget pretium bibendum, odio enim rutrum arcu, quis suscipit mauris turpis in neque. Vestibulum id vestibulum odio. Sed dolor felis, iaculis eget turpis eu, lobortis imperdiet massa.",
-    benefits: [
-      "Competitive salary package with performance-based bonuses",
-      "Comprehensive health, dental, and vision insurance plans",
-      "Flexible work arrangements including remote work options",
-      "Generous paid time off and parental leave policies",
-      "401(k) matching program and equity options",
-      "Professional development budget and learning opportunities",
-      "Modern office spaces with wellness rooms and recreational areas",
-      "Free daily meals and snacks"
-    ],
-    founded: "14 June, 2021",
-    orgType: "Private Company",
-    teamSize: "100-200 Candidates",
-    industry: "Technology",
-    contactInfo: {
-      email: "careers@twitter.com",
-      phone: "+1 (555) 123-4567",
-      website: "www.twitter.com/careers",
-      address: "1355 Market St, San Francisco, CA 94103"
-    },
-    openPositions: [
-      "Senior Software Engineer",
-      "Product Manager",
-      "UX Designer",
-      "Data Scientist",
-      "DevOps Engineer"
-    ]
-  };
-
-  // State for showing more/less benefits
+  const { id } = useParams(); // Get company ID from URL params
+  const [companyData, setCompanyData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [showAllBenefits, setShowAllBenefits] = useState(false);
-  const benefitsToShow = showAllBenefits ? company.benefits : company.benefits.slice(0, 4);
+  
+  useEffect(() => {
+    const fetchCompanyDetails = async () => {
+      try {
+        setLoading(true);
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`http://localhost:5000/api/employer/companies/${id}/details`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        if (response.data.success) {
+          setCompanyData(response.data.data);
+        } else {
+          setError(response.data.message || 'Failed to fetch company details');
+        }
+      } catch (error) {
+        console.error('Error fetching company details:', error);
+        setError('An error occurred while fetching company details');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (id) {
+      fetchCompanyDetails();
+    }
+  }, [id]);
+  
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5">
+          <Navbar />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      </div>
+    );
+  }
+  
+  // Error state
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5">
+          <Navbar />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <div className="text-center p-8 bg-red-50 rounded-lg max-w-md">
+            <h2 className="text-xl font-bold text-red-600 mb-2">Error Loading Company</h2>
+            <p className="text-red-500 mb-4">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // No data state
+  if (!companyData) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col">
+        <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5">
+          <Navbar />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-gray-500">No company information available</p>
+        </div>
+      </div>
+    );
+  }
+  
+  const company = companyData.company;
+  const jobPosts = companyData.jobPosts || [];
+  const benefits = [
+    "Competitive salary package",
+    "Flexible work arrangements",
+    "Professional development opportunities",
+    "Collaborative work environment",
+  ];
+  
+  const benefitsToShow = showAllBenefits ? benefits : benefits.slice(0, 4);
 
   return (
     <div className="bg-gray-50 min-h-screen">
-        <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
+      <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
         <Navbar />
       </div>
       {/* Header */}
@@ -58,48 +112,50 @@ const DetailCompany = () => {
               <span className="mx-2">/</span>
               <span>Find Employers</span>
               <span className="mx-2">/</span>
-              <span>S</span>
+              <span>{company.name}</span>
             </nav>
           </div>
         </div>
       </header>
 
-    {/* Background Image Banner */}
-    <div
+      {/* Background Image Banner */}
+      <div
         className="w-full h-64 bg-cover bg-center relative"
-        style={{ backgroundImage: `url(${company.logo})` }}
-    >
+        style={{ backgroundColor: "#1DA1F2" }} // Twitter blue color as fallback
+      >
         <div className="absolute inset-0 bg-black bg-opacity-50"></div>
         <div className="container mx-auto px-4 h-full flex items-center relative z-10">
-            <div className="text-white">
-                <h2 className="text-3xl font-bold">{company.name}</h2>
-                <p className="text-lg">{company.category}</p>
-            </div>
+          <div className="text-white">
+            <h2 className="text-3xl font-bold">{company.name}</h2>
+            <p className="text-lg">{company.industries || "Technology"}</p>
+          </div>
         </div>
-    </div>
+      </div>
 
-    <div className="container mx-auto px-4 -mt-16 relative z-10">
+      <div className="container mx-auto px-4 -mt-16 relative z-10">
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-                <div className="flex items-center">
-                    <div className="w-16 h-16 rounded bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center overflow-hidden mr-4">
-                        <img src={company.logo} alt={company.name} className="w-10 h-10 object-contain" />
-                    </div>
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-900">{company.name}</h2>
-                        <p className="text-gray-600">{company.category}</p>
-                    </div>
-                </div>
-                <button className="mt-4 md:mt-0 bg-blue-500 text-white py-2 px-4 rounded-md flex items-center hover:bg-blue-600 transition-colors">
-                    View Open Position
-                    <ChevronRight className="w-5 h-5 ml-1" />
-                </button>
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+            <div className="flex items-center">
+              <div className="w-16 h-16 rounded bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center overflow-hidden mr-4">
+                <img src={company.logo} alt={company.name} className="w-16 h-16 object-cover" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{company.name}</h2>
+                <p className="text-gray-600">{jobPosts[0]?.industries || "Technology"}</p>
+              </div>
             </div>
+            <button className="mt-4 md:mt-0 bg-blue-500 text-white py-2 px-4 rounded-md flex items-center hover:bg-blue-600 transition-colors">
+              View Open Position
+              <ChevronRight className="w-5 h-5 ml-1" />
+            </button>
+          </div>
 
-            {/* Description */}
+          {/* Description */}
           <div className="mb-8">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Description</h3>
-            <p className="text-gray-700 leading-relaxed">{company.description}</p>
+            <p className="text-gray-700 leading-relaxed">
+              {company.description || "No company description available."}
+            </p>
           </div>
 
           {/* Company Benefits */}
@@ -117,7 +173,7 @@ const DetailCompany = () => {
                 </div>
               ))}
             </div>
-            {company.benefits.length > 4 && (
+            {benefits.length > 4 && (
               <button 
                 className="mt-4 text-blue-500 font-medium hover:text-blue-700 transition-colors"
                 onClick={() => setShowAllBenefits(!showAllBenefits)}
@@ -138,7 +194,9 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 uppercase mb-1">Founded In</h4>
-                      <p className="text-gray-900 font-medium">{company.founded}</p>
+                      <p className="text-gray-900 font-medium">
+                        {new Date(company.created_at).toLocaleDateString()}
+                      </p>
                     </div>
                   </div>
 
@@ -148,7 +206,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 uppercase mb-1">Organization Type</h4>
-                      <p className="text-gray-900 font-medium">{company.orgType}</p>
+                      <p className="text-gray-900 font-medium">Private Company</p>
                     </div>
                   </div>
 
@@ -158,7 +216,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 uppercase mb-1">Team Size</h4>
-                      <p className="text-gray-900 font-medium">{company.teamSize}</p>
+                      <p className="text-gray-900 font-medium">{jobPosts.length > 5 ? "50+" : "10-50"} Employees</p>
                     </div>
                   </div>
 
@@ -168,7 +226,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500 uppercase mb-1">Industry Types</h4>
-                      <p className="text-gray-900 font-medium">{company.industry}</p>
+                      <p className="text-gray-900 font-medium">{jobPosts[0]?.industries || "Technology"}</p>
                     </div>
                   </div>
                 </div>
@@ -188,7 +246,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Email</h4>
-                      <p className="text-blue-500">{company.contactInfo.email}</p>
+                      <p className="text-blue-500">{company.email_domain}</p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -199,7 +257,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Phone</h4>
-                      <p className="text-gray-900">{company.contactInfo.phone}</p>
+                      <p className="text-gray-900">Contact via email</p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -210,7 +268,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Website</h4>
-                      <p className="text-blue-500">{company.contactInfo.website}</p>
+                      <p className="text-blue-500">{company.email_domain?.split('@')[1] || "Not provided"}</p>
                     </div>
                   </li>
                   <li className="flex items-start">
@@ -222,7 +280,7 @@ const DetailCompany = () => {
                     </div>
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Location</h4>
-                      <p className="text-gray-900">{company.contactInfo.address}</p>
+                      <p className="text-gray-900">{company.address}</p>
                     </div>
                   </li>
                 </ul>
@@ -235,33 +293,31 @@ const DetailCompany = () => {
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Open Positions</h3>
             <div className="bg-gray-50 rounded-lg p-6">
               <div className="space-y-4">
-                {company.openPositions.map((position, idx) => (
-                  <div key={idx} className="bg-white rounded-lg shadow-sm p-4 flex justify-between items-center">
-                    <div>
-                      <h4 className="font-medium text-gray-900">{position}</h4>
-                      <p className="text-sm text-gray-600">Twitter · Full Time</p>
-                    </div>
-                    <button className="bg-blue-500 text-white py-2 px-4 rounded-md flex items-center hover:bg-blue-600 transition-colors text-sm">
-                      Apply Now
-                    </button>
-                  </div>
-                ))}
+                {jobPosts.length > 0 ? (
+                  jobPosts.map((job) => (
+                   <JobCard  index={job._id} job={job} />
+                  ))
+                ) : (
+                  <p className="text-center text-gray-500 py-4">No open positions available at the moment.</p>
+                )}
               </div>
-              <div className="mt-6 text-center">
-                <button className="inline-flex items-center text-blue-500 font-medium hover:text-blue-700 transition-colors">
-                  View All Open Positions
-                  <ChevronRight className="w-5 h-5 ml-1" />
-                </button>
-              </div>
+              {jobPosts.length > 0 && (
+                <div className="mt-6 text-center">
+                  <button className="inline-flex items-center text-blue-500 font-medium hover:text-blue-700 transition-colors">
+                    View All Open Positions
+                    <ChevronRight className="w-5 h-5 ml-1" />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-     <Footer />
+      <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default DetailCompany
+export default DetailCompany;

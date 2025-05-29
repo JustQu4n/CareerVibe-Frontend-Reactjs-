@@ -11,15 +11,6 @@ const AdminJobs = () => {
     <div>
       <Navbar />
       <div className=" max-w-6xl mx-auto my-10">
-        <div className="flex items-center justify-between my-5">
-          <Input
-            className="w-fit"
-            placeholder="Filter by Name & Jobs"
-          ></Input>
-          <Button onClick={() => navigate("/admin/jobs/create")}>
-            Post new Job
-          </Button>
-        </div>
         <div>
           <JobPostList />
         </div>

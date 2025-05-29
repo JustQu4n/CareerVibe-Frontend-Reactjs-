@@ -4,16 +4,12 @@ import Login from "./components/authentication/Login";
 import Register from "./components/authentication/Register";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Home from "./components/components_lite/Home";
-import PrivacyPolicy from "./components/components_lite/PrivacyPolicy.jsx";
-import TermsofService from "./components/components_lite/TermsofService.jsx";
-import Jobs from "./components/components_lite/Jobs.jsx";
 import Browse from "./components/components_lite/Browse.jsx";
 import Profile from "./components/components_lite/Profile.jsx";
 import Companies from "./components/admincomponent/Companies";
 import CompanyCreate from "./components/admincomponent/CompanyCreate";
 import CompanySetup from "./components/admincomponent/CompanySetup";
 import AdminJobs from "./components/admincomponent/AdminJobs.jsx";
-import PostJob from "./components/admincomponent/PostJob";
 import Applicants from "./components/admincomponent/Applicants";
 import ProtectedRoute from "./components/admincomponent/ProtectedRoute";
 import Creator from "./components/creator/Creator.jsx";
@@ -30,6 +26,8 @@ import DetailCompany from "./components/components_lite/DetailCompany";
 import CreateJobPost from "./components/admincomponent/CreateJobPost";
 import CandidateProfile from "./components/components_lite/employer_components/CandidateProfile.jsx";
 import ChatPopup from "./components/components_lite/chatbot/ChatPopup.jsx";
+import SearchResults from "./components/components_lite/SearchResults ";
+import CvMatcher from "./components/components_lite/CvMatcher";
 import { useSelector } from "react-redux";
 
 const appRouter = createBrowserRouter([
@@ -59,18 +57,6 @@ const appRouter = createBrowserRouter([
     element: <JobseekerApplications />,
   },
   {
-    path: "/PrivacyPolicy",
-    element: <PrivacyPolicy />,
-  },
-  {
-    path: "/TermsofService",
-    element: <TermsofService />,
-  },
-  {
-    path: "/Jobs",
-    element: <Jobs />,
-  },
-  {
     path: "/Home",
     element: <Home />,
   },
@@ -97,6 +83,14 @@ const appRouter = createBrowserRouter([
   {
     path: "/company-details/:id",
     element: <DetailCompany />,
+  },
+  {
+    path: "/search-results",
+    element: <SearchResults />,
+  },
+  {
+    path: "/cv-tools",
+    element: <CvMatcher />,
   },
 
   // /admin
