@@ -9,6 +9,7 @@ import { format, formatDistanceToNow } from "date-fns";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
+import JDSummaryModal from "./JDSummaryModal";
 import {
   Search,
   Briefcase,
@@ -43,6 +44,8 @@ import {
   GraduationCap,
   Star,
   AlertTriangle,
+  Sparkles
+  
 } from "lucide-react";
 
 export default function JobPostViewDetails() {
@@ -59,6 +62,8 @@ export default function JobPostViewDetails() {
     (store) => store.jobPosts
   );
   const [activeTab, setActiveTab] = useState("description");
+ const [showSummaryModal, setShowSummaryModal] = useState(false);
+
 
   useEffect(() => {
     // Fetch related jobs when component mounts
@@ -104,10 +109,46 @@ export default function JobPostViewDetails() {
     });
   };
 
-  const toggleBookmark = () => {
-    setBookmarked(!bookmarked);
-  };
 
+
+// Replace your existing toggleBookmark function with this one
+const toggleBookmark = async () => {
+  if (!user) {
+    toast.error("Please login to save jobs");
+    navigate("/login", { state: { from: `/view-job-detail/${jobId}` } });
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem("token");
+    
+    if (bookmarked) {
+      // If already saved, remove it
+      await axios.delete(`http://localhost:5000/api/jobseeker/saved/unsave-job/${jobId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      });
+      
+      setBookmarked(false);
+      toast.success("Job removed from saved list");
+    } else {
+      // If not saved, save it
+      await axios.post(`http://localhost:5000/api/jobseeker/saved/save-job`, 
+        { jobId },
+        { 
+          headers: { Authorization: `Bearer ${token}` },
+          withCredentials: true 
+        }
+      );
+      
+      setBookmarked(true);
+      toast.success("Job saved successfully");
+    }
+  } catch (error) {
+    console.error("Error toggling job save:", error);
+    toast.error(error.response?.data?.message || "Failed to update saved jobs");
+  }
+};
   // Format date for display
   const formatDate = (dateString) => {
     if (!dateString) return "N/A";
@@ -235,6 +276,29 @@ export default function JobPostViewDetails() {
       <div className="sticky top-0 z-50 bg-white shadow-sm">
         <Navbar />
       </div>
+
+    {/* Floating JD Summary button */}
+    <div className="fixed bottom-24 right-6 z-40">
+      <motion.button
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 1 }}
+        onClick={() => setShowSummaryModal(true)}
+        className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-full p-3 shadow-lg hover:shadow-xl transition-all transform hover:scale-105 flex items-center space-x-2 pr-4 group"
+      >
+        <div className="bg-white bg-opacity-20 rounded-full p-2">
+          <Sparkles />
+        </div>
+        <span className="font-medium text-sm">Job Summary</span>
+      </motion.button>
+    </div>
+   {/* Modal hiển thị tóm tắt */}
+      {showSummaryModal && (
+        <JDSummaryModal
+          jdText={description}
+          onClose={() => setShowSummaryModal(false)}
+        />
+      )}
 
       {/* Job Details Hero Section */}
       <div className="bg-gradient-to-r from-blue-600 to-indigo-700 text-white py-10 md:py-16">

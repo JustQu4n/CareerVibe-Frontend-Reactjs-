@@ -28,6 +28,9 @@ import CandidateProfile from "./components/components_lite/employer_components/C
 import ChatPopup from "./components/components_lite/chatbot/ChatPopup.jsx";
 import SearchResults from "./components/components_lite/SearchResults ";
 import CvMatcher from "./components/components_lite/CvMatcher";
+import SaveItems from "./components/components_lite/SaveItems.jsx";
+import JobCandidateMatcher from "./components/admincomponent/JobCandidateMatcher";
+import JobMatchingDashboard from "./components/admincomponent/JobMatchingDashboard";
 import { useSelector } from "react-redux";
 
 const appRouter = createBrowserRouter([
@@ -91,6 +94,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/cv-tools",
     element: <CvMatcher />,
+  },
+  {
+    path: "/save-items",
+    element: <SaveItems />,
   },
 
   // /admin
@@ -158,6 +165,22 @@ const appRouter = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <CandidateProfile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/jobs/job-matching-dashboard",
+    element: (
+      <ProtectedRoute>
+        <JobMatchingDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/jobs/job-candidate-matcher",
+    element: (
+      <ProtectedRoute>
+        <JobCandidateMatcher />
       </ProtectedRoute>
     ),
   }

@@ -359,7 +359,7 @@ const JobPostList = () => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
-              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
+              className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-md transition-shadow duration-300"
             >
               {/* Job Header */}
               <div className="p-5 border-b border-gray-100">

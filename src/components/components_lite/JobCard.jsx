@@ -13,13 +13,13 @@ const JobCard = ({ job, mode }) => {
                 isGrid
                     ? "flex-col items-center text-center max-w-xs mx-auto bg-white/90"
                     : "flex-row items-center justify-between"
-            } p-7 rounded-3xl shadow-xl border-2 transition-all duration-200 cursor-pointer ${
+            } p-7 rounded-3xl shadow-lg border-2 transition-all duration-200 cursor-pointer ${
                 job.highlight
                     ? "bg-gradient-to-br from-green-50 via-blue-50 to-white"
                     : "bg-white"
             } ${
                 job.featured ? "border-yellow-400" : "border-gray-100"
-            } hover:shadow-2xl hover:scale-[1.03]`}
+            }  hover:scale-[1.03]`}
             style={{
                 minHeight: isGrid ? 420 : 160,
                 background:

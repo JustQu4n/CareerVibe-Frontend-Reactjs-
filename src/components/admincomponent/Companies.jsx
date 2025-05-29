@@ -109,7 +109,7 @@ const Companies = () => {
         
         <div className="container mx-auto h-full flex items-end px-4 md:px-6">
           <div className="pb-6 md:pb-8 flex flex-col md:flex-row items-center md:items-end">
-            <div className="relative -mb-12 md:-mb-16 z-10">
+            <div className="relative -mb-12 md:-mb-1 z-10">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-white p-1 shadow-lg overflow-hidden">
                 <img
                   src={user?.company?.logo || "https://via.placeholder.com/150"}
@@ -127,7 +127,7 @@ const Companies = () => {
               </div>
             </div>
             
-            <div className="mt-4 md:mt-0 flex gap-3">
+            <div className="mt-4 px-6 md:mt-0 flex gap-4">
               <button 
                 onClick={toggleFollow} 
                 className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
@@ -157,7 +157,7 @@ const Companies = () => {
       </div>
       
       {/* Navigation Tabs */}
-      <div className="bg-white shadow-sm sticky top-16 z-20 border-b">
+      <div className="bg-white shadow-sm  top-16  border-b">
         <div className="container mx-auto px-4">
           <div className="flex overflow-x-auto hide-scrollbar">
             <button 

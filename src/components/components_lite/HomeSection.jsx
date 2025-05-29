@@ -26,6 +26,7 @@ import {
   User,
   Check,
   ArrowRight,
+  AlertTriangle,
   Layers
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
