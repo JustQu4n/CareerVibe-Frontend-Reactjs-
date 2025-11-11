@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Navbar from "./Navbar";
+import { Navbar } from "../navbar";
 import { Badge } from "../ui/badge";
 import { Button } from "../ui/button";
 import EditProfileModal from "./EditProfileModal";

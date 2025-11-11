@@ -1,10 +1,9 @@
 import React from "react";
-import Navbar from "./components/components_lite/Navbar";
-import { Login, Register, RegisterRecruiter } from "./pages/Auth";
+import { Navbar } from "./components/navbar";
+import { Login, Register, RegisterRecruiter, Home } from "./pages";
 // import Register from "./components/authentication/Register";
 // import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Home from "./components/components_lite/Home";
 import Browse from "./components/components_lite/Browse.jsx";
 import Profile from "./components/components_lite/Profile.jsx";
 import Companies from "./components/admincomponent/Companies";

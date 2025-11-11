@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import Navbar from "./Navbar";
+import { Navbar } from "../navbar";
 import Footer from "./Footer";
 
 export default function CVUploadPage() {

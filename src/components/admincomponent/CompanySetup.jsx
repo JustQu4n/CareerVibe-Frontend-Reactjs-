@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import Navbar from "../components_lite/Navbar.jsx";
+import { Navbar } from "../navbar";
 import { Button } from "../ui/button.jsx";
 import { ArrowLeft, Loader2 } from "lucide-react";
 import { Label } from "../ui/label.jsx";

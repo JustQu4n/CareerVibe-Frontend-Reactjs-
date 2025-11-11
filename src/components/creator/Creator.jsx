@@ -1,11 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import Navbar from '../components_lite/Navbar';
+import { Navbar } from '../navbar';
 import Footer from '../components_lite/Footer';
-import amreshsir from './amreshsir.jpg';
-import ankit from './Ankit.jpg';
-import ritik from './ritik.jpg';
-import gaurav from './gaurav.jpg';
 import { CheckCircle, Briefcase, Heart, Search, Users, MessageCircle, ChevronRight } from 'lucide-react';
 
 const Creator = () => {
@@ -24,49 +20,7 @@ const Creator = () => {
     }
   };
   
-  const team = [
-    {
-      name: "Amresh Thakur",
-      role: "Project Lead",
-      image: amreshsir,
-      description: "Chịu trách nhiệm về chiến lược phát triển và tầm nhìn sản phẩm",
-      social: {
-        linkedin: "#",
-        github: "#",
-      }
-    },
-    {
-      name: "Ankit Kumar",
-      role: "Full Stack Developer",
-      image: ankit,
-      description: "Phát triển cơ sở hạ tầng backend và tích hợp API",
-      social: {
-        linkedin: "#",
-        github: "#",
-      }
-    },
-    {
-      name: "Ritik Sharma",
-      role: "UI/UX Designer",
-      image: ritik,
-      description: "Thiết kế giao diện người dùng và trải nghiệm người dùng",
-      social: {
-        linkedin: "#",
-        github: "#",
-      }
-    },
-    {
-      name: "Gaurav Singh",
-      role: "Frontend Developer",
-      image: gaurav,
-      description: "Xây dựng giao diện người dùng đáp ứng và tương tác",
-      social: {
-        linkedin: "#",
-        github: "#",
-      }
-    }
-  ];
-  
+
   const features = [
     {
       icon: <Search className="h-6 w-6" />,

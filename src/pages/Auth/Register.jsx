@@ -8,7 +8,7 @@ import { CheckCircle2 } from 'lucide-react';
 import { useRegister } from '@/hooks/useRegister';
 
 // Components
-import Navbar from '@/components/components_lite/Navbar';
+import { Navbar } from '@/components/navbar';
 import { FormProgress } from '@/components/shared';
 import RegisterStepOne from '@/components/authentication/RegisterStepOne';
 import RegisterStepTwo from '@/components/authentication/RegisterStepTwo';

@@ -40,6 +40,22 @@ export const registerUser = async (userData) => {
 };
 
 /**
+ * Login recruiter/employer
+ * @param {Object} credentials - Recruiter credentials
+ * @param {string} credentials.email - Recruiter email
+ * @param {string} credentials.password - Recruiter password
+ * @returns {Promise} API response
+ */
+export const loginRecruiter = async (credentials) => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGIN_EMPLOYER, credentials);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * Register new recruiter
  * @param {Object} userData - Recruiter registration data
  * @returns {Promise} API response
@@ -56,12 +72,20 @@ export const registerRecruiter = async (userData) => {
 /**
  * Logout user
  * @returns {Promise} API response
+ * @description
+ * Attempts to logout user on server-side.
+ * If fails, caller should still clear client-side state.
  */
 export const logoutUser = async () => {
   try {
-    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT);
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.LOGOUT, {}, {
+      // Ensure credentials are sent
+      withCredentials: true,
+    });
     return response.data;
   } catch (error) {
+    // Log error for debugging but don't block logout
+    console.warn('Server logout failed:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -125,6 +149,7 @@ export const resetPassword = async (data) => {
 
 export default {
   loginUser,
+  loginRecruiter,
   registerUser,
   registerRecruiter,
   logoutUser,

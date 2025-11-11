@@ -3,7 +3,7 @@ import { useSearchParams, useNavigate } from "react-router-dom";
 import { FaRegBookmark, FaArrowLeft } from "react-icons/fa";
 import { Building2, MapPin } from "lucide-react";
 import axios from "axios";
-import Navbar from "./Navbar";
+import { Navbar } from "../navbar";
 import Footer from "./Footer";
 import JobCard from "./JobCard";
 

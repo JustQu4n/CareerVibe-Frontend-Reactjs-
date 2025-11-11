@@ -6,7 +6,7 @@ import { fetchRelatedJobs } from "@/redux/jobPostSlice";
 import { JOB_API_ENDPOINT } from "@/utils/data";
 import axios from "axios";
 import { format, formatDistanceToNow } from "date-fns";
-import Navbar from "./Navbar";
+import { Navbar } from "../navbar";
 import Footer from "./Footer";
 import { motion } from "framer-motion";
 import JDSummaryModal from "./JDSummaryModal";

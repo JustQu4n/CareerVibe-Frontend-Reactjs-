@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployerApplications } from "../../redux/applicationSlice";
-import Navbar from "../components_lite/Navbar";
+import { Navbar } from "../navbar";
 import { useNavigate } from "react-router-dom";
 import {
   FaUserTie,

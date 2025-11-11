@@ -21,7 +21,7 @@ import { useSelector } from 'react-redux';
 import { useRegisterRecruiter } from '@/hooks/useRegisterRecruiter';
 
 // Components
-import Navbar from '@/components/components_lite/Navbar';
+import { Navbar } from '@/components/navbar';
 import { FormProgress } from '@/components/shared';
 import RecruiterStepOne from '@/components/authentication/RecruiterStepOne';
 import RecruiterStepTwo from '@/components/authentication/RecruiterStepTwo';

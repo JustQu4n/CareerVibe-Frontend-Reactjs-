@@ -20,7 +20,7 @@ import {
   Star,
   ExternalLink
 } from 'lucide-react';
-import Navbar from '../components_lite/Navbar';
+import { Navbar } from '../navbar';
 import Footer from '../components_lite/Footer';
 
 const SavedItems = () => {

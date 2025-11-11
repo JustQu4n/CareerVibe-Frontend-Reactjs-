@@ -6,7 +6,7 @@ import {
   fetchEmployerApplications,
   updateApplicationStatus,
 } from "../../../redux/applicationSlice";
-import Navbar from "../../components_lite/Navbar";
+import { Navbar } from "../../navbar";
 import Footer from "../../components_lite/Footer";
 import {
   FaUserTie,
