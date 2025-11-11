@@ -19,7 +19,7 @@ import {
   DollarSign,
   SlidersHorizontal
 } from "lucide-react";
-import Navbar from "./Navbar";
+import { Navbar } from "../navbar";
 
 const Browse = () => {
   useGetAllJobs();
@@ -388,7 +388,7 @@ const Browse = () => {
                 >
                   <JobCard job={job} mode={mode} />
                 </motion.div>
-              ))}
+              ))} 
             </AnimatePresence>
           </div>
         )}

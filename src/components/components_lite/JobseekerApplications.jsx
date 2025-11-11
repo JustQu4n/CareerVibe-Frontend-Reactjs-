@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchJobseekerApplications } from '../../redux/jobseekerApplicationsSlice';
-import ApplicationDetailModal from './ApplicationDetailModal';
-import Navbar from './Navbar';
-import Footer from './Footer';
+import { fetchJobseekerApplications } from "../../redux/jobseekerApplicationsSlice";
+import ApplicationDetailModal from "./ApplicationDetailModal";
+import { Navbar } from "../navbar";
+import Footer from "./Footer";
 import { 
   FileText, 
   Building, 

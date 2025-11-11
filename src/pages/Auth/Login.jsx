@@ -7,7 +7,7 @@ import { useSelector } from 'react-redux';
 import { useLogin } from '@/hooks/useLogin';
 
 // Shared components
-import Navbar from '@/components/components_lite/Navbar';
+import { Navbar } from '@/components/navbar';
 import EmailInput from '@/components/shared/EmailInput';
 import PasswordInput from '@/components/shared/PasswordInput';
 import LoadingButton from '@/components/shared/LoadingButton';

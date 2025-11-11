@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import { setSingleJob } from "@/redux/jobSlice";
 import { JOB_API_ENDPOINT } from "@/utils/data";
 import axios from "axios";
-import Navbar from "../components_lite/Navbar";
+import { Navbar } from "../navbar";
 import Footer from "../components_lite/Footer";
 
 const JobPostDetails = () => {

@@ -47,7 +47,7 @@ const JobCard = ({ job, mode }) => {
                 }`}
             >
                 <div className={`flex items-center gap-2 ${isGrid ? "justify-center" : ""}`}>
-                    <h2 className="text-2xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors drop-shadow-sm">
+                    <h2 className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors drop-shadow-sm">
                         {job.title}
                     </h2>
                     {job.featured && (

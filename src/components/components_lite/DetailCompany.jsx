@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import { ChevronRight, Calendar, Users, Briefcase, Building } from 'lucide-react';
-import Navbar from './Navbar';
+import { Navbar } from '../navbar';
 import Footer from './Footer';
 import JobCard from './JobCard'; // Assuming you have a JobCard component
 

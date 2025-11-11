@@ -26,7 +26,7 @@ import {
 import { format } from 'date-fns';
 import JobCandidateMatcher from './JobCandidateMatcher';
 import { fetchJobPostsByEmployer } from "../../redux/jobPostSlice";
-import Navbar from '../components_lite/Navbar';
+import { Navbar } from '../navbar';
 import Footer from '../components_lite/Footer';
 
 const JobMatchingDashboard = () => {

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../components_lite/Navbar";
+import { Navbar } from "../navbar";
 import Footer from "../components_lite/Footer";
 import useGetAllCompanies from "@/hooks/usegetAllCompanies";
 import { Link } from "react-router-dom";

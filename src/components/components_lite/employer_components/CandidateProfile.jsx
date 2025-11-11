@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchApplicationDetails } from "../../../redux/applicationSlice";
-import Navbar from "../Navbar";
+import { Navbar } from "../../navbar";
 import Footer from "../Footer";
 import { 
   Mail, 
