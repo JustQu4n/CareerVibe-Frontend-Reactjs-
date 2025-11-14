@@ -5,7 +5,7 @@ import { Button } from "../ui/button";
 import EditProfileModal from "./EditProfileModal";
 import { useSelector } from "react-redux";
 import useGetAppliedJobs from "@/hooks/useGetAllAppliedJobs";
-import JobseekerApplications from "./JobseekerApplications";
+import JobseekerApplications from "@/pages/JobseekerApplications";
 import { 
   Calendar, 
   MapPin, 

@@ -42,8 +42,32 @@ export const getCompanyById = async (companyId) => {
   return response.data;
 };
 
+/**
+ * Get company details with job posts
+ * @param {string} companyId - Company ID
+ * @returns {Promise<Object>} Company details with job posts
+ */
+export const getCompanyDetails = async (companyId) => {
+  const token = localStorage.getItem('token');
+  const response = await apiClient.get(
+    `http://localhost:5000/api/employer/companies/${companyId}/details`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    }
+  );
+  
+  if (response.data.success) {
+    return response.data.data;
+  } else {
+    throw new Error(response.data.message || 'Failed to fetch company details');
+  }
+};
+
 export default {
   getAllCompanies,
   searchCompaniesByName,
   getCompanyById,
+  getCompanyDetails,
 };

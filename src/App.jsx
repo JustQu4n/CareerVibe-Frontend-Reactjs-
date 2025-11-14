@@ -1,6 +1,6 @@
 import React from "react";
 import { Navbar } from "./components/navbar";
-import { Login, Register, RegisterRecruiter, Home } from "./pages";
+import { Login, Register, RegisterRecruiter, Home, JobPostViewDetails, JobseekerApplications } from "./pages";
 // import Register from "./components/authentication/Register";
 // import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
@@ -18,8 +18,6 @@ import 'react-toastify/dist/ReactToastify.css';
 import RecruiterSite from "./components/components_lite/RecruiterSite";
 // import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
 import JobPostDetails from "./components/admincomponent/JobPostDetails";
-import JobseekerApplications from "./components/components_lite/JobseekerApplications";
-import JobPostViewDetails from "./components/components_lite/JobPostViewDetails";
 import JobPostDetailApplication from "./components/components_lite/employer_components/DetailJobPostApplication";
 import ApplyForm from "./components/components_lite/ApplyForm";
 import DetailCompany from "./components/components_lite/DetailCompany";
