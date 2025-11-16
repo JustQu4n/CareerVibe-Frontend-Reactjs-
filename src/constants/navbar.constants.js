@@ -137,7 +137,7 @@ export const DEFAULT_AVATAR = 'https://avatar.iran.liara.run/public/boy';
  * Role display names
  */
 export const ROLE_DISPLAY = {
-  job_seeker: 'JobSeeker',
+  jobseeker: 'JobSeeker',
   employer: 'Recruiter',
   Recruiter: 'Recruiter',
 };

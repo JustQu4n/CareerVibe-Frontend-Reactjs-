@@ -11,19 +11,22 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
  */
 export const API_ENDPOINTS = {
   AUTH: {
-    LOGIN: `${API_BASE_URL}/api/auth/login-jobseeker`,
+    LOGIN: `${API_BASE_URL}/api/auth/login`,
     LOGIN_EMPLOYER: `${API_BASE_URL}/api/auth/login-employer`,
-    REGISTER_JOBSEEKER: `${API_BASE_URL}/api/auth/register-jobseeker`,
+    REGISTER_JOBSEEKER: `${API_BASE_URL}/api/auth/register`,
     REGISTER_RECRUITER: `${API_BASE_URL}/api/auth/register-recruiter`,
     LOGOUT: `${API_BASE_URL}/api/auth/logout`,
     REFRESH_TOKEN: `${API_BASE_URL}/api/auth/refresh`,
     FORGOT_PASSWORD: `${API_BASE_URL}/api/auth/forgot-password`,
     RESET_PASSWORD: `${API_BASE_URL}/api/auth/reset-password`,
+    VERIFY_EMAIL: `${API_BASE_URL}/api/auth/verify-email`,
+    RESEND_VERIFICATION: `${API_BASE_URL}/api/auth/resend-verification`,
   },
   
   USER: {
     PROFILE: `${API_BASE_URL}/api/auth/profile`,
     UPDATE_PROFILE: `${API_BASE_URL}/api/auth/profile`,
+    JOBSEEKER_PROFILE: (id) => `${API_BASE_URL}/api/jobseeker/profile/${id}`,
   },
   
   JOBS: {

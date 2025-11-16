@@ -77,30 +77,38 @@ export const useLogin = () => {
       // Call login API
       const response = await loginUser(formData);
       
-      if (response.success) {
-        const userData = response.data?.user;
+      // New API structure: { message, user, accessToken, refreshToken }
+      if (response.user && response.accessToken) {
+        // Construct full user data with token
+        const fullUserData = {
+          ...response.user,
+          token: response.accessToken,
+          refreshToken: response.refreshToken,
+          // Extract user info from new structure
+          id: response.user.user_id,
+          email: response.user.email,
+          fullname: response.user.full_name,
+          phone: response.user.phone,
+          role: response.user.roles?.[0] || 'jobseeker',
+          avatar_url: response.user.avatar_url,
+        };
         
-        if (userData) {
-          // Construct full user data with jobseeker info and token
-          const fullUserData = {
-            ...userData,
-            jobseeker: response.data?.jobSeeker,
-            token: response.data?.token,
-          };
-          
-          // Update Redux store
-          dispatch(setUser(fullUserData));
-          
-          // Show success message and redirect
-          toast.success(AUTH_MESSAGES.LOGIN_SUCCESS);
-          
-          // Small delay for better UX
-          setTimeout(() => {
-            navigate(ROUTES.HOME);
-          }, 300);
-        } else {
-          toast.warning(AUTH_MESSAGES.USER_DATA_NOT_FOUND);
-        }
+        // Store tokens in localStorage
+        localStorage.setItem('accessToken', response.accessToken);
+        localStorage.setItem('refreshToken', response.refreshToken);
+        
+        // Update Redux store
+        dispatch(setUser(fullUserData));
+        
+        // Show success message
+        toast.success(response.message || AUTH_MESSAGES.LOGIN_SUCCESS);
+        
+        // Small delay for better UX
+        setTimeout(() => {
+          navigate(ROUTES.HOME);
+        }, 300);
+      } else {
+        toast.warning(AUTH_MESSAGES.USER_DATA_NOT_FOUND);
       }
     } catch (error) {
       // Error handling

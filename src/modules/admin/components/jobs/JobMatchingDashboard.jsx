@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
+import { fetchJobPostsByEmployer } from "@/redux/jobPostSlice";
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -25,9 +26,6 @@ import {
 } from 'lucide-react';
 import { format } from 'date-fns';
 import JobCandidateMatcher from './JobCandidateMatcher';
-import { fetchJobPostsByEmployer } from "../../redux/jobPostSlice";
-import { Navbar } from '../navbar';
-import Footer from '../components_lite/Footer';
 
 const JobMatchingDashboard = () => {
   const [filteredJobs, setFilteredJobs] = useState([]);
@@ -120,9 +118,6 @@ const JobMatchingDashboard = () => {
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
-     <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
-        <Navbar />
-      </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <AnimatePresence mode="wait">
           {showMatcher && selectedJob ? (
@@ -532,7 +527,6 @@ const JobMatchingDashboard = () => {
           )}
         </AnimatePresence>
       </div>
-      <Footer />
     </div>
   );
 };

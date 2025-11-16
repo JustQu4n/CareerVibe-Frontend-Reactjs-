@@ -5,8 +5,8 @@ const authSlice = createSlice({
   initialState: {
     loading: false,
     user: null,
-    token: localStorage.getItem('token') || null,
-    isAuthenticated: !!localStorage.getItem('token')
+    token: localStorage.getItem('accessToken') || null,
+    isAuthenticated: !!localStorage.getItem('accessToken')
   },
   reducers: {
     setLoading: (state, action) => {
@@ -18,23 +18,24 @@ const authSlice = createSlice({
       if (action.payload?.token) {
         state.token = action.payload.token;
         state.isAuthenticated = true;
-        localStorage.setItem('token', action.payload.token);
+        localStorage.setItem('accessToken', action.payload.token);
       }
     },
     setToken: (state, action) => {
       state.token = action.payload;
       state.isAuthenticated = !!action.payload;
       if (action.payload) {
-        localStorage.setItem('token', action.payload);
+        localStorage.setItem('accessToken', action.payload);
       } else {
-        localStorage.removeItem('token');
+        localStorage.removeItem('accessToken');
       }
     },
     logout: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
-      localStorage.removeItem('token');
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
     },
   },
 });

@@ -28,6 +28,8 @@ export const loginUser = async (credentials) => {
  */
 export const registerUser = async (userData) => {
   try {
+    console.log('Registering user with FormData');
+    // Send as multipart/form-data
     const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER_JOBSEEKER, userData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -35,6 +37,7 @@ export const registerUser = async (userData) => {
     });
     return response.data;
   } catch (error) {
+    console.error('Registration error:', error.response?.data || error.message);
     throw error;
   }
 };
@@ -147,6 +150,34 @@ export const resetPassword = async (data) => {
   }
 };
 
+/**
+ * Verify email with token
+ * @param {string} token - Verification token from email
+ * @returns {Promise} API response
+ */
+export const verifyEmail = async (token) => {
+  try {
+    const response = await apiClient.get(`${API_ENDPOINTS.AUTH.VERIFY_EMAIL}?token=${token}`);
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Resend verification email
+ * @param {string} token - Original verification token
+ * @returns {Promise} API response
+ */
+export const resendVerificationEmail = async (token) => {
+  try {
+    const response = await apiClient.post(API_ENDPOINTS.AUTH.RESEND_VERIFICATION, { token });
+    return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 export default {
   loginUser,
   loginRecruiter,
@@ -157,4 +188,6 @@ export default {
   updateUserProfile,
   forgotPassword,
   resetPassword,
+  verifyEmail,
+  resendVerificationEmail,
 };

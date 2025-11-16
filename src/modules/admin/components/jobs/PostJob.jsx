@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Navbar } from "../navbar";
-import { Input } from "../ui/input";
-import { Label } from "../ui/label";
-import { Button } from "../ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { useSelector } from "react-redux";
 import store from "@/redux/store";
 import {
@@ -13,7 +12,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from "@/components/ui/select";
 import axios from "axios";
 import { JOB_API_ENDPOINT } from "@/utils/data";
 import { toast } from "sonner";
@@ -79,7 +78,6 @@ const PostJob = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="flex items-center justify-center w-screen my-5">
         <form
           onSubmit={submitHandler}

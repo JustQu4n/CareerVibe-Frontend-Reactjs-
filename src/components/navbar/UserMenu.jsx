@@ -19,10 +19,11 @@ const UserMenu = ({ user, onLogout, isLoggingOut }) => {
   const isRecruiter = user.role === 'employer' || user.role === 'Recruiter';
   const menuItems = isRecruiter ? USER_MENU_ITEMS.RECRUITER : USER_MENU_ITEMS.JOBSEEKER;
 
-  // Get user data
-  const userData = user.jobseeker || user.employer || {};
-  const avatarUrl = userData.avatar || DEFAULT_AVATAR;
-  const fullName = userData.full_name || 'User';
+  // Get user data - support both old and new structure
+  const userData = user.jobseeker || user.employer || user;
+  const avatarUrl = userData.avatar || userData.avatar_url || user.avatar_url || DEFAULT_AVATAR;
+  console.log('Avatar URL:', avatarUrl);
+  const fullName = userData.full_name || user.fullname || user.full_name || 'User';
   const roleDisplay = ROLE_DISPLAY[user.role] || user.role;
 
   return (
@@ -99,6 +100,9 @@ UserMenu.propTypes = {
   user: PropTypes.shape({
     email: PropTypes.string,
     role: PropTypes.string,
+    fullname: PropTypes.string,
+    full_name: PropTypes.string,
+    avatar_url: PropTypes.string,
     jobseeker: PropTypes.shape({
       full_name: PropTypes.string,
       avatar: PropTypes.string,

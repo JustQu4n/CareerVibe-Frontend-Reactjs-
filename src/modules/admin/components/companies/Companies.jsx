@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Navbar } from "../navbar";
-import Footer from "../components_lite/Footer";
 import useGetAllCompanies from "@/hooks/usegetAllCompanies";
 import { Link } from "react-router-dom";
 import {
@@ -95,7 +93,6 @@ const Companies = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
-      <Navbar />
       
       {/* Hero Banner */}
       <div className="relative h-64 md:h-80 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-700">
@@ -730,8 +727,6 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
           </div>
         </div>
       </div>
-      
-      <Footer />
     </div>
   );
 };

@@ -1,5 +1,5 @@
 /**
- * RecruiterSite Component - Refactored & Optimized
+ * RecruiterLogin Component - Refactored & Optimized
  * 
  * @description
  * Login page for recruiters/employers to access the CareerVibe platform.
@@ -21,19 +21,19 @@ import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Navbar } from "../navbar";
+import { Navbar } from "@/components/navbar";
 import { useRecruiterLogin } from "@/hooks/useRecruiterLogin";
-import RecruiterHeroSection from "../authentication/RecruiterHeroSection";
-import RecruiterLoginForm from "../authentication/RecruiterLoginForm";
-import SocialLoginButtons from "../authentication/SocialLoginButtons";
-import AuthPageHeader from "../authentication/AuthPageHeader";
-import AuthFooter from "../authentication/AuthFooter";
+import RecruiterHeroSection from "@/components/authentication/RecruiterHeroSection";
+import RecruiterLoginForm from "@/components/authentication/RecruiterLoginForm";
+import SocialLoginButtons from "@/components/authentication/SocialLoginButtons";
+import AuthPageHeader from "@/components/authentication/AuthPageHeader";
+import AuthFooter from "@/components/authentication/AuthFooter";
 
 /**
- * RecruiterSite Component
+ * RecruiterLogin Component
  * Main component for recruiter login page
  */
-const RecruiterSite = () => {
+const RecruiterLogin = () => {
   const navigate = useNavigate();
   
   // Get user from Redux store to check authentication status
@@ -117,6 +117,6 @@ const RecruiterSite = () => {
 };
 
 // Export with display name for better debugging
-RecruiterSite.displayName = 'RecruiterSite';
+RecruiterLogin.displayName = 'RecruiterLogin';
 
-export default RecruiterSite;
+export default RecruiterLogin;

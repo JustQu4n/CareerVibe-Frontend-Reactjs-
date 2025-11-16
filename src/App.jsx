@@ -1,35 +1,36 @@
 import React from "react";
 import { Navbar } from "./components/navbar";
-import { Login, Register, RegisterRecruiter, Home, JobPostViewDetails, JobseekerApplications } from "./pages";
-// import Register from "./components/authentication/Register";
-// import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
+import { Login, Register, RegisterRecruiter, RecruiterLogin, VerifyEmail, Home, JobPostViewDetails, JobseekerApplications } from "./pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Browse from "./components/components_lite/Browse.jsx";
 import Profile from "./components/components_lite/Profile.jsx";
-import Companies from "./components/admincomponent/Companies";
-import CompanyCreate from "./components/admincomponent/CompanyCreate";
-import CompanySetup from "./components/admincomponent/CompanySetup";
-import AdminJobs from "./components/admincomponent/AdminJobs.jsx";
-import Applicants from "./components/admincomponent/Applicants";
-import ProtectedRoute from "./components/admincomponent/ProtectedRoute";
+import EditProfile from "./pages/EditProfile.jsx";
 import Creator from "./components/creator/Creator.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import RecruiterSite from "./components/components_lite/RecruiterSite";
-// import RegisterRecruiter from "./components/authentication/RegisterRecruiter";
-import JobPostDetails from "./components/admincomponent/JobPostDetails";
-import JobPostDetailApplication from "./components/components_lite/employer_components/DetailJobPostApplication";
 import ApplyForm from "./components/components_lite/ApplyForm";
 import DetailCompany from "./components/components_lite/DetailCompany";
-import CreateJobPost from "./components/admincomponent/CreateJobPost";
-import CandidateProfile from "./components/components_lite/employer_components/CandidateProfile.jsx";
 import ChatPopup from "./components/components_lite/chatbot/ChatPopup.jsx";
 import SearchResults from "./components/components_lite/SearchResults ";
 import CvMatcher from "./components/components_lite/CvMatcher";
 import SaveItems from "./components/components_lite/SaveItems.jsx";
-import JobCandidateMatcher from "./components/admincomponent/JobCandidateMatcher";
-import JobMatchingDashboard from "./components/admincomponent/JobMatchingDashboard";
 import { useSelector } from "react-redux";
+
+// Admin Module Imports
+import { AdminLayout, AdminDashboard } from "./modules/admin";
+import { Companies, CompanyCreate, CompanySetup } from "./modules/admin/components/companies";
+import { 
+  AdminJobs, 
+  CreateJobPost, 
+  JobPostDetails,
+  JobCandidateMatcher,
+  JobMatchingDashboard 
+} from "./modules/admin/components/jobs";
+import { Applicants } from "./modules/admin/components/applicants";
+import JobPostDetailApplication from "./modules/admin/components/applicants/DetailJobPostApplication";
+import CandidateProfile from "./modules/admin/components/applicants/CandidateProfile";
+import Settings from "./modules/admin/pages/Settings";
+import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -46,12 +47,20 @@ const appRouter = createBrowserRouter([
     element: <RegisterRecruiter/>,
   },
   {
+    path: "/verify-email",
+    element: <VerifyEmail />,
+  },
+  {
     path: "/view-job-detail/:id",
     element: <JobPostViewDetails />,
   },
   {
     path: "/profile",
     element: <Profile />,
+  },
+  {
+    path: "/profile/edit",
+    element: <EditProfile />,
   },
   {
     path: "/jobseeker-applications",
@@ -70,8 +79,8 @@ const appRouter = createBrowserRouter([
     element: <Creator/>
   },
   {
-    path:"/RecruiteSite",
-    element: <RecruiterSite/>
+    path:"/recruiter-login",
+    element: <RecruiterLogin/>
   },
   {
     path: "/details/:id",
@@ -98,89 +107,72 @@ const appRouter = createBrowserRouter([
     element: <SaveItems />,
   },
 
-  // /admin
+  // Admin Routes with AdminLayout
   {
-    path: "/admin/companies",
+    path: "/admin",
     element: (
       <ProtectedRoute>
-        <Companies />
+        <AdminLayout />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/admin/companies/create",
-    element: (
-      <ProtectedRoute>
-        <CompanyCreate />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/companies/:id",
-    element: (
-      <ProtectedRoute>
-        <CompanySetup />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs",
-    element: (
-      <ProtectedRoute>
-        {" "}
-        <AdminJobs />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/create",
-    element: (
-      <ProtectedRoute>
-        {" "}
-        <CreateJobPost />{" "}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/applicants",
-    element: (
-      <ProtectedRoute>
-        <Applicants />
-        {/* <ManagementApplication /> */}
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/applicants/:id",
-    element: (
-      <ProtectedRoute>
-        <JobPostDetailApplication />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/applicants/candidate-profile/:applicationId",
-    element: (
-      <ProtectedRoute>
-        <CandidateProfile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/job-matching-dashboard",
-    element: (
-      <ProtectedRoute>
-        <JobMatchingDashboard />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/jobs/job-candidate-matcher",
-    element: (
-      <ProtectedRoute>
-        <JobCandidateMatcher />
-      </ProtectedRoute>
-    ),
+    children: [
+      {
+        index: true,
+        element: <AdminDashboard />
+      },
+      {
+        path: "dashboard",
+        element: <AdminDashboard />
+      },
+      {
+        path: "companies",
+        element: <Companies />
+      },
+      {
+        path: "companies/create",
+        element: <CompanyCreate />
+      },
+      {
+        path: "companies/:id",
+        element: <CompanySetup />
+      },
+      {
+        path: "jobs",
+        element: <AdminJobs />
+      },
+      {
+        path: "jobs/create",
+        element: <CreateJobPost />
+      },
+      {
+        path: "jobs/applicants",
+        element: <Applicants />
+      },
+      {
+        path: "jobs/applicants/:id",
+        element: <JobPostDetailApplication />
+      },
+      {
+        path: "jobs/applicants/candidate-profile/:applicationId",
+        element: <CandidateProfile />
+      },
+      {
+        path: "jobs/job-matching-dashboard",
+        element: <JobMatchingDashboard />
+      },
+      {
+        path: "jobs/job-candidate-matcher",
+        element: <JobCandidateMatcher />
+      },
+      {
+        path: "analytics",
+        element: <div className="p-6"><h1 className="text-2xl font-bold">Analytics (Coming Soon)</h1></div>
+      },
+      {
+        path: "settings",
+        element: <Settings />
+      }
+    ]
   }
 ]);
 

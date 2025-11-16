@@ -13,6 +13,7 @@ export const ROUTES = {
   
   // Protected routes
   PROFILE: '/profile',
+  EDIT_PROFILE: '/profile/edit',
   BROWSE: '/browse',
   JOBS: '/jobs',
   APPLICATIONS: '/applications',

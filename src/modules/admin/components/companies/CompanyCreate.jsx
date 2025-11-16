@@ -1,8 +1,7 @@
 import React, { useState } from "react";
-import { Navbar } from "../navbar";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
-import { Button } from "../ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { COMPANY_API_ENDPOINT } from "@/utils/data";
 import { toast } from "sonner";
@@ -38,7 +37,6 @@ const CompanyCreate = () => {
   };
   return (
     <div>
-      <Navbar />
       <div className="max-w-4xl mx-auto">
         <div className="my-10">
           <h1 className="font-bold text-2xl ">Company Name</h1>

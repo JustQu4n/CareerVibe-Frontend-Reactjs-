@@ -4,8 +4,6 @@ import { useParams } from "react-router-dom";
 import { setSingleJob } from "@/redux/jobSlice";
 import { JOB_API_ENDPOINT } from "@/utils/data";
 import axios from "axios";
-import { Navbar } from "../navbar";
-import Footer from "../components_lite/Footer";
 
 const JobPostDetails = () => {
   const params = useParams();
@@ -45,9 +43,6 @@ const JobPostDetails = () => {
 
   return (
     <div>
-      <div className="sticky top-0 z-50 bg-slate-100 shadow-md shadow-black/5 dark:bg-neutral-600 dark:shadow-black/10">
-        <Navbar />
-      </div>
       <div className="max-w-5xl mx-auto p-6 bg-white rounded-lg shadow-lg space-y-8">
         {/* Header: Job Title, Status */}
         <div className="flex justify-between items-center">
@@ -151,7 +146,6 @@ const JobPostDetails = () => {
           {/* You can fetch and display company details by ID if needed */}
         </div>
       </div>
-      <Footer />
     </div>
   );
 };

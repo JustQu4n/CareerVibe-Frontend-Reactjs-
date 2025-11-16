@@ -90,12 +90,12 @@ export const useRecruiterLogin = () => {
           // Update Redux store
           dispatch(setUser(fullUserData));
           
-          // Show success message and redirect
+          // Show success message and redirect to admin dashboard
           toast.success('Login successful');
           
           // Small delay for better UX (allows toast to be visible)
           setTimeout(() => {
-            navigate(ROUTES.HOME);
+            navigate('/admin/dashboard');
           }, 300);
         } else {
           toast.warning('User data not found in response');

@@ -187,19 +187,39 @@ export const useRegister = () => {
       toast.warning('Adding at least one skill is recommended');
     }
 
-    // Prepare form data
+    // Prepare FormData (backend expects multipart/form-data)
     const submitData = new FormData();
     submitData.append('full_name', formData.fullname);
     submitData.append('email', formData.email);
     submitData.append('password', formData.password);
-    submitData.append('phone', formData.phone);
-    submitData.append('address', formData.address);
-    submitData.append('skills', JSON.stringify(skills));
+    submitData.append('role', 'job_seeker');
     
+    // Optional fields - only append if they exist
+    if (formData.phone) {
+      submitData.append('phone', formData.phone);
+    }
+    if (formData.address) {
+      submitData.append('address', formData.address);
+    }
+    
+    // Skills array - append each skill individually
+    if (skills.length > 0) {
+      skills.forEach(skill => {
+        submitData.append('skills', skill);
+      });
+    }
+    
+    // Avatar file
     if (formData.file) {
       submitData.append('avatar', formData.file);
     }
 
+    // Debug: Log FormData contents
+    console.log('Submitting registration data:');
+    for (let pair of submitData.entries()) {
+      console.log(pair[0] + ':', pair[1]);
+    }
+    
     try {
       setIsSubmitting(true);
       dispatch(setLoading(true));

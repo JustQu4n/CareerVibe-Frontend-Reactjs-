@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Navbar } from "../navbar";
-import { Button } from "../ui/button.jsx";
+import { Button } from "@/components/ui/button.jsx";
 import { ArrowLeft, Loader2 } from "lucide-react";
-import { Label } from "../ui/label.jsx";
-import { Input } from "../ui/input.jsx";
+import { Label } from "@/components/ui/label.jsx";
+import { Input } from "@/components/ui/input.jsx";
 import axios from "axios";
-import { COMPANY_API_ENDPOINT } from "../../utils/data.js";
+import { COMPANY_API_ENDPOINT } from "@/utils/data.js";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
 import { useSelector } from "react-redux";
@@ -87,7 +86,6 @@ const CompanySetup = () => {
 
   return (
     <div>
-      <Navbar />
       <div className="max-w-xl mx-auto my-10">
         <form onSubmit={submitHandler}>
           <div className="flex items-center gap-5 p-8">
