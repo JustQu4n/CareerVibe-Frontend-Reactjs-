@@ -27,6 +27,27 @@ export const API_ENDPOINTS = {
     PROFILE: `${API_BASE_URL}/api/auth/profile`,
     UPDATE_PROFILE: `${API_BASE_URL}/api/auth/profile`,
     JOBSEEKER_PROFILE: (id) => `${API_BASE_URL}/api/jobseeker/profile/${id}`,
+    AVATAR_UPDATE: `${API_BASE_URL}/api/jobseeker/profile/avatar`,
+    // Experience endpoints - Try these alternatives if 404:
+    // Option 1: Original (from requirements)
+    EXPERIENCES: `${API_BASE_URL}/api/jobseeker/profile/experiences`,
+    EXPERIENCE_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/profile/experiences/${id}`,
+    // Option 2: Uncomment if backend uses different path
+    // EXPERIENCES: `${API_BASE_URL}/api/experiences`,
+    // EXPERIENCE_DETAIL: (id) => `${API_BASE_URL}/api/experiences/${id}`,
+    // Option 3: Uncomment if no /profile in path
+    // EXPERIENCES: `${API_BASE_URL}/api/jobseeker/experiences`,
+    // EXPERIENCE_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/experiences/${id}`,
+    // Education endpoints
+    EDUCATIONS: `${API_BASE_URL}/api/jobseeker/profile/educations`,
+    EDUCATION_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/profile/educations/${id}`,
+    // Project endpoints
+    PROJECTS: `${API_BASE_URL}/api/jobseeker/profile/projects`,
+    PROJECT_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/profile/projects/${id}`,
+    // Skill endpoints
+    SKILLS: `${API_BASE_URL}/api/jobseeker/profile/skills`,
+    SKILLS_AVAILABLE: `${API_BASE_URL}/api/jobseeker/profile/skills/available`,
+    SKILL_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/profile/skills/${id}`,
   },
   
   JOBS: {

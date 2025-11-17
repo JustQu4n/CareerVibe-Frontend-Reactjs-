@@ -1,9 +1,19 @@
 import React from "react";
 import { Navbar } from "./components/navbar";
-import { Login, Register, RegisterRecruiter, RecruiterLogin, VerifyEmail, Home, JobPostViewDetails, JobseekerApplications, Browse } from "./pages";
+import { 
+  Login, 
+  Register, 
+  RegisterRecruiter, 
+  RecruiterLogin, 
+  VerifyEmail, 
+  Home, 
+  JobPostViewDetails, 
+  JobseekerApplications, 
+  Browse,
+  Profile,
+  EditProfile
+} from "./pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Profile from "./components/components_lite/Profile.jsx";
-import EditProfile from "./pages/EditProfile.jsx";
 import Creator from "./components/creator/Creator.jsx";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';

@@ -27,12 +27,12 @@ const EditProfile = () => {
   const [previewUrl, setPreviewUrl] = useState(null);
   
   const [formData, setFormData] = useState({
-    resume_url: "",
-    skills: "",
     bio: "",
-    experience: "",
-    education: "",
+    phone: "",
+    address: "",
   });
+  const [avatarFile, setAvatarFile] = useState(null);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   // Fetch current profile data
   useEffect(() => {
@@ -48,14 +48,13 @@ const EditProfile = () => {
         
         if (response.data?.data) {
           const profileData = response.data.data;
+          const userData = profileData.user || {};
           setFormData({
-            resume_url: profileData.resume_url || "",
-            skills: profileData.skills || "",
-            bio: profileData.user?.bio || "",
-            experience: profileData.experience || "",
-            education: profileData.education || "",
+            bio: userData.bio || "",
+            phone: userData.phone || "",
+            address: userData.address || "",
           });
-          setPreviewUrl(profileData.avatar_url || profileData.user?.avatar_url);
+          setPreviewUrl(userData.avatar_url || profileData.avatar_url);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -76,6 +75,58 @@ const EditProfile = () => {
     }));
   };
 
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+      setAvatarFile(file);
+      setPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!avatarFile) {
+      toast.error('Please select an image first');
+      return;
+    }
+
+    try {
+      setUploadingAvatar(true);
+      const formData = new FormData();
+      formData.append('avatar', avatarFile);
+
+      // PATCH /api/jobseeker/profile/avatar
+      const response = await apiClient.patch(
+        API_ENDPOINTS.USER.AVATAR_UPDATE,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        toast.success('Avatar updated successfully!');
+        setAvatarFile(null);
+      }
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+      toast.error(error.response?.data?.message || 'Failed to upload avatar');
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -87,23 +138,15 @@ const EditProfile = () => {
     try {
       setLoading(true);
       
-      // Prepare data according to UpdateJobSeekerDto
-      const updateData = {
-        resume_url: formData.resume_url || undefined,
-        skills: formData.skills || undefined,
-        bio: formData.bio || undefined,
-        experience: formData.experience || undefined,
-        education: formData.education || undefined,
-      };
+      // Prepare data according to new UpdateProfileDto (all fields optional)
+      const updateData = {};
+      if (formData.bio?.trim()) updateData.bio = formData.bio.trim();
+      if (formData.phone?.trim()) updateData.phone = formData.phone.trim();
+      if (formData.address?.trim()) updateData.address = formData.address.trim();
 
-      // Remove undefined fields
-      Object.keys(updateData).forEach(key => 
-        updateData[key] === undefined && delete updateData[key]
-      );
-
-      // PUT /api/jobseeker/profile/:user_id (using user_id, not job_seeker_id)
+      // PUT /api/jobseeker/profile/:id
       const response = await apiClient.put(
-        `${API_ENDPOINTS.USER.JOBSEEKER_PROFILE(authUser.id)}`,
+        API_ENDPOINTS.USER.JOBSEEKER_PROFILE(authUser.id),
         updateData
       );
       
@@ -163,6 +206,71 @@ const EditProfile = () => {
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Avatar Section */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                <Upload className="w-5 h-5 text-purple-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">Profile Picture</h2>
+            </div>
+            
+            <div className="flex items-start gap-6">
+              {/* Avatar Preview */}
+              <div className="flex-shrink-0">
+                <div className="relative w-32 h-32 rounded-full overflow-hidden bg-gradient-to-br from-blue-400 to-purple-600 flex items-center justify-center">
+                  {previewUrl ? (
+                    <img
+                      src={previewUrl}
+                      alt="Avatar preview"
+                      className="w-full h-full object-contain"
+                    />
+                  ) : (
+                    <User className="w-16 h-16 text-white" />
+                  )}
+                </div>
+              </div>
+              
+              {/* Upload Controls */}
+              <div className="flex-1 space-y-3">
+                <div>
+                  <Label htmlFor="avatar" className="text-sm font-medium text-gray-700">
+                    Upload New Avatar
+                  </Label>
+                  <input
+                    type="file"
+                    id="avatar"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="mt-2 w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+                  />
+                  <p className="text-sm text-gray-500 mt-2">Recommended: Square image, at least 400x400px, max 5MB</p>
+                </div>
+                
+                {avatarFile && (
+                  <Button
+                    type="button"
+                    onClick={handleAvatarUpload}
+                    disabled={uploadingAvatar}
+                    className="bg-purple-600 hover:bg-purple-700"
+                  >
+                    {uploadingAvatar ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="w-4 h-4 mr-2" />
+                        Upload Avatar
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Bio Section */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
@@ -189,108 +297,47 @@ const EditProfile = () => {
             </div>
           </div>
 
-          {/* Skills Section */}
+          {/* Contact Information */}
           <div className="bg-white rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
                 <FileText className="w-5 h-5 text-green-600" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Skills</h2>
+              <h2 className="text-xl font-semibold text-gray-900">Contact Information</h2>
             </div>
             
-            <div className="space-y-2">
-              <Label htmlFor="skills" className="text-sm font-medium text-gray-700">
-                Skills <span className="text-gray-400">(Comma-separated)</span>
-              </Label>
-              <input
-                type="text"
-                id="skills"
-                name="skills"
-                value={formData.skills}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder="e.g., React, NodeJS, Docker, SQL, MongoDB, AWS, Python, JavaScript"
-              />
-              <p className="text-sm text-gray-500">List your technical and professional skills separated by commas</p>
-            </div>
-          </div>
-
-          {/* Resume URL Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                <LinkIcon className="w-5 h-5 text-purple-600" />
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="phone" className="text-sm font-medium text-gray-700">
+                  Phone Number <span className="text-gray-400">(Optional)</span>
+                </Label>
+                <input
+                  type="tel"
+                  id="phone"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="e.g., 0987654321"
+                />
+                <p className="text-sm text-gray-500">Provide a phone number for employers to contact you</p>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Resume</h2>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="resume_url" className="text-sm font-medium text-gray-700">
-                Resume URL <span className="text-gray-400">(Optional)</span>
-              </Label>
-              <input
-                type="url"
-                id="resume_url"
-                name="resume_url"
-                value={formData.resume_url}
-                onChange={handleInputChange}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder="https://drive.google.com/your-resume"
-                maxLength={2048}
-              />
-              <p className="text-sm text-gray-500">Provide a link to your online resume (Google Drive, Dropbox, etc.)</p>
-            </div>
-          </div>
 
-          {/* Experience Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-orange-100 rounded-lg flex items-center justify-center">
-                <Briefcase className="w-5 h-5 text-orange-600" />
+              <div className="space-y-2">
+                <Label htmlFor="address" className="text-sm font-medium text-gray-700">
+                  Address <span className="text-gray-400">(Optional)</span>
+                </Label>
+                <input
+                  type="text"
+                  id="address"
+                  name="address"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
+                  placeholder="e.g., 123 Nguyen Van Linh, District 7, Ho Chi Minh City"
+                />
+                <p className="text-sm text-gray-500">Your current address or preferred work location</p>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900">Experience</h2>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="experience" className="text-sm font-medium text-gray-700">
-                Work Experience <span className="text-gray-400">(Optional)</span>
-              </Label>
-              <textarea
-                id="experience"
-                name="experience"
-                value={formData.experience}
-                onChange={handleInputChange}
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder="Describe your work experience, including job titles, companies, and key achievements..."
-              />
-              <p className="text-sm text-gray-500">Detail your professional experience and accomplishments</p>
-            </div>
-          </div>
-
-          {/* Education Section */}
-          <div className="bg-white rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
-                <GraduationCap className="w-5 h-5 text-indigo-600" />
-              </div>
-              <h2 className="text-xl font-semibold text-gray-900">Education</h2>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="education" className="text-sm font-medium text-gray-700">
-                Educational Background <span className="text-gray-400">(Optional)</span>
-              </Label>
-              <textarea
-                id="education"
-                name="education"
-                value={formData.education}
-                onChange={handleInputChange}
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all"
-                placeholder="List your degrees, certifications, and educational achievements..."
-              />
-              <p className="text-sm text-gray-500">Include your degrees, institutions, and relevant coursework</p>
             </div>
           </div>
 
