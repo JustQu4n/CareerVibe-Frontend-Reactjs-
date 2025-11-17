@@ -39,11 +39,24 @@ export const API_ENDPOINTS = {
     LIST: `${API_BASE_URL}/api/applications`,
     SUBMIT: `${API_BASE_URL}/api/applications`,
     DETAIL: (id) => `${API_BASE_URL}/api/applications/${id}`,
+    JOBSEEKER_HISTORY: (jobSeekerId) => `${API_BASE_URL}/api/jobseeker/applications/history-applications/${jobSeekerId}`,
+  },
+  
+  SAVED_JOBS: {
+    SAVE: (jobId) => `${API_BASE_URL}/api/jobseeker/saved/save-job/${jobId}`,
+    UNSAVE: (jobId) => `${API_BASE_URL}/api/jobseeker/saved/unsave-job/${jobId}`,
+    CHECK: (jobId) => `${API_BASE_URL}/api/jobseeker/saved/check/${jobId}`,
+    LIST: `${API_BASE_URL}/api/jobseeker/saved/jobs`,
   },
   
   COMPANIES: {
     LIST: `${API_BASE_URL}/api/employer/companies`,
     DETAIL: (id) => `${API_BASE_URL}/api/employer/companies/${id}`,
+    JOBSEEKER_DETAIL: (id) => `${API_BASE_URL}/api/jobseeker/company/detail/${id}`,
+    FOLLOW: (id) => `${API_BASE_URL}/api/jobseeker/company/follow-company/${id}`,
+    UNFOLLOW: (id) => `${API_BASE_URL}/api/jobseeker/company/unfollow-company/${id}`,
+    FOLLOWED_LIST: `${API_BASE_URL}/api/jobseeker/company/companies`,
+    CHECK_FOLLOW: (id) => `${API_BASE_URL}/api/jobseeker/company/check/${id}`,
   },
   
   EMPLOYER: {

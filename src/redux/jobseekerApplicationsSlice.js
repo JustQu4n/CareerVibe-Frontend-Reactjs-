@@ -1,24 +1,34 @@
 // src/redux/slices/jobseekerApplicationsSlice.js
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { API_ENDPOINTS } from '@/config/api.config';
 
-// Thunk để fetch applications
+// Thunk để fetch applications từ API history-applications
 export const fetchJobseekerApplications = createAsyncThunk(
   'jobseekerApplications/fetchJobseekerApplications',
   async (jobseekerId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/api/jobseeker/applications/all-applications/${jobseekerId}/`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          withCredentials: true
-        }
-      );
-      return response.data.applications; // dữ liệu trả về từ API
+      const token = localStorage.getItem("accessToken");
+      
+      if (!token) {
+        return rejectWithValue({ message: 'No authentication token found. Please login again.' });
+      }
+      
+      const response = await axios.get(API_ENDPOINTS.APPLICATIONS.JOBSEEKER_HISTORY(jobseekerId), {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        withCredentials: true,
+      });
+      
+      return {
+        applications: response.data.data || [],
+        total: response.data.total || 0
+      };
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      const errorMessage = error.response?.data?.message || error.message || 'Failed to fetch applications';
+      return rejectWithValue({ message: errorMessage });
     }
   }
 );
@@ -27,10 +37,18 @@ const jobseekerApplicationsSlice = createSlice({
   name: 'jobseekerApplications',
   initialState: {
     applications: [],
+    total: 0,
     loading: false,
     error: null,
   },
-  reducers: {},
+  reducers: {
+    // Clear applications
+    clearApplications: (state) => {
+      state.applications = [];
+      state.total = 0;
+      state.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder
       .addCase(fetchJobseekerApplications.pending, (state) => {
@@ -39,13 +57,18 @@ const jobseekerApplicationsSlice = createSlice({
       })
       .addCase(fetchJobseekerApplications.fulfilled, (state, action) => {
         state.loading = false;
-        state.applications = action.payload;
+        state.applications = action.payload.applications;
+        state.total = action.payload.total;
       })
       .addCase(fetchJobseekerApplications.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || 'Something went wrong';
+        state.error = action.payload?.message || 'Something went wrong';
+        state.applications = [];
+        state.total = 0;
       });
   },
 });
+
+export const { clearApplications } = jobseekerApplicationsSlice.actions;
 
 export default jobseekerApplicationsSlice.reducer;

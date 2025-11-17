@@ -85,7 +85,7 @@ const DetailCompany = () => {
     );
   }
 
-  const { company, jobPosts = [] } = companyData;
+  const { company, jobPosts = [], activeJobPostsCount = 0 } = companyData;
 
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
@@ -120,7 +120,7 @@ const DetailCompany = () => {
           <div className="flex flex-col md:flex-row gap-6 mb-8">
             <CompanyInfoGrid 
               company={company}
-              jobPostsCount={jobPosts.length}
+              jobPostsCount={activeJobPostsCount || jobPosts.length}
             />
             <ContactInformation company={company} />
           </div>

@@ -43,14 +43,14 @@ export const getCompanyById = async (companyId) => {
 };
 
 /**
- * Get company details with job posts
+ * Get company details with job posts (for jobseekers)
  * @param {string} companyId - Company ID
  * @returns {Promise<Object>} Company details with job posts
  */
 export const getCompanyDetails = async (companyId) => {
-  const token = localStorage.getItem('token');
+  const token = localStorage.getItem('accessToken');
   const response = await apiClient.get(
-    `http://localhost:5000/api/employer/companies/${companyId}/details`,
+    `${API_ENDPOINTS.COMPANIES.JOBSEEKER_DETAIL(companyId)}`,
     {
       headers: {
         Authorization: `Bearer ${token}`
@@ -58,10 +58,43 @@ export const getCompanyDetails = async (companyId) => {
     }
   );
   
-  if (response.data.success) {
-    return response.data.data;
+  // API returns { data: {...} } structure
+  if (response.data && response.data.data) {
+    const companyData = response.data.data;
+    
+    // Company info to attach to each job
+    const companyInfo = {
+      company_id: companyData.company_id,
+      name: companyData.name,
+      industry: companyData.industry,
+      location: companyData.location,
+      logo_url: companyData.logo_url,
+    };
+    
+    // Attach company info to each job post for JobCard compatibility
+    const jobPostsWithCompany = (companyData.jobPosts || []).map(job => ({
+      ...job,
+      company: companyInfo,
+    }));
+    
+    // Transform to match expected format
+    return {
+      company: {
+        company_id: companyData.company_id,
+        name: companyData.name,
+        industry: companyData.industry,
+        description: companyData.description,
+        location: companyData.location,
+        website: companyData.website,
+        logo_url: companyData.logo_url,
+        created_at: companyData.created_at,
+        updated_at: companyData.updated_at,
+      },
+      jobPosts: jobPostsWithCompany,
+      activeJobPostsCount: companyData.activeJobPostsCount || 0,
+    };
   } else {
-    throw new Error(response.data.message || 'Failed to fetch company details');
+    throw new Error('Failed to fetch company details');
   }
 };
 

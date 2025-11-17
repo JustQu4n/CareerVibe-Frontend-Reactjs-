@@ -65,7 +65,7 @@ export default function JobPostViewDetails() {
         jobData: {
           title: singleJob?.title || '',
           company: {
-            name: singleJob?.company_id?.name || '',
+            name: singleJob?.company?.name || '',
           },
         },
       },
@@ -144,7 +144,7 @@ export default function JobPostViewDetails() {
             <JobOverview job={singleJob} />
 
             {/* Company Information - Thông tin công ty */}
-            <CompanyInfo company={singleJob.company_id} />
+            <CompanyInfo company={singleJob.company} />
           </div>
         </div>
       </div>

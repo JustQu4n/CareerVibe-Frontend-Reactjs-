@@ -88,12 +88,12 @@ const FeaturedJobsSection = React.memo(({
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job, idx) => (
             <motion.div
-              key={job._id || idx}
+              key={job.job_post_id || idx}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.1 }}
               whileHover={{ y: -5 }}
-              onClick={() => navigate(`/view-job-detail/${job._id}`)}
+              onClick={() => navigate(`/view-job-detail/${job.job_post_id}`)}
               className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-300 cursor-pointer relative group"
             >
               <div className="absolute top-4 right-4 z-10">
@@ -113,82 +113,65 @@ const FeaturedJobsSection = React.memo(({
               <div className="p-6">
                 <div className="flex items-start space-x-3 mb-4">
                   <div className="h-12 w-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                    {job.company_id?.logo ? (
+                    {job.company?.logo_url ? (
                       <img
-                        src={job.company_id.logo}
-                        alt={`${job.company_id.name} logo`}
+                        src={job.company.logo_url}
+                        alt={`${job.company.name} logo`}
                         className="h-full w-full object-contain"
                       />
                     ) : (
                       <Building2 className="h-6 w-6 text-gray-400" />
                     )}
                   </div>
-                  <div>
-                    <span className="block text-gray-500 text-sm">
-                      <Clock className="h-3.5 w-3.5 inline mr-1" />
-                      Posted {getTimeAgo(job.created_at)}
-                    </span>
-                    <h3 className="font-medium text-gray-900 mt-0.5">
-                      {job.company_id?.name || 'Company Name'}
+                  <div className="flex-1">
+                    <h3 className="font-semibold text-gray-900 truncate">
+                      {job.company?.name || 'Company Name'}
                     </h3>
+                    <span className="block text-gray-500 text-xs mt-0.5">
+                      {job.company?.industry || 'Technology'}
+                    </span>
                   </div>
                 </div>
                 
-                <h2 className="text-xl font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <h2 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
                   {job.title}
                 </h2>
                 
-                <div className="grid grid-cols-2 gap-2 mb-4">
+                <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 text-gray-400 mr-1.5" />
-                    <span className="truncate">{job.location || 'Remote'}</span>
+                    <MapPin className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
+                    <span className="truncate">{job.location || 'Not specified'}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <Briefcase className="h-4 w-4 text-gray-400 mr-1.5" />
+                    <Briefcase className="h-4 w-4 text-green-500 mr-2 flex-shrink-0" />
                     <span>
-                      {job.job_type === 'full_time'
+                      {job.employment_type === 'full-time'
                         ? 'Full-time'
-                        : job.job_type === 'part_time'
+                        : job.employment_type === 'part-time'
                         ? 'Part-time'
-                        : job.job_type}
+                        : job.employment_type === 'contract'
+                        ? 'Contract'
+                        : job.employment_type || 'Full-time'}
                     </span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
-                    <DollarSign className="h-4 w-4 text-gray-400 mr-1.5" />
-                    <span>
-                      {job.salary ? `$${job.salary.toLocaleString()}` : 'Competitive'}
-                    </span>
-                  </div>
-                  <div className="flex items-center text-sm text-gray-600">
-                    <Users className="h-4 w-4 text-gray-400 mr-1.5" />
-                    <span>{job.experience || '1-3 years'}</span>
+                    <DollarSign className="h-4 w-4 text-emerald-500 mr-2 flex-shrink-0" />
+                    <span className="truncate">{job.salary_range || 'Competitive'}</span>
                   </div>
                 </div>
                 
-                <div className="flex flex-wrap gap-2 mb-4">
-                  {job.skills?.slice(0, 3).map((tag, tagIdx) => (
-                    <span
-                      key={tagIdx}
-                      className="px-3 py-1 text-xs bg-gray-50 text-gray-700 rounded-full font-medium"
-                    >
-                      {tag}
-                    </span>
-                  ))}
-                  {(job.skills?.length || 0) > 3 && (
-                    <span className="px-3 py-1 text-xs bg-gray-50 text-gray-500 rounded-full">
-                      +{job.skills.length - 3} more
-                    </span>
-                  )}
-                </div>
+                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+                  {job.description || 'No description available'}
+                </p>
                 
-                <div className="pt-3 mt-2 border-t border-gray-100 flex justify-between items-center">
-                  <span className="text-sm font-medium text-blue-600">
-                    <Award className="h-4 w-4 inline mr-1" />
-                    Top Employer
-                  </span>
+                <div className="pt-4 mt-4 border-t border-gray-100 flex justify-between items-center">
+                  <div className="flex items-center text-xs text-gray-500">
+                    <Clock className="h-3.5 w-3.5 mr-1" />
+                    Deadline: {new Date(job.deadline).toLocaleDateString('en-GB')}
+                  </div>
                   <span className="inline-flex items-center text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform">
-                    Apply Now
-                    <ArrowRight className="ml-1 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                    View Details
+                    <ArrowRight className="ml-1 h-4 w-4" />
                   </span>
                 </div>
               </div>

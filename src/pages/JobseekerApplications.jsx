@@ -44,7 +44,8 @@ const JobseekerApplications = () => {
   // Redux selectors
   const { applications, loading, error } = useSelector((state) => state.jobseekerApplications);
   const { user } = useSelector((state) => state.auth);
-  const jobseekerId = user?.jobseeker?.id;
+  // Use job_seeker_id instead of user_id
+  const jobseekerId = user?.job_seeker_id;
 
   // Custom hooks - Logic đã được tách ra
   const {

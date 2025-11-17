@@ -1,8 +1,7 @@
 import React from "react";
 import { Navbar } from "./components/navbar";
-import { Login, Register, RegisterRecruiter, RecruiterLogin, VerifyEmail, Home, JobPostViewDetails, JobseekerApplications } from "./pages";
+import { Login, Register, RegisterRecruiter, RecruiterLogin, VerifyEmail, Home, JobPostViewDetails, JobseekerApplications, Browse } from "./pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Browse from "./components/components_lite/Browse.jsx";
 import Profile from "./components/components_lite/Profile.jsx";
 import EditProfile from "./pages/EditProfile.jsx";
 import Creator from "./components/creator/Creator.jsx";
@@ -13,7 +12,8 @@ import DetailCompany from "./components/components_lite/DetailCompany";
 import ChatPopup from "./components/components_lite/chatbot/ChatPopup.jsx";
 import SearchResults from "./components/components_lite/SearchResults ";
 import CvMatcher from "./components/components_lite/CvMatcher";
-import SaveItems from "./components/components_lite/SaveItems.jsx";
+import SaveJobs from "./components/components_lite/SaveJobs.jsx";
+import FollowedCompanies from "./components/components_lite/FollowedCompanies.jsx";
 import { useSelector } from "react-redux";
 
 // Admin Module Imports
@@ -104,7 +104,11 @@ const appRouter = createBrowserRouter([
   },
   {
     path: "/save-items",
-    element: <SaveItems />,
+    element: <SaveJobs />,
+  },
+  {
+    path: "/followed-companies",
+    element: <FollowedCompanies />,
   },
 
   // Admin Routes with AdminLayout

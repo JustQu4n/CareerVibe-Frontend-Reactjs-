@@ -12,7 +12,8 @@ import StatusIcon from './StatusIcon';
  * @param {Function} props.onClick - Click handler
  */
 const ApplicationCard = ({ application, onClick }) => {
-  const { job, status, applied_at } = application;
+  // New API structure: application.jobPost instead of application.job
+  const { jobPost, status, applied_at } = application;
 
   return (
     <div 
@@ -32,10 +33,10 @@ const ApplicationCard = ({ application, onClick }) => {
 
       {/* Job Info */}
       <h3 className="text-lg font-bold text-gray-800 mb-1 line-clamp-1">
-        {job?.title}
+        {jobPost?.title || 'N/A'}
       </h3>
       <p className="text-gray-600 mb-3 line-clamp-1">
-        {job?.company_id?.name || 'N/A'}
+        {jobPost?.company?.name || 'N/A'}
       </p>
       
       {/* Meta Info */}
@@ -46,7 +47,7 @@ const ApplicationCard = ({ application, onClick }) => {
         </div>
         <div className="flex items-center">
           <FileText className="w-4 h-4 mr-1.5 text-gray-400" />
-          {job?.job_type || 'Full Time'}
+          {jobPost?.employment_type || 'Full Time'}
         </div>
       </div>
       

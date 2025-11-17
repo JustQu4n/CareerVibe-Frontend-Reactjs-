@@ -32,8 +32,9 @@ const useJobDetails = (jobId) => {
           withCredentials: true,
         });
 
-        if (response.data.success) {
-          const jobData = response.data.job;
+        // New API structure: { data: {...} }
+        if (response.data?.data) {
+          const jobData = response.data.data;
           // Update Redux store
           dispatch(setSingleJob(jobData));
           // Update local state

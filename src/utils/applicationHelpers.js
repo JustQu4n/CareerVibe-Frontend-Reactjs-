@@ -53,9 +53,10 @@ export const getStatusIconType = (status) => {
 export const filterApplications = (applications = [], filterStatus = 'all', searchTerm = '') => {
   return applications.filter(app => {
     const matchesStatus = filterStatus === 'all' || app.status?.toLowerCase() === filterStatus;
+    // Updated to use jobPost instead of job
     const matchesSearch = !searchTerm || 
-      app.job?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      app.job?.company_id?.name?.toLowerCase().includes(searchTerm.toLowerCase());
+      app.jobPost?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      app.jobPost?.company?.name?.toLowerCase().includes(searchTerm.toLowerCase());
     return matchesStatus && matchesSearch;
   });
 };

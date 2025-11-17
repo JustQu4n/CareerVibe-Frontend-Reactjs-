@@ -5,6 +5,7 @@
 
 /**
  * Job type filter options
+ * Exported as JOB_TYPES for consistency with components
  */
 export const JOB_TYPES = [
   "All",
@@ -28,6 +29,7 @@ export const EXPERIENCE_OPTIONS = [
 
 /**
  * Date posted filter options
+ * Exported as DATE_OPTIONS for consistency with components
  */
 export const DATE_OPTIONS = [
   "Any",

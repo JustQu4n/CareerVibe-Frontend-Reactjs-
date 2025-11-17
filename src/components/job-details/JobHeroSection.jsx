@@ -12,12 +12,11 @@ import { formatDistanceToNow } from 'date-fns';
 const JobHeroSection = ({ job }) => {
   const {
     title,
-    company_id,
+    company,
     location,
-    salary,
-    job_type,
-    level,
-    views,
+    salary_range,
+    employment_type,
+    views_count,
     created_at,
   } = job;
 
@@ -28,27 +27,30 @@ const JobHeroSection = ({ job }) => {
           {/* Company Logo */}
           <div className="w-16 h-16 md:w-20 md:h-20 rounded-xl bg-white p-2 shadow-lg flex items-center justify-center mb-4 md:mb-0">
             <img
-              src={company_id?.logo || 'https://via.placeholder.com/64'}
-              alt={`${company_id?.name || 'Company'} logo`}
-              className="max-h-12 max-w-12"
+              src={company?.logo_url || 'https://via.placeholder.com/64'}
+              alt={`${company?.name || 'Company'} logo`}
+              className="max-h-12 max-w-12 object-contain"
             />
           </div>
 
           {/* Job Info */}
-          <div className="md:ml-6">
+          <div className="md:ml-6 flex-1">
             {/* Badges */}
             <div className="flex flex-wrap gap-2 mb-2">
               <span className="px-3 py-1 bg-blue-500/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-                {job_type?.replace('_', ' ') || 'Full Time'}
+                {employment_type === 'full-time' ? 'Full Time' : 
+                 employment_type === 'part-time' ? 'Part Time' : 
+                 employment_type === 'contract' ? 'Contract' : 
+                 employment_type || 'Full Time'}
               </span>
-              {level && (
+              {company?.industry && (
                 <span className="px-3 py-1 bg-indigo-500/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full">
-                  {level}
+                  {company.industry}
                 </span>
               )}
               <span className="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs font-semibold rounded-full flex items-center">
                 <Eye className="mr-1 h-3 w-3" />
-                {views || 0} views
+                {views_count || 0} views
               </span>
             </div>
 
@@ -59,17 +61,15 @@ const JobHeroSection = ({ job }) => {
             <div className="flex flex-wrap items-center text-sm text-blue-100 gap-y-2">
               <div className="flex items-center mr-4">
                 <Building className="h-4 w-4 mr-1" />
-                <span>{company_id?.name || 'Company Name'}</span>
+                <span>{company?.name || 'Company Name'}</span>
               </div>
               <div className="flex items-center mr-4">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span>{location || 'Remote'}</span>
+                <span>{location || 'Not specified'}</span>
               </div>
               <div className="flex items-center mr-4">
                 <DollarSign className="h-4 w-4 mr-1" />
-                <span>
-                  {salary ? `$${salary.toLocaleString()}` : 'Competitive salary'}
-                </span>
+                <span>{salary_range || 'Competitive salary'}</span>
               </div>
               <div className="flex items-center">
                 <Calendar className="h-4 w-4 mr-1" />

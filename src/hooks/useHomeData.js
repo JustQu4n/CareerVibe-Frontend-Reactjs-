@@ -76,16 +76,31 @@ export const useHomeData = () => {
     setIsSearching(true);
 
     try {
+      // Build params object with only non-empty values
+      const params = {};
+      if (searchTitle?.trim()) {
+        params.keyword = searchTitle.trim();
+      }
+      if (searchLocation?.trim()) {
+        params.location = searchLocation.trim();
+      }
+
       await axios.get(`${API_BASE_URL}/api/job-posts/search`, {
-        params: {
-          title: searchTitle,
-          location: searchLocation,
-        },
+        params,
       });
+
+      // Build search URL
+      const searchParams = new URLSearchParams();
+      if (searchTitle?.trim()) {
+        searchParams.append('keyword', searchTitle.trim());
+      }
+      if (searchLocation?.trim()) {
+        searchParams.append('location', searchLocation.trim());
+      }
 
       navigate({
         pathname: '/search-results',
-        search: `?title=${encodeURIComponent(searchTitle)}&location=${encodeURIComponent(searchLocation)}`,
+        search: searchParams.toString() ? `?${searchParams.toString()}` : '',
       });
     } catch (error) {
       console.error('Search error:', error);

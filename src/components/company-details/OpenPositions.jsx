@@ -27,10 +27,10 @@ const OpenPositions = ({ jobPosts = [] }) => {
             <div className="space-y-4">
               {jobPosts.map((job) => (
                 <div 
-                  key={job._id}
+                  key={job.job_post_id}
                   className="bg-white rounded-xl p-4 hover:shadow-lg transition-shadow duration-300"
                 >
-                  <JobCard index={job._id} job={job} />
+                  <JobCard index={job.job_post_id} job={job} />
                 </div>
               ))}
             </div>

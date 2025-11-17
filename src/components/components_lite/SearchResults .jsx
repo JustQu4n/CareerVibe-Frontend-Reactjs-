@@ -11,9 +11,9 @@ export default function SearchResults() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   
-  const title = searchParams.get("title") || "";
+  const keyword = searchParams.get("keyword") || "";
   const location = searchParams.get("location") || "";
-    console.log("Search Params:", { title, location });
+    console.log("Search Params:", { keyword, location });
   
   const [searchResults, setSearchResults] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +27,7 @@ export default function SearchResults() {
       try {
         const response = await axios.get(`http://localhost:5000/api/job-posts/search`, {
           params: {
-            title,
+            keyword,
             location
           }
         });
@@ -43,7 +43,7 @@ export default function SearchResults() {
     };
     
     fetchSearchResults();
-  }, [title, location]);
+  }, [keyword, location]);
   
   return (
     <div className="bg-gray-50 min-h-screen">
@@ -63,10 +63,10 @@ export default function SearchResults() {
         <div className="bg-white rounded-xl shadow-md p-6 mb-6">
           <h1 className="text-2xl font-bold mb-2">Search Results</h1>
           <p className="text-gray-600">
-            {title && location ? (
-              <>Showing jobs for <span className="font-semibold">"{title}"</span> in <span className="font-semibold">"{location}"</span></>
-            ) : title ? (
-              <>Showing jobs for <span className="font-semibold">"{title}"</span></>
+            {keyword && location ? (
+              <>Showing jobs for <span className="font-semibold">"{keyword}"</span> in <span className="font-semibold">"{location}"</span></>
+            ) : keyword ? (
+              <>Showing jobs for <span className="font-semibold">"{keyword}"</span></>
             ) : location ? (
               <>Showing jobs in <span className="font-semibold">"{location}"</span></>
             ) : (

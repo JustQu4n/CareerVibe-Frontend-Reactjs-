@@ -19,7 +19,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 const ApplicationDetailModal = ({ application, onClose }) => {
   if (!application) return null;
   
-  const { job, cover_letter, cv_url, applied_at, status } = application;
+  // New API structure: application.jobPost instead of application.job
+  const { jobPost, cover_letter, resume_url, applied_at, status } = application;
 
   // Status configuration with modern design
   const statusConfig = {
@@ -84,8 +85,8 @@ const ApplicationDetailModal = ({ application, onClose }) => {
                 <Building2 className="w-8 h-8" />
               </div>
               <div className="flex-1">
-                <h2 className="text-3xl font-bold mb-2">{job?.title || 'Job Title'}</h2>
-                <p className="text-blue-100 text-lg">{job?.company_id?.name || 'Company Name'}</p>
+                <h2 className="text-3xl font-bold mb-2">{jobPost?.title || 'Job Title'}</h2>
+                <p className="text-blue-100 text-lg">{jobPost?.company?.name || 'Company Name'}</p>
                 <div className="mt-4 flex items-center gap-2">
                   <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold border-2 ${currentStatus.bgColor} ${currentStatus.textColor} ${currentStatus.borderColor}`}>
                     {currentStatus.icon}
@@ -103,17 +104,17 @@ const ApplicationDetailModal = ({ application, onClose }) => {
               <InfoCard 
                 icon={<MapPin className="w-5 h-5 text-blue-600" />}
                 label="Location"
-                value={job?.location || 'Not specified'}
+                value={jobPost?.location || 'Not specified'}
               />
               <InfoCard 
                 icon={<Briefcase className="w-5 h-5 text-purple-600" />}
-                label="Experience"
-                value={job?.experience || 'Not specified'}
+                label="Employment Type"
+                value={jobPost?.employment_type || 'Not specified'}
               />
               <InfoCard 
                 icon={<DollarSign className="w-5 h-5 text-green-600" />}
                 label="Salary"
-                value={job?.salary ? `$${job.salary.toLocaleString()}` : 'Negotiable'}
+                value={jobPost?.salary_range || 'Negotiable'}
               />
               <InfoCard 
                 icon={<Calendar className="w-5 h-5 text-orange-600" />}
@@ -126,22 +127,17 @@ const ApplicationDetailModal = ({ application, onClose }) => {
               />
             </div>
 
-            {/* Skills Section */}
-            {job?.skills && job.skills.length > 0 && (
+            {/* Requirements Section */}
+            {jobPost?.requirements && (
               <div className="mb-8">
                 <h3 className="text-lg font-bold text-gray-900 mb-3 flex items-center gap-2">
                   <div className="w-1 h-5 bg-gradient-to-b from-blue-600 to-indigo-600 rounded-full"></div>
-                  Required Skills
+                  Job Requirements
                 </h3>
-                <div className="flex flex-wrap gap-2">
-                  {job.skills.map((skill, index) => (
-                    <span
-                      key={index}
-                      className="px-4 py-2 bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 rounded-full text-sm font-medium border border-blue-200 hover:shadow-md transition-shadow"
-                    >
-                      {skill}
-                    </span>
-                  ))}
+                <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl p-6 border border-gray-200">
+                  <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+                    {jobPost.requirements}
+                  </p>
                 </div>
               </div>
             )}
@@ -163,16 +159,16 @@ const ApplicationDetailModal = ({ application, onClose }) => {
 
             {/* Actions Section */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {cv_url && (
+              {resume_url && (
                 <a
-                  href={`http://localhost:5000/${cv_url}`}
+                  href={resume_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 group relative overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-600 text-white py-4 px-6 rounded-xl font-semibold hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2"
                 >
                   <span className="relative z-10 flex items-center gap-2">
                     <FileText className="w-5 h-5" />
-                    View CV
+                    View Resume
                   </span>
                   <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 </a>

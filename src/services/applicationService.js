@@ -48,7 +48,7 @@ export const submitApplication = async (applicationData, cvFile) => {
 };
 
 /**
- * Lấy tất cả applications của jobseeker
+ * Lấy tất cả applications của jobseeker (API cũ - deprecated)
  * @param {string} jobseekerId - ID của jobseeker
  * @returns {Promise<Object>} Applications data
  */
@@ -58,6 +58,29 @@ export const getJobseekerApplications = async (jobseekerId) => {
       withCredentials: true,
     });
     return response.data;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Lấy history applications của jobseeker (API mới)
+ * @param {string} jobseekerId - ID của jobseeker
+ * @returns {Promise<Object>} Applications data with jobPost details
+ */
+export const getJobseekerHistoryApplications = async (jobseekerId) => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    const response = await axios.get(
+      `${JOBSEEKER_API_BASE}/history-applications/${jobseekerId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        withCredentials: true,
+      }
+    );
+    return response.data; // { data: [], total: number }
   } catch (error) {
     throw error;
   }
@@ -117,6 +140,7 @@ export const updateApplicationStatus = async (applicationId, status) => {
 export default {
   submitApplication,
   getJobseekerApplications,
+  getJobseekerHistoryApplications,
   getApplicationById,
   withdrawApplication,
   updateApplicationStatus,

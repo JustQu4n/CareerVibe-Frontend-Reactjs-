@@ -91,6 +91,9 @@ export const useLogin = () => {
           phone: response.user.phone,
           role: response.user.roles?.[0] || 'jobseeker',
           avatar_url: response.user.avatar_url,
+          // Add job_seeker_id from jobSeeker object
+          job_seeker_id: response.user.jobSeeker?.job_seeker_id,
+          jobSeeker: response.user.jobSeeker, // Keep full jobSeeker data
         };
         
         // Store tokens in localStorage

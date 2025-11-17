@@ -28,14 +28,14 @@ const CompanyInfoGrid = ({ company, jobPostsCount }) => {
     },
     {
       icon: <Users className="w-6 h-6 text-green-600" />,
-      label: "Team Size",
-      value: jobPostsCount > 5 ? "50+" : "10-50" + " Employees",
+      label: "Open Positions",
+      value: `${jobPostsCount} Active Jobs`,
       bgColor: "from-green-50 to-green-100"
     },
     {
       icon: <Briefcase className="w-6 h-6 text-orange-600" />,
-      label: "Industry Types",
-      value: "Technology & Innovation",
+      label: "Industry Type",
+      value: company.industry || "Technology & Innovation",
       bgColor: "from-orange-50 to-orange-100"
     }
   ];

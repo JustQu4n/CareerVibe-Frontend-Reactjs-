@@ -15,16 +15,20 @@ const useGetAllJobs = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(
-          `${JOB_API_ENDPOINT}/?keyword=${searchedQuery}`,
-          {
-            withCredentials: true,
-          }
-        );
+        // Build URL with optional keyword parameter
+        const keyword = searchedQuery || '';
+        const url = keyword 
+          ? `${JOB_API_ENDPOINT}?keyword=${encodeURIComponent(keyword)}`
+          : JOB_API_ENDPOINT;
+        
+        const res = await axios.get(url, {
+          withCredentials: true,
+        });
         console.log("API Response Job:", res.data);
-        if (res.data.success) {
-          // Updated success check
-          dispatch(setAllJobs(res.data.jobs));
+        
+        // New API structure: { data: [...], meta: {...} }
+        if (res.data?.data) {
+          dispatch(setAllJobs(res.data.data));
         } else {
           setError("Failed to fetch jobs.");
         }
@@ -37,7 +41,7 @@ const useGetAllJobs = () => {
     };
 
     fetchAllJobs();
-  }, [dispatch]);
+  }, [dispatch, searchedQuery]);
 
   return { loading, error };
 };

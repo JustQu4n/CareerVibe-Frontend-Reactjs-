@@ -13,6 +13,7 @@ import {
   FileText,
   MessageSquare,
   Calendar,
+  Heart,
 } from 'lucide-react';
 
 /**
@@ -28,7 +29,7 @@ export const NAVIGATION_LINKS = {
     { to: '/Browse', label: 'Browse' },
     { to: '/', label: 'Jobs' },
     { to: '/cv-tools', label: 'Career Tools' },
-    { to: '/RecruiteSite', label: 'Recruiter site' },
+    { to: '/recruiter-login', label: 'Recruiter site' },
     { to: '/Creator', label: 'About' },
   ],
 };
@@ -98,6 +99,12 @@ export const USER_MENU_ITEMS = {
       icon: Star,
       label: 'Your Saved Jobs',
       to: '/save-items',
+    },
+    {
+      id: 'followed',
+      icon: Heart,
+      label: 'Followed Companies',
+      to: '/followed-companies',
     },
   ],
   RECRUITER: [

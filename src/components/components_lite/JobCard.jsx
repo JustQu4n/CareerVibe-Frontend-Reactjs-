@@ -1,6 +1,7 @@
 import React from "react";
-import { Briefcase, Clock, MapPin, Bookmark, ArrowRight } from "lucide-react";
+import { Briefcase, Clock, MapPin, Bookmark, ArrowRight, DollarSign, Eye, Building2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { formatDistanceToNow } from "date-fns";
 
 const JobCard = ({ job, mode }) => {
     const navigate = useNavigate();
@@ -8,22 +9,22 @@ const JobCard = ({ job, mode }) => {
 
     return (
         <div
-            onClick={() => navigate(`/view-job-detail/${job._id}`)}
+            onClick={() => navigate(`/view-job-detail/${job.job_post_id}`)}
             className={`group relative flex ${
                 isGrid
-                    ? "flex-col items-center text-center max-w-xs mx-auto bg-white/90"
+                    ? "flex-col h-full"
                     : "flex-row items-center justify-between"
-            } p-7 rounded-3xl shadow-lg border-2 transition-all duration-200 cursor-pointer ${
+            } p-6 rounded-2xl shadow-lg border-2 transition-all duration-300 cursor-pointer ${
                 job.highlight
                     ? "bg-gradient-to-br from-green-50 via-blue-50 to-white"
                     : "bg-white"
             } ${
-                job.featured ? "border-yellow-400" : "border-gray-100"
-            }  hover:scale-[1.03]`}
+                job.status === 'active' ? "border-green-200" : "border-gray-100"
+            } hover:shadow-xl`}
             style={{
-                minHeight: isGrid ? 420 : 160,
+                minHeight: isGrid ? "400px" : "160px",
                 background:
-                    !job.highlight && !job.featured && !isGrid
+                    !job.highlight && job.status !== 'active' && !isGrid
                         ? "linear-gradient(90deg, #f8fafc 0%, #e0e7ef 100%)"
                         : undefined,
             }}
@@ -31,87 +32,128 @@ const JobCard = ({ job, mode }) => {
             {/* Company Logo */}
             <div
                 className={`flex-shrink-0 ${
-                    isGrid ? "mb-6" : "mr-8"
-                } bg-white rounded-2xl shadow-lg border-2 border-gray-100 p-3 transition-all duration-200 group-hover:shadow-blue-100`}
+                    isGrid ? "mb-4" : "mr-6"
+                } bg-white rounded-xl shadow-md border border-gray-100 p-2 transition-all duration-200 group-hover:shadow-lg group-hover:border-blue-200`}
             >
                 <img
-                    src={job.company_id?.logo}
-                    alt={job.company}
-                    className="w-20 h-20 rounded-xl object-cover border-2 border-blue-50"
+                    src={job.company?.logo_url || 'https://via.placeholder.com/80'}
+                    alt={job.company?.name}
+                    className={`${isGrid ? "w-16 h-16" : "w-20 h-20"} rounded-lg object-contain`}
                 />
             </div>
+
             {/* Job Info */}
             <div
-                className={`flex-1 flex flex-col gap-3 ${
-                    isGrid ? "items-center" : "items-start"
+                className={`flex-1 flex flex-col items-start ${
+                    isGrid ? "space-y-3" : "space-y-2"
                 }`}
             >
-                <div className={`flex items-center gap-2 ${isGrid ? "justify-center" : ""}`}>
-                    <h2 className="text-xl font-bold text-gray-800 group-hover:text-blue-700 transition-colors drop-shadow-sm">
+                {/* Title and Status */}
+                <div className="flex items-center gap-2 flex-wrap">
+                    <h2 className={`${isGrid ? "text-lg" : "text-xl"} font-bold text-gray-800 group-hover:text-blue-700 transition-colors line-clamp-2`}>
                         {job.title}
                     </h2>
-                    {job.featured && (
-                        <span className="ml-2 px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 text-xs font-semibold border border-yellow-200 animate-pulse shadow">
-                            Featured
+                    {job.status === 'active' && (
+                        <span className="px-2 py-0.5 rounded-full bg-green-100 text-green-800 text-xs font-semibold border border-green-200">
+                            Active
                         </span>
                     )}
                 </div>
-                <div
-                    className={`flex items-center gap-3 text-sm text-gray-500 ${
-                        isGrid ? "justify-center" : ""
-                    }`}
-                >
-                    <Briefcase size={16} className="text-blue-400" />
-                    <span className="font-medium">{job.level}</span>
-                    <MapPin size={16} className="text-green-400" />
-                    <span>{job.location}</span>
+                
+                {/* Company Name */}
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                    <Building2 size={16} className="text-blue-500 flex-shrink-0" />
+                    <span className="font-medium line-clamp-1">{job.company?.name}</span>
                 </div>
-                <div
-                    className={`flex flex-wrap items-center gap-2 mt-2 ${
-                        isGrid ? "justify-center" : ""
-                    }`}
-                >
-                    {job.job_type && (
-                        <span className="bg-blue-100/60 text-blue-700 px-4 py-1 rounded-full text-xs font-medium border border-blue-200 shadow-sm">
-                            {job.job_type === "full_time"
+
+                {/* Location and Salary */}
+                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-500">
+                    <div className="flex items-center gap-1.5">
+                        <MapPin size={16} className="text-green-500 flex-shrink-0" />
+                        <span className="line-clamp-1">{job.location || 'Not specified'}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                        <DollarSign size={16} className="text-emerald-500 flex-shrink-0" />
+                        <span className="font-medium line-clamp-1">{job.salary_range || 'Competitive'}</span>
+                    </div>
+                </div>
+
+                {/* Tags and Meta Info */}
+                <div className="flex flex-wrap items-center gap-2">
+                    {job.employment_type && (
+                        <span className="bg-blue-50 text-blue-700 px-3 py-1 rounded-full text-xs font-medium border border-blue-200">
+                            {job.employment_type === "full-time"
                                 ? "Full-time"
-                                : job.job_type === "part_time"
+                                : job.employment_type === "part-time"
                                 ? "Part-time"
-                                : job.job_type}
+                                : job.employment_type === "contract"
+                                ? "Contract"
+                                : job.employment_type}
                         </span>
                     )}
-                    {job.salary && (
-                        <span className="bg-green-100/60 text-green-700 px-4 py-1 rounded-full text-xs font-medium border border-green-200 shadow-sm">
-                            {job.status}
+                    {job.company?.industry && (
+                        <span className="bg-purple-50 text-purple-700 px-3 py-1 rounded-full text-xs font-medium border border-purple-200">
+                            {job.company.industry}
                         </span>
                     )}
-                    <span className="flex items-center gap-1 text-xs text-gray-400">
-                        <Clock size={14} /> {job.createdAt}
-                    </span>
                 </div>
+
+                {/* Views and Time - Only show in grid mode or at bottom in list mode */}
+                {isGrid && (
+                    <div className="flex flex-wrap items-center gap-3 text-xs text-gray-400 mt-auto pt-2">
+                        <span className="flex items-center gap-1">
+                            <Eye size={14} /> {job.views_count || 0} views
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <Clock size={14} /> 
+                            {job.created_at 
+                                ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true })
+                                : 'Recently'}
+                        </span>
+                    </div>
+                )}
+                
+                {!isGrid && (
+                    <div className="flex items-center gap-3 text-xs text-gray-400">
+                        <span className="flex items-center gap-1">
+                            <Eye size={14} /> {job.views_count || 0} views
+                        </span>
+                        <span className="flex items-center gap-1">
+                            <Clock size={14} /> 
+                            {job.created_at 
+                                ? formatDistanceToNow(new Date(job.created_at), { addSuffix: true })
+                                : 'Recently'}
+                        </span>
+                    </div>
+                )}
             </div>
+
             {/* Actions */}
             <div
-                className={`flex flex-col items-end gap-3 ${
-                    isGrid ? "absolute right-6 top-6" : "ml-8"
-                }`}
+                className={`flex ${isGrid ? "flex-col w-full mt-4 gap-2" : "flex-col ml-6 gap-3"} items-center`}
                 onClick={e => e.stopPropagation()}
             >
-                <button className="bg-gradient-to-r from-blue-600 to-blue-400 text-white text-sm px-7 py-2 rounded-xl shadow-lg hover:from-blue-700 hover:to-blue-600 flex items-center gap-2 transition-all font-semibold">
-                    Apply Now <ArrowRight size={18} />
+                <button 
+                    onClick={() => navigate(`/apply/${job.job_post_id}`)}
+                    className={`bg-gradient-to-r from-blue-600 to-blue-500 text-white text-sm font-semibold px-6 py-2.5 rounded-lg shadow-md hover:shadow-lg hover:from-blue-700 hover:to-blue-600 flex items-center justify-center gap-2 transition-all ${
+                        isGrid ? "w-full" : ""
+                    }`}
+                >
+                    Apply Now <ArrowRight size={16} />
                 </button>
-                <Bookmark
-                    size={22}
-                    className="text-gray-300 hover:text-blue-600 cursor-pointer transition-colors"
-                />
+                {!isGrid && (
+                    <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                        <Bookmark
+                            size={20}
+                            className="text-gray-400 hover:text-blue-600 transition-colors"
+                        />
+                    </button>
+                )}
             </div>
-            {/* Decorative border for highlight */}
-            {job.highlight && (
-                <span className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-green-400 via-blue-400 to-blue-200" />
-            )}
-            {/* Subtle shadow for grid mode */}
-            {isGrid && (
-                <span className="absolute inset-0 rounded-3xl pointer-events-none shadow-[0_8px_32px_0_rgba(0,60,255,0.07)]" />
+            
+            {/* Decorative border for active status */}
+            {job.status === 'active' && (
+                <span className="absolute top-0 left-0 w-full h-1 rounded-t-2xl bg-gradient-to-r from-green-400 via-blue-400 to-purple-400" />
             )}
         </div>
     );

@@ -61,7 +61,7 @@ const ApplicationsTable = ({ applications = [], onViewDetails, onClearFilters })
           <tbody className="bg-white divide-y divide-gray-200">
             {applications.map((app) => (
               <ApplicationRow 
-                key={app._id} 
+                key={app.application_id} 
                 application={app} 
                 onViewDetails={onViewDetails}
               />
@@ -77,7 +77,8 @@ const ApplicationsTable = ({ applications = [], onViewDetails, onClearFilters })
  * ApplicationRow - Individual table row
  */
 const ApplicationRow = React.memo(({ application, onViewDetails }) => {
-  const { job, status, applied_at } = application;
+  // New API structure: application.jobPost instead of application.job
+  const { jobPost, status, applied_at } = application;
 
   const handleViewDetails = (e) => {
     e.stopPropagation();
@@ -88,25 +89,25 @@ const ApplicationRow = React.memo(({ application, onViewDetails }) => {
     <tr className="hover:bg-gray-50 transition-colors">
       {/* Job Title */}
       <td className="px-6 py-4 whitespace-nowrap">
-        <div className="text-sm font-medium text-gray-900">{job?.title}</div>
-        <div className="text-xs text-gray-500">{job?.job_type || 'Full Time'}</div>
+        <div className="text-sm font-medium text-gray-900">{jobPost?.title || 'N/A'}</div>
+        <div className="text-xs text-gray-500">{jobPost?.employment_type || 'Full Time'}</div>
       </td>
 
       {/* Company */}
       <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex items-center">
           <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
-            {job?.company_id?.logo ? (
-              <img src={job.company_id.logo} alt="" className="h-8 w-8 rounded-full" />
+            {jobPost?.company?.logo_url ? (
+              <img src={jobPost.company.logo_url} alt="" className="h-8 w-8 rounded-full object-cover" />
             ) : (
               <Building className="h-4 w-4 text-gray-500" />
             )}
           </div>
           <div className="ml-3">
             <div className="text-sm font-medium text-gray-900">
-              {job?.company_id?.name || 'N/A'}
+              {jobPost?.company?.name || 'N/A'}
             </div>
-            <div className="text-xs text-gray-500">{job?.location || 'Remote'}</div>
+            <div className="text-xs text-gray-500">{jobPost?.location || 'Remote'}</div>
           </div>
         </div>
       </td>

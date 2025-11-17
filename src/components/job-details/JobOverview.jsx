@@ -20,16 +20,17 @@ import { format } from 'date-fns';
 const JobOverview = ({ job }) => {
   const {
     created_at,
-    expires_at,
-    salary,
+    deadline,
+    salary_range,
     location,
-    job_type,
-    experience,
+    employment_type,
+    requirements,
+    status,
   } = job;
 
   // Format date helper
   const formatDate = (dateString) => {
-    if (!dateString) return 'N/A';
+    if (!dateString) return 'N/A';  
     return format(new Date(dateString), 'd MMMM, yyyy');
   };
 
@@ -41,33 +42,33 @@ const JobOverview = ({ job }) => {
     },
     {
       icon: Clock,
-      label: 'Expires On',
-      value: formatDate(expires_at),
-    },
-    {
-      icon: GraduationCap,
-      label: 'Education',
-      value: "Bachelor's Degree",
+      label: 'Deadline',
+      value: formatDate(deadline),
     },
     {
       icon: DollarSign,
       label: 'Salary',
-      value: salary ? `$${salary.toLocaleString()}` : 'Competitive',
+      value: salary_range || 'Competitive',
     },
     {
       icon: MapPin,
       label: 'Location',
-      value: location || 'Remote',
+      value: location || 'Not specified',
     },
     {
       icon: Briefcase,
       label: 'Job Type',
-      value: job_type?.replace('_', ' ') || 'Full Time',
+      value: employment_type === 'full-time' ? 'Full Time' : 
+             employment_type === 'part-time' ? 'Part Time' : 
+             employment_type === 'contract' ? 'Contract' : 
+             employment_type || 'Full Time',
     },
     {
       icon: Award,
-      label: 'Experience',
-      value: experience || '2-3 years',
+      label: 'Status',
+      value: status === 'active' ? 'Active' : 
+             status === 'closed' ? 'Closed' : 
+             status || 'Active',
     },
   ];
 
