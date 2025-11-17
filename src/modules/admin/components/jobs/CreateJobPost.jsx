@@ -34,21 +34,23 @@ export default function CreateJobPost() {
   const { user } = useSelector((store) => store.auth);
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState({
-    user_id: user?.id || "",
-    company_id: user?.company?.id || "",
+    user_id: user?.user_id || "",
+    company_id: user?.employer?.company?.company_id || "",
     title: "",
     industries: "",
     description: "",
+    requirements: "",
     location: "",
     address: "",
     skills: [],
     experience: "",
     level: "",
-    salary: "",
+    salary_range: "",
     gender: "any",
     job_type: "full_time",
     status: "active",
     expires_at: "",
+    deadline: "",
   });
 
   const handleChange = (e) => {
@@ -75,13 +77,15 @@ export default function CreateJobPost() {
         title: "",
         industries: "",
         description: "",
+        requirements: "",
         location: "",
         address: "",
         skills: [],
         experience: "",
         level: "",
-        salary: "",
+        salary_range: "",
         expires_at: "",
+        deadline: "",
       });
 
       // Navigate back after success
@@ -112,7 +116,8 @@ export default function CreateJobPost() {
     { value: 'Middle', label: 'Middle', color: 'yellow' },
     { value: 'Senior', label: 'Senior', color: 'orange' },
     { value: 'Lead', label: 'Lead', color: 'red' },
-    { value: 'Manager', label: 'Manager', color: 'purple' }
+    { value: 'Manager', label: 'Manager', color: 'purple' },
+    { value: 'All', label: 'All', color: 'teal' }
   ];
 
   const genderOptions = [
@@ -257,8 +262,12 @@ export default function CreateJobPost() {
                   placeholder="e.g., Senior Frontend Developer"
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   required
+                   minLength={5}
                   disabled={loading}
                 />
+                {formData.title && formData.title.length < 5 && (
+                  <p className="mt-1 text-sm text-red-600">Title must be at least 5 characters long</p>
+                )}
               </div>
 
               {/* Job Type */}
@@ -440,16 +449,31 @@ export default function CreateJobPost() {
                 <div>
                   <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
                     <DollarSign className="w-4 h-4 text-blue-600" />
-                    Salary (USD/year)
+                    Salary Range
                   </label>
                   <input
-                    name="salary"
-                    type="number"
-                    value={formData.salary}
+                    name="salary_range"
+                    type="text"
+                    value={formData.salary_range}
                     onChange={handleChange}
-                    placeholder="e.g., 80000"
+                    placeholder="e.g., $3000 - $5000"
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     required
+                    disabled={loading}
+                  />
+                </div>
+
+                <div>
+                  <label className="flex items-center gap-2 text-sm font-semibold text-gray-700 mb-2">
+                    <Calendar className="w-4 h-4 text-blue-600" />
+                    Expiration Date
+                  </label>
+                  <input
+                    name="expires_at"
+                    type="date"
+                    value={formData.expires_at ? formData.expires_at.split("T")[0] : ""}
+                    onChange={handleChange}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     disabled={loading}
                   />
                 </div>
@@ -460,12 +484,11 @@ export default function CreateJobPost() {
                     Application Deadline
                   </label>
                   <input
-                    name="expires_at"
+                    name="deadline"
                     type="date"
-                    value={formData.expires_at.split("T")[0]}
+                    value={formData.deadline ? formData.deadline.split("T")[0] : ""}
                     onChange={handleChange}
                     className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                    required
                     disabled={loading}
                   />
                 </div>
@@ -552,6 +575,51 @@ export default function CreateJobPost() {
                         writer.setStyle(
                           "min-height",
                           "300px",
+                          editor.editing.view.document.getRoot()
+                        );
+                      });
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Requirements */}
+              <div>
+                <label className="text-sm font-semibold text-gray-700 mb-3 block">
+                  Job Requirements
+                </label>
+                <div className="border-2 border-gray-200 rounded-xl overflow-hidden focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent transition-all">
+                  <CKEditor
+                    editor={ClassicEditor}
+                    data={formData.requirements}
+                    disabled={loading}
+                    config={{
+                      toolbar: [
+                        "heading",
+                        "|",
+                        "bold",
+                        "italic",
+                        "link",
+                        "bulletedList",
+                        "numberedList",
+                        "|",
+                        "outdent",
+                        "indent",
+                        "|",
+                        "undo",
+                        "redo",
+                      ],
+                      placeholder: "List the requirements for this position...\n\nTip: Be specific about required qualifications, certifications, or experience!",
+                    }}
+                    onChange={(event, editor) => {
+                      const data = editor.getData();
+                      setFormData({ ...formData, requirements: data });
+                    }}
+                    onReady={(editor) => {
+                      editor.editing.view.change((writer) => {
+                        writer.setStyle(
+                          "min-height",
+                          "200px",
                           editor.editing.view.document.getRoot()
                         );
                       });

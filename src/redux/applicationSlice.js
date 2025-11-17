@@ -7,13 +7,13 @@ export const fetchEmployerApplications = createAsyncThunk(
   "applications/fetchEmployerApplications",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token"); // lấy token từ localStorage
-      const response = await axios.get("http://localhost:5000/api/employer/applications/job-posts/applications", {
+      const token = localStorage.getItem("accessToken"); // lấy token từ localStorage
+      const response = await axios.get("http://localhost:5000/api/employer/application/job-posts/applications", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      return response.data.applications; // vì res.json({ applications }) từ backend
+      return response.data.data;
     } catch (error) {
       return rejectWithValue(error.response.data.message || "Something went wrong");
     }
@@ -25,22 +25,18 @@ export const fetchApplicationDetails = createAsyncThunk(
   'applications/fetchDetails',
   async (applicationId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
+      const token = localStorage.getItem('accessToken');
       
       const response = await axios.get(
-        `http://localhost:5000/api/employer/applications/detail-applications/${applicationId}`,
+        `http://localhost:5000/api/employer/application/detail-applications/${applicationId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`
           }
         }
       );
-       console.log("API Response:", response.data);
-      if (response.data.success) {
-        return response.data.application;
-      } else {
-        return rejectWithValue(response.data.message || 'Failed to fetch application details');
-      }
+      console.log('Application Details Response:', response.data);
+     return response.data.data;
     } catch (error) {
       console.error('Error fetching application details:', error);
       return rejectWithValue(

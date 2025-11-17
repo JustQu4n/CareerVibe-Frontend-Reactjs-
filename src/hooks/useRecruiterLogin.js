@@ -72,37 +72,39 @@ export const useRecruiterLogin = () => {
       setIsSubmitting(true);
       dispatch(setLoading(true));
       
-      // Call recruiter login API
+      // Call recruiter login API (now using same endpoint as jobseeker)
       const response = await loginRecruiter(formData);
       
-      if (response.success) {
-        const userData = response.data?.user;
-        
-        if (userData) {
-          // Construct full user data with employer, company info and token
-          const fullUserData = {
-            ...userData,
-            employer: response.data?.employer,
-            company: response.data?.company,
-            token: response.data?.token,
-          };
-          
-          // Update Redux store
-          dispatch(setUser(fullUserData));
-          
-          // Show success message and redirect to admin dashboard
-          toast.success('Login successful');
-          
-          // Small delay for better UX (allows toast to be visible)
-          setTimeout(() => {
-            navigate('/admin/dashboard');
-          }, 300);
-        } else {
-          toast.warning('User data not found in response');
+      // Backend returns: { message, user: { user_id, email, full_name, roles, employer: { employer_id, company } }, accessToken, refreshToken }
+      if (response.user && response.user.roles?.includes('employer')) {
+        // Store tokens in localStorage
+        if (response.accessToken) {
+          localStorage.setItem('accessToken', response.accessToken);
+          localStorage.setItem('token', response.accessToken); // For backward compatibility
         }
+        if (response.refreshToken) {
+          localStorage.setItem('refreshToken', response.refreshToken);
+        }
+        
+        // Construct full user data with employer and company info
+        const fullUserData = {
+          ...response.user,
+          token: response.accessToken,
+          refreshToken: response.refreshToken,
+        };
+        
+        // Update Redux store
+        dispatch(setUser(fullUserData));
+        
+        toast.success('Login successful!');
+
+        setTimeout(() => {
+          navigate('/admin/dashboard');
+        }, 500);
+      } else {
+        toast.error('Invalid account type. Please use employer account.');
       }
     } catch (error) {
-      // Extract error message from response or use default
       const errorMessage = error.response?.data?.message || 'Login failed';
       toast.error(errorMessage);
     } finally {

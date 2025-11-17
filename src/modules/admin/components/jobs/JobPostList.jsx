@@ -46,11 +46,7 @@ import {
   Zap,
   Sparkles
 } from "lucide-react";
-import EditJobModal from "./EditJobModal";
-import {
-  updateJobPostById,
-  deleteJobPostById,
-} from "@/redux/jobPostSlice";
+import { updateJobPostById, deleteJobPostById } from "@/redux/jobPostSlice";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -61,38 +57,23 @@ const JobPostList = () => {
   const [filterStatus, setFilterStatus] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [showFilters, setShowFilters] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const { user } = useSelector((state) => state.auth);
-  const employerId = user?.employer?.id;
+  const employerId = user?.employer?.employer_id;
   const dispatch = useDispatch();
-  const { jobs, loading, error } = useSelector((state) => state.jobPosts);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [selectedJob, setSelectedJob] = useState(null);
+  const { jobs, loading, error, pagination } = useSelector((state) => state.jobPosts);
   const navigate = useNavigate();
-
-  const handleEditClick = (job) => {
-    setSelectedJob(job);
-    setEditModalOpen(true);
-  };
-
-  const handleUpdateJob = (updatedJob) => {
-    dispatch(updateJobPostById({ jobId: updatedJob._id, updatedData: updatedJob }))
-      .unwrap()
-      .then(() => {
-        toast.success("Job updated successfully");
-        setEditModalOpen(false);
-      })
-      .catch((err) => toast.error(err || "Failed to update job"));
-  };
 
   useEffect(() => {
     if (employerId) {
-      dispatch(fetchJobPostsByEmployer(employerId));
+      dispatch(fetchJobPostsByEmployer({ page: currentPage, limit: itemsPerPage }));
     }
-  }, [dispatch, employerId]);
+  }, [dispatch, employerId, currentPage, itemsPerPage]);
 
   const handleDelete = (job) => {
     if (window.confirm("Are you sure you want to delete this job post?")) {
-      dispatch(deleteJobPostById({ jobId: job._id, user_id: user.id, company_id: user.company.id }))
+      dispatch(deleteJobPostById({ jobId: job.job_post_id || job._id, user_id: user.id, company_id: user.company.id }))
         .unwrap()
         .then(() => {
           toast.success("Job deleted successfully");
@@ -107,9 +88,9 @@ const JobPostList = () => {
   const filteredJobs = jobs?.filter(
     (job) => {
       const matchesSearch = 
-        job.title.toLowerCase().includes(search.toLowerCase()) ||
-        job.location.toLowerCase().includes(search.toLowerCase()) ||
-        job.level.toLowerCase().includes(search.toLowerCase());
+        (job.title?.toLowerCase() || "").includes(search.toLowerCase()) ||
+        (job.location?.toLowerCase() || "").includes(search.toLowerCase()) ||
+        (job.level?.toLowerCase() || "").includes(search.toLowerCase());
         
       const matchesStatus = 
         filterStatus === "all" || 
@@ -123,15 +104,15 @@ const JobPostList = () => {
   const sortedJobs = [...(filteredJobs || [])].sort((a, b) => {
     switch (sortBy) {
       case "newest":
-        return new Date(b.created_at) - new Date(a.created_at);
+        return new Date(b.created_at || 0) - new Date(a.created_at || 0);
       case "oldest":
-        return new Date(a.created_at) - new Date(b.created_at);
+        return new Date(a.created_at || 0) - new Date(b.created_at || 0);
       case "title":
-        return a.title.localeCompare(b.title);
+        return (a.title || "").localeCompare(b.title || "");
       case "salary-high":
-        return (b.salary || 0) - (a.salary || 0);
+        return (b.salary_range || b.salary || 0) - (a.salary_range || a.salary || 0);
       case "salary-low":
-        return (a.salary || 0) - (b.salary || 0);
+        return (a.salary_range || a.salary || 0) - (b.salary_range || b.salary || 0);
       default:
         return 0;
     }
@@ -476,7 +457,7 @@ const JobPostList = () => {
         >
           {sortedJobs.map((job, index) => (
             <motion.div
-              key={job._id}
+              key={job.job_post_id || job._id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
@@ -548,7 +529,7 @@ const JobPostList = () => {
                 {/* Action Buttons */}
                 <div className="flex gap-2 pt-2">
                   <Link
-                    to={`/admin/jobs/applicants/${job._id}`}
+                    to={`/admin/jobs/applicants/${job.job_post_id || job._id}`}
                     className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-gradient-to-r from-indigo-50 to-blue-50 text-indigo-700 rounded-xl hover:from-indigo-100 hover:to-blue-100 transition-all font-medium text-xs border border-indigo-200 hover:shadow-md"
                   >
                     <Users className="w-4 h-4" />
@@ -558,7 +539,7 @@ const JobPostList = () => {
                   <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    onClick={() => handleEditClick(job)}
+                    onClick={() => navigate(`/admin/jobs/edit/${job.job_post_id || job._id}`)}
                     className="flex items-center justify-center px-3 py-2 bg-amber-50 text-amber-700 rounded-xl hover:bg-amber-100 transition-all font-medium text-xs border border-amber-200"
                     title="Edit Job"
                   >
@@ -601,7 +582,7 @@ const JobPostList = () => {
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {sortedJobs.map((job) => (
-                  <tr key={job._id} className="hover:bg-gray-50 transition-colors">
+                  <tr key={job.job_post_id || job._id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-5 py-4">
                       <div className="font-semibold text-gray-800">{job.title}</div>
                       <div className="text-xs text-gray-500">{job.level}</div>
@@ -642,14 +623,14 @@ const JobPostList = () => {
                     <td className="px-5 py-4">
                       <div className="flex space-x-2">
                         <Link
-                          to={`/admin/jobs/applicants/${job._id}`}
+                          to={`/admin/jobs/applicants/${job.job_post_id || job._id}`}
                           className="p-1.5 bg-indigo-50 text-indigo-700 rounded hover:bg-indigo-100 transition-colors"
                           title="View Applications"
                         >
                           <FaUsers />
                         </Link>
                         <button
-                          onClick={() => handleEditClick(job)}
+                          onClick={() => navigate(`/admin/jobs/edit/${job.job_post_id || job._id}`)}
                           className="p-1.5 bg-amber-50 text-amber-700 rounded hover:bg-amber-100 transition-colors"
                           title="Edit Job"
                         >
@@ -672,13 +653,86 @@ const JobPostList = () => {
         </div>
       )}
       
-      {/* Edit Modal */}
-      <EditJobModal
-        isOpen={editModalOpen}
-        onClose={() => setEditModalOpen(false)}
-        job={selectedJob}
-        onSubmit={handleUpdateJob}
-      />
+      {/* Pagination */}
+      {!loading && !error && sortedJobs?.length > 0 && pagination && (
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mt-8 flex items-center justify-between bg-white rounded-2xl shadow-sm border border-gray-100 px-6 py-4"
+        >
+          <div className="text-sm text-gray-600">
+            Showing <span className="font-semibold text-gray-900">{((pagination.currentPage - 1) * pagination.limit) + 1}</span> to{' '}
+            <span className="font-semibold text-gray-900">
+              {Math.min(pagination.currentPage * pagination.limit, pagination.total)}
+            </span> of{' '}
+            <span className="font-semibold text-gray-900">{pagination.total}</span> jobs
+          </div>
+          
+          <div className="flex items-center gap-2">
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                currentPage === 1
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+              }`}
+            >
+              Previous
+            </motion.button>
+            
+            <div className="flex items-center gap-1">
+              {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => {
+                // Show first, last, current, and pages around current
+                const showPage = page === 1 || 
+                                page === pagination.totalPages || 
+                                (page >= currentPage - 1 && page <= currentPage + 1);
+                
+                const showEllipsis = (page === currentPage - 2 && currentPage > 3) || 
+                                    (page === currentPage + 2 && currentPage < pagination.totalPages - 2);
+                
+                if (showEllipsis) {
+                  return <span key={page} className="px-2 text-gray-400">...</span>;
+                }
+                
+                if (!showPage) return null;
+                
+                return (
+                  <motion.button
+                    key={page}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-10 h-10 rounded-xl font-medium transition-all ${
+                      currentPage === page
+                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100'
+                    }`}
+                  >
+                    {page}
+                  </motion.button>
+                );
+              })}
+            </div>
+            
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+              disabled={currentPage === pagination.totalPages}
+              className={`px-4 py-2 rounded-xl font-medium transition-all ${
+                currentPage === pagination.totalPages
+                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  : 'bg-blue-50 text-blue-600 hover:bg-blue-100'
+              }`}
+            >
+              Next
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
       </div>
     </div>
   );

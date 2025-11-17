@@ -6,21 +6,26 @@ import { EMPLOYER_POST_API_ENDPOINT } from "@/utils/data";// Adjust the import p
 // --- Thunk: Fetch job posts by employer ---
 export const fetchJobPostsByEmployer = createAsyncThunk(
   "jobPosts/fetchByEmployer",
-  async (employerId, { rejectWithValue, getState }) => {
+  async (params = {}, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken");
 
       if (!token) return rejectWithValue("Authentication required.");
 
-      const res = await axios.get(
-        `${EMPLOYER_POST_API_ENDPOINT}/${employerId}`,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
+      // Use new endpoint: GET /api/employer/job-posts with pagination
+      const { page = 1, limit = 10 } = params;
+      const url = `${EMPLOYER_POST_API_ENDPOINT}?page=${page}&limit=${limit}`;
 
-      return res.data.jobs;
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+
+      // Return both jobs array and pagination metadata
+      return {
+        jobs: res.data.jobs || res.data.data || [],
+        pagination: res.data.pagination || res.data.meta || null,
+      };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch jobs");
     }
@@ -32,13 +37,25 @@ export const createJobPost = createAsyncThunk(
   "jobPosts/create",
   async (jobData, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem("accessToken") || localStorage.getItem("token");
 
       if (!token) return rejectWithValue("Authentication required.");
 
+      // Validate title length
+      if (!jobData.title || jobData.title.trim().length < 5) {
+        return rejectWithValue("Title must be at least 5 characters long");
+      }
+
+      const { requirements, deadline, ...createPayload } = jobData;
+      
+      const payload = {
+        ...createPayload,
+        expires_at: jobData.expires_at ? new Date(jobData.expires_at).toISOString() : null,
+      };
+
       const res = await axios.post(
-        "http://localhost:5000/api/employer/jobposts",
-        jobData,
+        EMPLOYER_POST_API_ENDPOINT,
+        payload,
         {
           headers: { 
             Authorization: `Bearer ${token}`,
@@ -48,7 +65,7 @@ export const createJobPost = createAsyncThunk(
         }
       );
 
-      return res.data.job;
+      return res.data.jobPost || res.data.job || res.data.data || res.data;
     } catch (err) {
       return rejectWithValue(
         err.response?.data?.message || "Failed to create job post"
@@ -63,10 +80,10 @@ export const updateJobPostById = createAsyncThunk(
   async ({ jobId, updatedData }, { rejectWithValue, getState }) => {
     try {
       const { auth } = getState();
-      const token = auth.user?.token;
+      const token = auth.user?.token || localStorage.getItem("accessToken") || localStorage.getItem("token");
 
-      const res = await axios.put(
-        `http://localhost:5000/api/employer/jobposts/${jobId}`,
+      const res = await axios.patch(
+        `${EMPLOYER_POST_API_ENDPOINT}/${jobId}`,
         updatedData,
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -74,7 +91,7 @@ export const updateJobPostById = createAsyncThunk(
         }
       );
 
-      return res.data.updatedJob;
+      return res.data.updatedJob || res.data;
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to update job");
     }
@@ -87,9 +104,9 @@ export const deleteJobPostById = createAsyncThunk(
   async ({ jobId, user_id, company_id }, { rejectWithValue, getState }) => {
     try {
       const { auth } = getState();
-      const token = auth.user?.token;
+      const token = auth.user?.token || localStorage.getItem("accessToken") || localStorage.getItem("token");
 
-      const url = `http://localhost:5000/api/employer/jobposts/${jobId}?user_id=${user_id}&company_id=${company_id}`;
+      const url = `${EMPLOYER_POST_API_ENDPOINT}/${jobId}`;
 
       await axios.delete(url, {
         headers: { Authorization: `Bearer ${token}` },
@@ -117,13 +134,11 @@ export const fetchRelatedJobs = createAsyncThunk(
       
       // Check if the response is successful
       if (response.data.success) {
-        console.log("Related jobs fetched successfully:", response.data.relatedJobs);
         return response.data.relatedJobs;
       } else {
         return rejectWithValue(response.data.message || "Failed to fetch related jobs");
       }
     } catch (error) {
-      console.error("Error fetching related jobs:", error);
       return rejectWithValue(
         error.response?.data?.message || "An error occurred while fetching related jobs"
       );
@@ -137,8 +152,8 @@ const jobPostSlice = createSlice({
   initialState: {
     jobs: [],
     filteredJobs: [],
-    initialState: [],
     relatedJobs: [],
+    pagination: null,
     loading: false,
     error: null,
   },
@@ -172,12 +187,15 @@ const jobPostSlice = createSlice({
       })
       .addCase(fetchJobPostsByEmployer.fulfilled, (state, action) => {
         state.loading = false;
-        state.jobs = action.payload;
-        state.filteredJobs = action.payload;
+        state.jobs = Array.isArray(action.payload.jobs) ? action.payload.jobs : [];
+        state.filteredJobs = Array.isArray(action.payload.jobs) ? action.payload.jobs : [];
+        state.pagination = action.payload.pagination;
       })
       .addCase(fetchJobPostsByEmployer.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
+        state.jobs = [];
+        state.filteredJobs = [];
       })
       .addCase(fetchRelatedJobs.pending, (state) => {
         state.loadingRelated = true;
@@ -192,9 +210,13 @@ const jobPostSlice = createSlice({
         state.errorRelated = action.payload;
       })
       // Add these to your extraReducers builder chain
+.addCase(createJobPost.pending, (state) => {
+  state.loading = true;
+  state.error = null;
+})
 .addCase(createJobPost.fulfilled, (state, action) => {
   state.loading = false;
-  state.jobs.push(action.payload);
+  state.jobs.unshift(action.payload);
   state.filteredJobs = state.jobs;
 })
 .addCase(createJobPost.rejected, (state, action) => {

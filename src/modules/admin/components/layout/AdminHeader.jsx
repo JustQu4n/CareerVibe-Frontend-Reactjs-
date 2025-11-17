@@ -33,9 +33,6 @@ export default function AdminHeader({ isCollapsed, setIsCollapsed }) {
   const dispatch = useDispatch();
   const { user } = useSelector((store) => store.auth);
 
-  // Debug: Check user data structure
-  console.log('AdminHeader - User data:', user);
-
   // Mock notifications
   const notifications = [
     {

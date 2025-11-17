@@ -24,9 +24,7 @@ const useGetAllJobs = () => {
         const res = await axios.get(url, {
           withCredentials: true,
         });
-        console.log("API Response Job:", res.data);
         
-        // New API structure: { data: [...], meta: {...} }
         if (res.data?.data) {
           dispatch(setAllJobs(res.data.data));
         } else {

@@ -1,5 +1,6 @@
 export { default as AdminJobs } from './AdminJobs';
 export { default as CreateJobPost } from './CreateJobPost';
+export { default as EditJobPost } from './EditJobPost';
 export { default as JobPostDetails } from './JobPostDetails';
 export { default as JobPostList } from './JobPostList';
 export { default as PostJob } from './PostJob';

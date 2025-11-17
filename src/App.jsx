@@ -31,7 +31,8 @@ import { AdminLayout, AdminDashboard } from "./modules/admin";
 import { Companies, CompanyCreate, CompanySetup } from "./modules/admin/components/companies";
 import { 
   AdminJobs, 
-  CreateJobPost, 
+  CreateJobPost,
+  EditJobPost,
   JobPostDetails,
   JobCandidateMatcher,
   JobMatchingDashboard 
@@ -157,6 +158,10 @@ const appRouter = createBrowserRouter([
       {
         path: "jobs/create",
         element: <CreateJobPost />
+      },
+      {
+        path: "jobs/edit/:jobId",
+        element: <EditJobPost />
       },
       {
         path: "jobs/applicants",

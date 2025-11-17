@@ -30,23 +30,23 @@ const Applicants = () => {
   const { applications, loading, error } = useSelector(
     (state) => state.applications
   );
+  // Ensure applications is always an array to avoid runtime errors
+  const apps = Array.isArray(applications) ? applications : [];
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
   const [showJobPostings, setShowJobPostings] = useState(true);
-
   useEffect(() => {
     dispatch(fetchEmployerApplications());
   }, [dispatch]);
 
   // Calculate statistics
   const stats = {
-    total: applications.length,
-    pending: applications.filter((app) => app.status === "pending").length,
-    reviewed: applications.filter((app) => app.status === "reviewed").length,
-    shortlisted: applications.filter((app) => app.status === "shortlisted")
-      .length,
-    rejected: applications.filter((app) => app.status === "rejected").length,
+    total: apps.length,
+    pending: apps.filter((app) => app?.status === "pending").length,
+    reviewed: apps.filter((app) => app?.status === "reviewed").length,
+    shortlisted: apps.filter((app) => app?.status === "shortlisted").length,
+    rejected: apps.filter((app) => app?.status === "rejected").length,
   };
 
   // Get percentage for progress bars
@@ -56,7 +56,7 @@ const Applicants = () => {
   };
 
   // Filter and sort applications
-  const filteredApplications = applications
+  const filteredApplications = apps
     .filter((app) => {
       // Filter by status
       if (statusFilter !== "all" && app.status !== statusFilter) return false;
@@ -64,12 +64,13 @@ const Applicants = () => {
       // Filter by search query (applicant name or job title)
       if (searchQuery) {
         const searchLower = searchQuery.toLowerCase();
-        const nameMatch = app.job_seeker_id?.full_name
-          ?.toLowerCase()
-          .includes(searchLower);
-        const jobMatch = app.job_post_id?.title
-          ?.toLowerCase()
-          .includes(searchLower);
+        const seekerName =
+          app?.job_seeker_id?.full_name || app?.jobSeeker?.user?.full_name || app?.jobSeeker?.full_name;
+        const nameMatch = seekerName?.toLowerCase?.().includes(searchLower);
+
+        const jobTitle = app?.job_post_id?.title || app?.jobPost?.title;
+        const jobMatch = jobTitle?.toLowerCase?.().includes(searchLower);
+
         if (!nameMatch && !jobMatch) return false;
       }
 
@@ -311,8 +312,8 @@ const Applicants = () => {
           
           {filteredApplications.length > 0 && (
             <div className="mt-3 pt-3 border-t border-gray-100">
-              <p className="text-sm text-gray-600">
-                Showing <span className="font-semibold text-gray-900">{filteredApplications.length}</span> of <span className="font-semibold text-gray-900">{applications.length}</span> applications
+                <p className="text-sm text-gray-600">
+                Showing <span className="font-semibold text-gray-900">{filteredApplications.length}</span> of <span className="font-semibold text-gray-900">{apps.length}</span> applications
               </p>
             </div>
           )}
@@ -351,31 +352,53 @@ const Applicants = () => {
               >
               {/* Group applications by job post ID to avoid duplicates */}
                 {Object.values(
-                  applications.reduce((acc, application) => {
-                    if (!application.job_post_id?._id) return acc;
-                    const jobId = application.job_post_id._id;
+                  apps.reduce((acc, application) => {
+                    // Support multiple API shapes: application.job_post_id may be an object or a string id, or application.jobPost may exist
+                    let jobObj = null;
+                    if (application?.job_post_id && typeof application.job_post_id === 'object') {
+                      jobObj = application.job_post_id;
+                    } else if (application?.jobPost) {
+                      jobObj = application.jobPost;
+                    } else if (application?.job_post_id) {
+                      jobObj = { _id: application.job_post_id, title: application.job_post_title || 'Unknown Position' };
+                    }
+
+                    if (!jobObj) return acc;
+
+                    const jobId = jobObj._id || jobObj.job_post_id;
                     if (!acc[jobId]) {
                       acc[jobId] = {
-                        jobPost: application.job_post_id,
+                        jobPost: jobObj,
                         applicantCount: 0,
                       };
                     }
                     acc[jobId].applicantCount++;
                     return acc;
                   }, {})
-                ).map(({ jobPost, applicantCount }, index) => (
+                ).map(({ jobPost, applicantCount }, index) => {
+                  const jobId = jobPost._id || jobPost.job_post_id;
+                  // find a representative application for this job to get application_id
+                  const firstApp = apps.find((application) => {
+                    const appJobObj = application?.job_post_id && typeof application.job_post_id === 'object'
+                      ? (application.job_post_id._id || application.job_post_id.job_post_id)
+                      : (application.job_post_id || application.jobPost?._id || application.jobPost?.job_post_id);
+                    return appJobObj === jobId;
+                  });
+                  const applicationId = firstApp?.application_id || firstApp?._id || jobId;
+
+                  return (
                   <motion.div
-                    key={jobPost._id}
+                    key={applicationId}
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                     whileHover={{ y: -4 }}
                     className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all cursor-pointer group"
-                    onClick={() => navigate(`/admin/jobs/applicants/${jobPost._id}`)}
+                    onClick={() => navigate(`/admin/jobs/applicants/${applicationId}`)}
                   >
                     <div className="p-4 pb-3 bg-gradient-to-br from-blue-50 to-indigo-50">
                       <h3 className="font-bold text-gray-900 text-base line-clamp-1 group-hover:text-blue-600 transition-colors">
-                        {jobPost.title}
+                        {jobPost.title || jobPost.name || 'Untitled Position'}
                       </h3>
                     </div>
                     <div className="p-4 pt-3">
@@ -394,7 +417,7 @@ const Applicants = () => {
                       </div>
                     </div>
                   </motion.div>
-                ))}
+                  )})}
               </motion.div>
             )}
           </AnimatePresence>
@@ -425,11 +448,11 @@ const Applicants = () => {
                   No applications found
                 </h3>
                 <p className="text-sm text-gray-500 max-w-md mx-auto mb-4">
-                  {applications.length > 0
+                  {apps.length > 0
                     ? "Try adjusting your search or filter settings."
                     : "When job seekers apply to your job posts, they'll appear here."}
                 </p>
-                {applications.length > 0 && statusFilter !== 'all' && (
+                {apps.length > 0 && statusFilter !== 'all' && (
                   <button 
                     onClick={() => setStatusFilter('all')} 
                     className="text-sm text-blue-600 hover:text-blue-800 font-medium"
@@ -465,7 +488,7 @@ const Applicants = () => {
                       const statusStyle = getStatusStyle(app.status);
                       return (
                         <motion.tr
-                          key={app._id}
+                          key={app._id || app.application_id}
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           transition={{ delay: index * 0.03 }}
@@ -474,9 +497,9 @@ const Applicants = () => {
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center overflow-hidden">
-                                {app.job_seeker_id?.avatar ? (
+                                {app.job_seeker_id?.avatar || app.jobSeeker?.avatar_url ? (
                                   <img
-                                    src={app.job_seeker_id.avatar}
+                                    src={app.job_seeker_id?.avatar || app.jobSeeker?.avatar_url}
                                     alt="avatar"
                                     className="w-10 h-10 object-cover"
                                   />
@@ -486,21 +509,21 @@ const Applicants = () => {
                               </div>
                               <div>
                                 <div className="text-sm font-medium text-gray-900">
-                                  {app.job_seeker_id?.full_name || "Unknown Applicant"}
+                                  {app.job_seeker_id?.full_name || app.jobSeeker?.user?.full_name || app.jobSeeker?.full_name || "Unknown Applicant"}
                                 </div>
                                 <div className="text-xs text-gray-500">
-                                  {app.job_seeker_id?.user_id?.email || "No email"}
+                                  {app.job_seeker_id?.user_id?.email || app.jobSeeker?.user?.email || "No email"}
                                 </div>
                               </div>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm font-medium text-gray-900">
-                              {app.job_post_id?.title || "Unknown Position"}
+                              {app.job_post_id?.title || app.jobPost?.title || "Unknown Position"}
                             </div>
                             <div className="flex items-center text-xs text-gray-500 mt-0.5">
                               <MapPin className="w-3 h-3 mr-1 text-gray-400" />
-                              {app.job_post_id?.location || "No location"}
+                              {app.job_post_id?.location || app.jobPost?.location || "No location"}
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -540,7 +563,7 @@ const Applicants = () => {
                               <motion.a
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
-                                href={app.cv_url}
+                                href={app.cv_url || app.resume_url || app.jobSeeker?.resume_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="p-2 bg-gray-50 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
