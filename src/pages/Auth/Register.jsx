@@ -17,14 +17,6 @@ import RegisterStepTwo from '@/components/authentication/RegisterStepTwo';
 import { ROUTES } from '@/constants';
 
 /**
- * Popular skills list
- */
-const POPULAR_SKILLS = [
-  'React', 'NodeJS', 'Docker', 'SQL',
-  'MongoDB', 'AWS', 'Python', 'JavaScript'
-];
-
-/**
  * Register Component
  * Main registration page with multi-step form
  */
@@ -38,19 +30,13 @@ const Register = () => {
     imagePreview,
     showPassword,
     showConfirmPassword,
-    skillInput,
-    skills,
     formStep,
     passwordStrength,
     isSubmitting,
-    setSkillInput,
     handleInputChange,
     handleFileChange,
     togglePasswordVisibility,
     toggleConfirmPasswordVisibility,
-    handleSkillKeyDown,
-    removeSkill,
-    addPopularSkill,
     nextStep,
     prevStep,
     handleSubmit,
@@ -130,21 +116,14 @@ const Register = () => {
                     formData={formData}
                     passwordStrength={passwordStrength}
                     imagePreview={imagePreview}
-                    skills={skills}
-                    skillInput={skillInput}
                     showPassword={showPassword}
                     showConfirmPassword={showConfirmPassword}
                     handleInputChange={handleInputChange}
                     handleFileChange={handleFileChange}
                     togglePasswordVisibility={togglePasswordVisibility}
                     toggleConfirmPasswordVisibility={toggleConfirmPasswordVisibility}
-                    onSkillInputChange={handleSkillInputChange}
-                    handleSkillKeyDown={handleSkillKeyDown}
-                    removeSkill={removeSkill}
-                    addPopularSkill={addPopularSkill}
                     onBack={prevStep}
                     isSubmitting={isSubmitting}
-                    popularSkills={POPULAR_SKILLS}
                   />
                 )}
                 

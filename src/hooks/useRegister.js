@@ -34,8 +34,6 @@ export const useRegister = () => {
   const [imagePreview, setImagePreview] = useState(null);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [skillInput, setSkillInput] = useState('');
-  const [skills, setSkills] = useState([]);
   const [formStep, setFormStep] = useState(1);
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [errors, setErrors] = useState({});
@@ -104,34 +102,7 @@ export const useRegister = () => {
     setShowConfirmPassword((prev) => !prev);
   }, []);
 
-  /**
-   * Handle skill input
-   */
-  const handleSkillKeyDown = useCallback((e) => {
-    if (e.key === 'Enter' && skillInput.trim()) {
-      e.preventDefault();
-      if (!skills.includes(skillInput.trim())) {
-        setSkills((prev) => [...prev, skillInput.trim()]);
-      }
-      setSkillInput('');
-    }
-  }, [skillInput, skills]);
 
-  /**
-   * Remove skill
-   */
-  const removeSkill = useCallback((index) => {
-    setSkills((prev) => prev.filter((_, i) => i !== index));
-  }, []);
-
-  /**
-   * Add popular skill
-   */
-  const addPopularSkill = useCallback((skill) => {
-    if (!skills.includes(skill)) {
-      setSkills((prev) => [...prev, skill]);
-    }
-  }, [skills]);
 
   /**
    * Validate step one
@@ -182,11 +153,6 @@ export const useRegister = () => {
       return;
     }
 
-    // Warn about skills
-    if (skills.length === 0) {
-      toast.warning('Adding at least one skill is recommended');
-    }
-
     // Prepare FormData (backend expects multipart/form-data)
     const submitData = new FormData();
     submitData.append('full_name', formData.fullname);
@@ -200,13 +166,6 @@ export const useRegister = () => {
     }
     if (formData.address) {
       submitData.append('address', formData.address);
-    }
-    
-    // Skills array - append each skill individually
-    if (skills.length > 0) {
-      skills.forEach(skill => {
-        submitData.append('skills', skill);
-      });
     }
     
     // Avatar file
@@ -227,39 +186,40 @@ export const useRegister = () => {
       // Call register API
       const response = await registerUser(submitData);
       
+      console.log('Registration response:', response);
+      
+      // Backend now returns { success: true, message, user }
       if (response.success) {
-        const userData = response.data?.user;
+        // Show success message from backend
+        toast.success(response.message || 'Registration successful! Welcome to CareerVibe');
         
-        if (userData) {
-          // Construct full user data
-          const fullUserData = {
-            ...userData,
-            jobseeker: response.data?.jobSeeker,
-            token: response.data?.token,
-          };
-          
-          // Update Redux store
-          dispatch(setUser(fullUserData));
-          
-          // Navigate to home
-          toast.success('Registration successful! Welcome to CareerVibe');
-          setTimeout(() => {
-            navigate(ROUTES.HOME);
-          }, 300);
-        } else {
-          // Fallback
-          navigate(ROUTES.LOGIN);
-          toast.success(response.message);
-        }
+        // Construct full user data
+        const fullUserData = {
+          ...response.user,
+          jobseeker: response.jobSeeker,
+          token: response.token,
+        };
+        
+        // Update Redux store
+        dispatch(setUser(fullUserData));
+        
+        // Navigate to home after short delay to show toast
+        setTimeout(() => {
+          navigate(ROUTES.HOME);
+        }, 1500);
+      } else {
+        // Handle unsuccessful response
+        toast.error(response?.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
+      console.error('Registration error:', error);
       const errorMessage = error.response?.data?.message || AUTH_MESSAGES.REGISTER_FAILED;
       toast.error(errorMessage);
     } finally {
       setIsSubmitting(false);
       dispatch(setLoading(false));
     }
-  }, [formData, skills, passwordStrength, dispatch, navigate]);
+  }, [formData, passwordStrength, dispatch, navigate]);
 
   return {
     // Form data
@@ -270,23 +230,15 @@ export const useRegister = () => {
     imagePreview,
     showPassword,
     showConfirmPassword,
-    skillInput,
-    skills,
     formStep,
     passwordStrength,
     isSubmitting,
-    
-    // Setters
-    setSkillInput,
     
     // Handlers
     handleInputChange,
     handleFileChange,
     togglePasswordVisibility,
     toggleConfirmPasswordVisibility,
-    handleSkillKeyDown,
-    removeSkill,
-    addPopularSkill,
     nextStep,
     prevStep,
     handleSubmit,

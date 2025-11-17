@@ -8,12 +8,25 @@ const ProtectedRoute = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!user || user.role !== "employer") {
+    // Check if user exists and has employer role (can be in roles array or role string)
+    const isEmployer = user && (
+      user.roles?.includes("employer") || 
+      user.role === "employer"
+    );
+    
+    if (!isEmployer) {
+      console.log('ProtectedRoute: Access denied, redirecting to home');
       navigate("/");  
     }
   }, [user, navigate]);   
  
-  if (!user || user.role !== "employer") {
+  // Check if user exists and has employer role
+  const isEmployer = user && (
+    user.roles?.includes("employer") || 
+    user.role === "employer"
+  );
+  
+  if (!isEmployer) {
     return null;   
   }
 
