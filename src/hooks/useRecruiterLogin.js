@@ -75,6 +75,7 @@ export const useRecruiterLogin = () => {
       // Call recruiter login API (now using same endpoint as jobseeker)
       const response = await loginRecruiter(formData);
       
+<<<<<<< HEAD
       // Backend returns: { message, user: { user_id, email, full_name, roles, employer: { employer_id, company } }, accessToken, refreshToken }
       if (response.user && response.user.roles?.includes('employer')) {
         // Store tokens in localStorage
@@ -86,6 +87,12 @@ export const useRecruiterLogin = () => {
           localStorage.setItem('refreshToken', response.refreshToken);
         }
         
+=======
+      console.log('Recruiter login response:', response);
+      
+      // Backend returns: { message, user: { user_id, email, full_name, roles, employer: { employer_id, company } }, accessToken, refreshToken }
+      if (response.user && response.user.roles?.includes('employer')) {
+>>>>>>> 45acdd1b9640aa7de6bd078fe8d1b5c1c79e67e4
         // Construct full user data with employer and company info
         const fullUserData = {
           ...response.user,
@@ -96,15 +103,32 @@ export const useRecruiterLogin = () => {
         // Update Redux store
         dispatch(setUser(fullUserData));
         
+<<<<<<< HEAD
         toast.success('Login successful!');
 
         setTimeout(() => {
+=======
+        console.log('User data saved to Redux:', fullUserData);
+        console.log('Navigating to /admin/dashboard...');
+        
+        // Show success message and redirect to admin dashboard
+        toast.success(response.message || 'Login successful');
+        
+        // Small delay for better UX (allows toast to be visible)
+        setTimeout(() => {
+          console.log('Executing navigate to /admin/dashboard');
+>>>>>>> 45acdd1b9640aa7de6bd078fe8d1b5c1c79e67e4
           navigate('/admin/dashboard');
         }, 500);
       } else {
         toast.error('Invalid account type. Please use employer account.');
       }
     } catch (error) {
+<<<<<<< HEAD
+=======
+      console.error('Recruiter login error:', error);
+      // Extract error message from response or use default
+>>>>>>> 45acdd1b9640aa7de6bd078fe8d1b5c1c79e67e4
       const errorMessage = error.response?.data?.message || 'Login failed';
       toast.error(errorMessage);
     } finally {
