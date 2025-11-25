@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { Upload, FileText } from 'lucide-react';
 
 /**
@@ -23,6 +23,16 @@ const CVUploadSection = ({
   onRemove, 
   formatFileSize 
 }) => {
+  const fileInputRef = useRef(null);
+
+  const handleRemove = () => {
+    // Reset input file
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    // Call parent remove handler
+    onRemove();
+  };
   return (
     <div className="mb-8">
       <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
@@ -46,6 +56,7 @@ const CVUploadSection = ({
                 Browse Files
               </button>
               <input
+                ref={fileInputRef}
                 type="file"
                 accept=".doc,.docx,.pdf"
                 onChange={onFileChange}
@@ -71,7 +82,7 @@ const CVUploadSection = ({
                   </div>
                   <button 
                     type="button"
-                    onClick={onRemove}
+                    onClick={handleRemove}
                     className="text-gray-500 hover:text-red-600 transition-colors text-sm font-medium"
                   >
                     Remove
@@ -95,4 +106,4 @@ const CVUploadSection = ({
   );
 };
 
-export default React.memo(CVUploadSection);
+export default CVUploadSection;

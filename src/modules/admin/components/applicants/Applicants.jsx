@@ -23,6 +23,7 @@ import {
   AlertCircle,
   Download
 } from 'lucide-react';
+import { APPLICATION_STATUS } from '../../../../constants/application.constants';
 
 const Applicants = () => {
   const dispatch = useDispatch();
@@ -43,10 +44,10 @@ const Applicants = () => {
   // Calculate statistics
   const stats = {
     total: apps.length,
-    pending: apps.filter((app) => app?.status === "pending").length,
-    reviewed: apps.filter((app) => app?.status === "reviewed").length,
-    shortlisted: apps.filter((app) => app?.status === "shortlisted").length,
-    rejected: apps.filter((app) => app?.status === "rejected").length,
+    pending: apps.filter((app) => app?.status === APPLICATION_STATUS.PENDING).length,
+    reviewed: apps.filter((app) => app?.status === APPLICATION_STATUS.REVIEWED).length,
+    accepted: apps.filter((app) => app?.status === APPLICATION_STATUS.ACCEPTED).length,
+    rejected: apps.filter((app) => app?.status === APPLICATION_STATUS.REJECTED).length,
   };
 
   // Get percentage for progress bars
@@ -89,28 +90,28 @@ const Applicants = () => {
   // Get status badge style
   const getStatusStyle = (status) => {
     switch (status) {
-      case "pending":
+      case APPLICATION_STATUS.PENDING:
         return {
           bgColor: "bg-amber-50",
           textColor: "text-amber-700",
           borderColor: "border-amber-200",
           icon: <Clock className="mr-1 w-3 h-3" />,
         };
-      case "reviewed":
+      case APPLICATION_STATUS.REVIEWED:
         return {
           bgColor: "bg-blue-50",
           textColor: "text-blue-700",
           borderColor: "border-blue-200",
           icon: <Eye className="mr-1 w-3 h-3" />,
         };
-      case "shortlisted":
+      case APPLICATION_STATUS.ACCEPTED:
         return {
           bgColor: "bg-emerald-50",
           textColor: "text-emerald-700",
           borderColor: "border-emerald-200",
           icon: <CheckCircle className="mr-1 w-3 h-3" />,
         };
-      case "rejected":
+      case APPLICATION_STATUS.REJECTED:
         return {
           bgColor: "bg-red-50",
           textColor: "text-red-700",
@@ -242,7 +243,7 @@ const Applicants = () => {
               <p className="text-sm text-gray-600">Reviewed</p>
             </div>
             
-            {/* Shortlisted Card */}
+            {/* Accepted Card */}
             <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between mb-2">
                 <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-green-50 rounded-xl flex items-center justify-center">
@@ -250,8 +251,8 @@ const Applicants = () => {
                 </div>
                 <CheckCircle className="w-4 h-4 text-green-500" />
               </div>
-              <h3 className="text-2xl font-bold text-green-600 mb-1">{stats.shortlisted}</h3>
-              <p className="text-sm text-gray-600">Shortlisted</p>
+              <h3 className="text-2xl font-bold text-green-600 mb-1">{stats.accepted}</h3>
+              <p className="text-sm text-gray-600">Accepted</p>
             </div>
             
             {/* Rejected Card */}
@@ -293,10 +294,10 @@ const Applicants = () => {
                 className="px-3 py-2 text-sm border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="all">All Statuses</option>
-                <option value="pending">Pending</option>
-                <option value="reviewed">Reviewed</option>
-                <option value="shortlisted">Shortlisted</option>
-                <option value="rejected">Rejected</option>
+                <option value={APPLICATION_STATUS.PENDING}>Pending</option>
+                <option value={APPLICATION_STATUS.REVIEWED}>Reviewed</option>
+                <option value={APPLICATION_STATUS.ACCEPTED}>Accepted</option>
+                <option value={APPLICATION_STATUS.REJECTED}>Rejected</option>
               </select>
 
               <select
@@ -394,7 +395,7 @@ const Applicants = () => {
                     transition={{ delay: index * 0.05 }}
                     whileHover={{ y: -4 }}
                     className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all cursor-pointer group"
-                    onClick={() => navigate(`/admin/jobs/applicants/${applicationId}`)}
+                    onClick={() => navigate(`/admin/jobs/applicants/${jobPost._id || jobPost.job_post_id}`)}
                   >
                     <div className="p-4 pb-3 bg-gradient-to-br from-blue-50 to-indigo-50">
                       <h3 className="font-bold text-gray-900 text-base line-clamp-1 group-hover:text-blue-600 transition-colors">

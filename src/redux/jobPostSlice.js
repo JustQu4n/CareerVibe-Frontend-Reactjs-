@@ -8,24 +8,40 @@ export const fetchJobPostsByEmployer = createAsyncThunk(
   "jobPosts/fetchByEmployer",
   async (params = {}, { rejectWithValue, getState }) => {
     try {
-      const token = localStorage.getItem("accessToken");
+      const { auth } = getState();
+      const token = auth?.user?.token || localStorage.getItem("accessToken") || localStorage.getItem("token") || localStorage.getItem('access_token');
 
-      if (!token) return rejectWithValue("Authentication required.");
+      if (!token) {
+        console.warn('fetchJobPostsByEmployer: no auth token found in state or localStorage');
+        return rejectWithValue("Authentication required.");
+      }
 
       // Use new endpoint: GET /api/employer/job-posts with pagination
       const { page = 1, limit = 10 } = params;
       const url = `${EMPLOYER_POST_API_ENDPOINT}?page=${page}&limit=${limit}`;
-
       const res = await axios.get(url, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
 
-      // Return both jobs array and pagination metadata
-      return {
-        jobs: res.data.jobs || res.data.data || [],
-        pagination: res.data.pagination || res.data.meta || null,
-      };
+      // Normalize jobs array
+      const jobs = res.data.jobs || res.data.data || [];
+
+      // Normalize pagination metadata into a predictable shape
+      const rawPagination = res.data.pagination || res.data.meta || res.data.pagination_meta || res.data.metaData || null;
+
+      let pagination = null;
+      if (rawPagination) {
+        const currentPage = Number(rawPagination.currentPage ?? rawPagination.page ?? rawPagination.page_number ?? rawPagination.pageNum ?? rawPagination.page_num ?? 1) || 1;
+        const limit = Number(rawPagination.limit ?? rawPagination.per_page ?? rawPagination.pageSize ?? rawPagination.page_size ?? 10) || 10;
+        const total = Number(rawPagination.total ?? rawPagination.totalItems ?? rawPagination.count ?? rawPagination.total_count ?? 0) || 0;
+        const totalPages = Number(rawPagination.totalPages ?? rawPagination.total_pages ?? Math.ceil(total / limit) ?? 1) || Math.max(1, Math.ceil(total / limit));
+
+        pagination = { currentPage, limit, total, totalPages };
+      }
+
+      // Return both jobs array and normalized pagination metadata
+      return { jobs, pagination };
     } catch (err) {
       return rejectWithValue(err.response?.data?.message || "Failed to fetch jobs");
     }

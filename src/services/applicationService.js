@@ -9,19 +9,19 @@ const JOBSEEKER_API_BASE = 'http://localhost:5000/api/jobseeker/applications';
 
 /**
  * Submit job application
+ * @param {string} jobPostId - Job post ID
  * @param {Object} applicationData - Application form data
  * @param {File} cvFile - CV file
  * @returns {Promise<Object>} Response data
  */
-export const submitApplication = async (applicationData, cvFile) => {
+export const submitApplication = async (jobPostId, applicationData, cvFile) => {
   const formData = new FormData();
-  formData.append("job_post_id", applicationData.jobPostId);
-  formData.append("job_seeker_id", applicationData.jobSeekerId);
+  formData.append("job_post_id", jobPostId);
   formData.append("cover_letter", applicationData.coverLetter || "");
-  formData.append("cv", cvFile);
+  formData.append("resume", cvFile);
 
-  const token = localStorage.getItem('token');
-  
+  const token = localStorage.getItem('accessToken');
+
   try {
     const response = await axios.post(
       `${JOBSEEKER_API_BASE}/submit`,

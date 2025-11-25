@@ -37,7 +37,7 @@ import useJobData from '@/hooks/useJobData';
 import {
   FormMessages,
   CVUploadSection,
-  PersonalInfoSection,
+  // PersonalInfoSection, // Removed as per new backend DTO
   CoverLetterSection,
   SubmitSection
 } from '@/components/apply-form';
@@ -80,7 +80,8 @@ export default function ApplyForm() {
     cvSize,
     cvProgress,
     handleFileChange,
-    removeCvFile
+    handleRemoveFile,
+    formatFileSize
   } = useFileUpload(setError);
 
   // ========================================
@@ -90,27 +91,24 @@ export default function ApplyForm() {
     e.preventDefault();
     setError(null);
     setSuccess(false);
-    
+
     // Validate CV file
     if (!cvFile) {
       setError('Please upload your CV/Resume');
       return;
     }
-    
-    // Prepare application data
+
+    // Prepare application data (only job_post_id and cover_letter as per backend DTO)
     const applicationData = {
-      fullname: input.fullname,
-      phone: input.phone,
-      location: input.location,
       coverLetter: coverLetter
     };
-    
+
     try {
       setLoading(true);
       await submitApplication(params.id, applicationData, cvFile);
-      
+
       setSuccess(true);
-      
+
       // Redirect to applications page after 2 seconds
       setTimeout(() => {
         navigate('/jobseeker-applications');
@@ -120,7 +118,7 @@ export default function ApplyForm() {
     } finally {
       setLoading(false);
     }
-  }, [cvFile, input, coverLetter, params.id, navigate]);
+  }, [cvFile, coverLetter, params.id, navigate]);
 
   // ========================================
   // Render
@@ -214,14 +212,18 @@ export default function ApplyForm() {
               cvSize={cvSize}
               cvProgress={cvProgress}
               onFileChange={handleFileChange}
-              onRemove={removeCvFile}
+              onRemove={handleRemoveFile}
+              formatFileSize={formatFileSize}
             />
 
-            {/* Personal Information */}
+            {/* Personal Information - Removed as per new backend DTO */}
+            {/* Backend now gets user info from authentication, no need for manual input */}
+            {/*
             <PersonalInfoSection 
               input={input}
               onChange={handleInputChange}
             />
+            */}
 
             {/* Cover Letter */}
             <CoverLetterSection 
