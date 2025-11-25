@@ -39,6 +39,7 @@ import {
 } from "./modules/admin/components/jobs";
 import { Applicants } from "./modules/admin/components/applicants";
 import JobPostDetailApplication from "./modules/admin/components/applicants/DetailJobPostApplication";
+import JobPostApplications from "./modules/admin/components/applicants/JobPostApplications";
 import CandidateProfile from "./modules/admin/components/applicants/CandidateProfile";
 import Settings from "./modules/admin/pages/Settings";
 import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
@@ -168,8 +169,8 @@ const appRouter = createBrowserRouter([
         element: <Applicants />
       },
       {
-        path: "jobs/applicants/:id",
-        element: <JobPostDetailApplication />
+        path: "jobs/applicants/:jobPostId",
+        element: <JobPostApplications />
       },
       {
         path: "jobs/applicants/candidate-profile/:applicationId",
