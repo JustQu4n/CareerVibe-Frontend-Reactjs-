@@ -6,14 +6,15 @@
 import {
   BriefcaseBusiness,
   Building2,
-  CircleUser,
-  FileUser,
-  Star,
+  UserCheck,
+  ClipboardList,
+  Bookmark,
   LogOut,
   FileText,
   MessageSquare,
   Calendar,
-  Heart,
+  Users,
+  FileUser
 } from 'lucide-react';
 
 /**
@@ -84,25 +85,25 @@ export const USER_MENU_ITEMS = {
   JOBSEEKER: [
     {
       id: 'profile',
-      icon: CircleUser,
+      icon: UserCheck,
       label: 'Profile',
       to: '/profile',
     },
     {
       id: 'applications',
-      icon: FileUser,
-      label: 'Manager Applications',
+      icon: ClipboardList,
+      label: 'Manage Applications',
       to: '/jobseeker-applications',
     },
     {
       id: 'saved',
-      icon: Star,
-      label: 'Your Saved Jobs',
+      icon: Bookmark,
+      label: 'Saved Jobs',
       to: '/save-items',
     },
     {
       id: 'followed',
-      icon: Heart,
+      icon: Building2,
       label: 'Followed Companies',
       to: '/followed-companies',
     },

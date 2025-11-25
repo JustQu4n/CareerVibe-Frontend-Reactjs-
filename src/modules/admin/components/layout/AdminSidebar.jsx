@@ -134,11 +134,19 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
       {/* User Info */}
       <div className={`p-4 border-b border-gray-200 ${isCollapsed ? 'px-2' : ''}`}>
         <div className="flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
-            <span className="text-white font-semibold text-sm">
-              {user?.fullname?.charAt(0).toUpperCase() || 'A'}
-            </span>
-          </div>
+          <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
+                {user?.avatar ? (
+                  <img 
+                    src={user.avatar} 
+                    alt={user?.fullname || 'Admin'} 
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white font-semibold text-sm">
+                    {user?.fullname?.charAt(0).toUpperCase() || 'A'}
+                  </span>
+                )}
+              </div>
           <AnimatePresence mode="wait">
             {!isCollapsed && (
               <motion.div
