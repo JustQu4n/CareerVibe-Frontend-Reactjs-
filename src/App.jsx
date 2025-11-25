@@ -6,6 +6,8 @@ import {
   RegisterRecruiter, 
   RecruiterLogin, 
   VerifyEmail, 
+  ForgotPassword,
+  ResetPassword,
   Home, 
   JobPostViewDetails, 
   JobseekerApplications, 
@@ -61,6 +63,14 @@ const appRouter = createBrowserRouter([
   {
     path: "/verify-email",
     element: <VerifyEmail />,
+  },
+  {
+    path: "/forgot-password",
+    element: <ForgotPassword />,
+  },
+  {
+    path: "/reset-password",
+    element: <ResetPassword />,
   },
   {
     path: "/view-job-detail/:id",

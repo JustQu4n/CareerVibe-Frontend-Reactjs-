@@ -8,5 +8,6 @@ export { default as Register } from './Register';
 export { default as RegisterRecruiter } from './RegisterRecruiter';
 export { default as RecruiterLogin } from './RecruiterLogin';
 export { default as VerifyEmail } from './VerifyEmail';
-// export { default as ForgotPassword } from './ForgotPassword';
+export { default as ForgotPassword } from './ForgotPassword';
+export { default as ResetPassword } from './ResetPassword';
 // export { default as ResetPassword } from './ResetPassword';
