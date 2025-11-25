@@ -215,7 +215,7 @@ export default function AdminHeader({ isCollapsed, setIsCollapsed }) {
                   {user?.fullname || 'Admin User'}
                 </p>
                 <p className="text-xs text-gray-500">
-                  {user?.role === 'recruiter' ? 'Recruiter' : 'Admin'}
+                  {user?.company?.name || (user?.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1) : 'Admin')}
                 </p>
               </div>
             </motion.button>

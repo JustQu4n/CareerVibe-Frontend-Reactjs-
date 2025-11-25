@@ -12,13 +12,51 @@ const authSlice = createSlice({
     setLoading: (state, action) => {
       state.loading = action.payload;
     },
+    // Accepts either a normalized user object or the raw response from /login
     setUser: (state, action) => {
-      state.user = action.payload;
-      // If token is included in user payload, save it
-      if (action.payload?.token) {
-        state.token = action.payload.token;
+      const payload = action.payload;
+
+      // Clear user when payload is falsy
+      if (!payload) {
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+        localStorage.removeItem('token');
+        return;
+      }
+
+      // Extract tokens (support various field names)
+      const accessToken = payload.accessToken || payload.token || payload.access_token || payload.user?.accessToken || null;
+      const refreshToken = payload.refreshToken || payload.refresh_token || payload.user?.refreshToken || null;
+
+      // The actual user object may be at payload.user or payload itself
+      const rawUser = payload.user || payload;
+
+      // Normalize user fields
+      const normalized = {
+        id: rawUser.user_id || rawUser.id || rawUser.userId || null,
+        email: rawUser.email || null,
+        fullname: rawUser.full_name || rawUser.fullname || rawUser.name || null,
+        avatar: rawUser.avatar || rawUser.avatar_url || rawUser.avatarUrl || null,
+        roles: rawUser.roles || (rawUser.role ? [rawUser.role] : []),
+        role: (rawUser.roles && rawUser.roles[0]) || rawUser.role || null,
+        employer: rawUser.employer || null,
+        company: (rawUser.employer && rawUser.employer.company) || rawUser.company || null,
+      };
+
+      state.user = normalized;
+
+      // Persist tokens and update state.token
+      if (accessToken) {
+        state.token = accessToken;
         state.isAuthenticated = true;
-        localStorage.setItem('accessToken', action.payload.token);
+        localStorage.setItem('accessToken', accessToken);
+        localStorage.setItem('token', accessToken); // backward compat
+      }
+      if (refreshToken) {
+        localStorage.setItem('refreshToken', refreshToken);
       }
     },
     setToken: (state, action) => {
@@ -36,6 +74,7 @@ const authSlice = createSlice({
       state.isAuthenticated = false;
       localStorage.removeItem('accessToken');
       localStorage.removeItem('refreshToken');
+      localStorage.removeItem('token');
     },
   },
 });

@@ -21,9 +21,14 @@ const apiClient = axios.create({
  */
 apiClient.interceptors.request.use(
   (config) => {
-    // Add auth token from localStorage
-    const token = localStorage.getItem('accessToken');
+    // Add auth token from localStorage (check common key variants)
+    const token =
+      localStorage.getItem('accessToken') ||
+      localStorage.getItem('access_token') ||
+      localStorage.getItem('token');
+
     if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
     
@@ -69,7 +74,9 @@ apiClient.interceptors.response.use(
       switch (status) {
         case 401:
           // Check if this is a token refresh request that failed
-          if (originalRequest.url?.includes('/api/auth/refresh')) {
+          // Normalize url check to handle absolute or relative URLs
+          const origUrl = String(originalRequest.url || '');
+          if (origUrl.includes('/api/auth/refresh')) {
             // Refresh token is also expired, logout user
             isRefreshing = false;
             processQueue(error, null);
@@ -79,7 +86,6 @@ apiClient.interceptors.response.use(
             window.location.href = '/login';
             return Promise.reject(error);
           }
-
           // If we haven't tried to refresh yet
           if (!originalRequest._retry) {
             if (isRefreshing) {
@@ -87,11 +93,12 @@ apiClient.interceptors.response.use(
               return new Promise((resolve, reject) => {
                 failedQueue.push({ resolve, reject });
               })
-                .then(token => {
+                .then((token) => {
+                  originalRequest.headers = originalRequest.headers || {};
                   originalRequest.headers['Authorization'] = 'Bearer ' + token;
                   return apiClient(originalRequest);
                 })
-                .catch(err => {
+                .catch((err) => {
                   return Promise.reject(err);
                 });
             }
@@ -99,8 +106,12 @@ apiClient.interceptors.response.use(
             originalRequest._retry = true;
             isRefreshing = true;
 
-            const refreshToken = localStorage.getItem('refreshToken');
-            
+            // Try to get refresh token from common keys
+            const refreshToken =
+              localStorage.getItem('refreshToken') ||
+              localStorage.getItem('refresh_token') ||
+              localStorage.getItem('token_refresh');
+
             if (!refreshToken) {
               // No refresh token available, redirect to login
               toast.error('Session expired. Please login again.');
@@ -109,14 +120,22 @@ apiClient.interceptors.response.use(
             }
 
             try {
-              // Try to refresh the token
+              // Build refresh URL from environment or apiClient baseURL
+              const base = import.meta.env.VITE_API_BASE_URL || apiClient.defaults.baseURL || 'http://localhost:5000';
+              const refreshUrl = `${base.replace(/\/$/, '')}/api/auth/refresh`;
+
+              // Use plain axios (no interceptors) to avoid recursion
               const response = await axios.post(
-                `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000'}/api/auth/refresh`,
+                refreshUrl,
                 { refreshToken },
                 { withCredentials: true }
               );
 
-              const { accessToken, refreshToken: newRefreshToken } = response.data;
+              const { accessToken, refreshToken: newRefreshToken } = response.data || {};
+
+              if (!accessToken) {
+                throw new Error('No access token returned from refresh');
+              }
 
               // Store new tokens
               localStorage.setItem('accessToken', accessToken);
@@ -124,9 +143,15 @@ apiClient.interceptors.response.use(
                 localStorage.setItem('refreshToken', newRefreshToken);
               }
 
+              // Update axios instance default header so future requests use the new token
+              apiClient.defaults.headers = apiClient.defaults.headers || {};
+              apiClient.defaults.headers.common = apiClient.defaults.headers.common || {};
+              apiClient.defaults.headers.common['Authorization'] = 'Bearer ' + accessToken;
+
               // Update the original request with new token
+              originalRequest.headers = originalRequest.headers || {};
               originalRequest.headers['Authorization'] = 'Bearer ' + accessToken;
-              
+
               // Process all queued requests
               processQueue(null, accessToken);
               isRefreshing = false;
