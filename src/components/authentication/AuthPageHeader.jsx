@@ -14,6 +14,7 @@
  */
 
 import React from 'react';
+import logo from '@/assets/logo.png';
 
 /**
  * AuthPageHeader Component
@@ -21,7 +22,7 @@ import React from 'react';
 export const AuthPageHeader = React.memo(({ 
   title = "Welcome back", 
   subtitle = "Sign in to your account",
-  logoSrc = "/src/assets/logo.png",
+  logoSrc = logo,
   logoAlt = "CareerVibe"
 }) => {
   return (

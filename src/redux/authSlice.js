@@ -37,6 +37,9 @@ const authSlice = createSlice({
       // Normalize user fields
       const normalized = {
         id: rawUser.user_id || rawUser.id || rawUser.userId || null,
+        user_id: rawUser.user_id || rawUser.id || rawUser.userId || null,
+        job_seeker_id: rawUser.job_seeker_id || rawUser.jobSeekerId || null,
+        jobSeekerId: rawUser.job_seeker_id || rawUser.jobSeekerId || null,
         email: rawUser.email || null,
         fullname: rawUser.full_name || rawUser.fullname || rawUser.name || null,
         avatar: rawUser.avatar || rawUser.avatar_url || rawUser.avatarUrl || null,

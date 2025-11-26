@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchRelatedJobs } from '@/redux/jobPostSlice';
+import apiClient from '@/api/client';
 import { Navbar } from '@/components/navbar';
 import Footer from '@/components/components_lite/Footer';
 import JDSummaryModal from '@/components/components_lite/JDSummaryModal';
@@ -40,8 +40,11 @@ export default function JobPostViewDetails() {
   // Redux selectors
   const { singleJob } = useSelector((store) => store.job);
   const { user } = useSelector((store) => store.auth);
-  const { relatedJobs, loadingRelated } = useSelector((store) => store.jobPosts);
 
+  // Local state for related jobs (fetched directly from jobseeker related endpoint)
+  const [relatedJobs, setRelatedJobs] = React.useState([]);
+  const [loadingRelated, setLoadingRelated] = React.useState(false);
+  const [relatedError, setRelatedError] = React.useState(null);
   // Local state
   const [activeTab, setActiveTab] = useState('description');
   const [showSummaryModal, setShowSummaryModal] = useState(false);
@@ -51,12 +54,30 @@ export default function JobPostViewDetails() {
   const { bookmarked, toggleBookmark } = useJobBookmark(jobId, user);
   const { daysRemaining } = useJobDateInfo(singleJob?.expires_at);
 
-  // Fetch related jobs khi component mount
+  // Fetch related jobs when component mounts
   useEffect(() => {
-    if (jobId) {
-      dispatch(fetchRelatedJobs(jobId));
-    }
-  }, [jobId, dispatch]);
+    let mounted = true;
+    const fetchRelated = async () => {
+      if (!jobId) return;
+      setLoadingRelated(true);
+      setRelatedError(null);
+      try {
+        const res = await apiClient.get(`/api/jobseeker/job-posts/${jobId}/related`, {
+          params: { limit: 5 }
+        });
+        const data = res.data?.data || res.data || [];
+        if (mounted) setRelatedJobs(Array.isArray(data) ? data : []);
+      } catch (err) {
+        if (mounted) setRelatedError(err.response?.data?.message || err.message || 'Failed to load related jobs');
+      } finally {
+        if (mounted) setLoadingRelated(false);
+      }
+    };
+
+    fetchRelated();
+
+    return () => { mounted = false; };
+  }, [jobId]);
 
   // Handler: Navigate to apply page - sử dụng useCallback để tránh re-create function
   const handleApplyClick = useCallback(() => {

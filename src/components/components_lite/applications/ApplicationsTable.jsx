@@ -59,13 +59,16 @@ const ApplicationsTable = ({ applications = [], onViewDetails, onClearFilters })
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {applications.map((app) => (
-              <ApplicationRow 
-                key={app.application_id} 
-                application={app} 
-                onViewDetails={onViewDetails}
-              />
-            ))}
+            {applications.map((app, idx) => {
+              const rowKey = app?.application_id || app?._id || app?.id || app?.applicationId || idx;
+              return (
+                <ApplicationRow
+                  key={rowKey}
+                  application={app}
+                  onViewDetails={onViewDetails}
+                />
+              );
+            })}
           </tbody>
         </table>
       </div>

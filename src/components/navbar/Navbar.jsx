@@ -6,6 +6,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Menu, X } from 'lucide-react';
+import logo from '@/assets/logo.png';
 import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
 import ThemeToggle from '@/components/components_lite/ThemeToggle';
@@ -40,13 +41,15 @@ const Navbar = () => {
               className="flex items-center"
             >
               <img
-                src="/vite.svg"
+                src={logo}
                 alt="CareerVibe"
                 className="h-8 w-auto sm:h-10"
               />
+               {/*
               <span className="ml-2 hidden md:inline text-lg font-semibold text-gray-800">
                 CareerVibe
               </span>
+              */}
             </Link>
           </div>
 

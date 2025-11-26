@@ -40,8 +40,6 @@ import useApplicationModal from '@/hooks/useApplicationModal';
  */
 const JobseekerApplications = () => {
   const dispatch = useDispatch();
-  
-  // Redux selectors
   const { applications, loading, error } = useSelector((state) => state.jobseekerApplications);
   const { user } = useSelector((state) => state.auth);
   // Use job_seeker_id instead of user_id
@@ -116,13 +114,16 @@ const JobseekerApplications = () => {
                 Recent Applications
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                {filteredApplications?.slice(0, 6).map((app) => (
-                  <ApplicationCard
-                    key={app._id}
-                    application={app}
-                    onClick={() => handleOpenModal(app)}
-                  />
-                ))}
+                {filteredApplications?.slice(0, 6).map((app, idx) => {
+                  const appKey = app?._id || app?.id || app?.application_id || app?.applicationId || app?.uuid || idx;
+                  return (
+                    <ApplicationCard
+                      key={appKey}
+                      application={app}
+                      onClick={() => handleOpenModal(app)}
+                    />
+                  );
+                })}
               </div>
 
               {/* All Applications Table - Component đã được tách riêng */}

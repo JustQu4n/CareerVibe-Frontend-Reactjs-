@@ -49,38 +49,6 @@ const MobileMenu = ({
           </div>
         ) : (
           <div className="pt-2">
-            {/* User Info */}
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage 
-                  src={avatarUrl} 
-                  alt={`${fullName}'s profile`}
-                />
-              </Avatar>
-              <div>
-                <div className="font-semibold">{fullName}</div>
-                <div className="text-xs text-muted-foreground">
-                  {user.email}
-                </div>
-              </div>
-            </div>
-
-            {/* Mobile Menu Actions */}
-            <div className="mt-3 flex flex-col gap-2">
-              <Button 
-                variant="link" 
-                onClick={onNavigateToProfile}
-              >
-                Profile
-              </Button>
-              <Button 
-                variant="link" 
-                onClick={onLogout}
-                disabled={isLoggingOut}
-              >
-                {isLoggingOut ? 'Logging out...' : 'Logout'}
-              </Button>
-            </div>
           </div>
         )}
       </div>
