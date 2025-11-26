@@ -135,32 +135,7 @@ export const deleteJobPostById = createAsyncThunk(
     }
   }
 );
-// Thunk to fetch related job posts
-export const fetchRelatedJobs = createAsyncThunk(
-  "job/fetchRelatedJobs",
-  async (jobId, { rejectWithValue }) => {
-    try {
-      // Make the API request
-      const response = await axios.get(
-        `http://localhost:5000/api/job-posts/jobs/${jobId}/related`, 
-        {
-          withCredentials: true
-        }
-      );
-      
-      // Check if the response is successful
-      if (response.data.success) {
-        return response.data.relatedJobs;
-      } else {
-        return rejectWithValue(response.data.message || "Failed to fetch related jobs");
-      }
-    } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "An error occurred while fetching related jobs"
-      );
-    }
-  }
-);
+// Related jobs are fetched directly in the UI component; removed thunk from slice
 
 // --- Slice ---
 const jobPostSlice = createSlice({
@@ -168,7 +143,6 @@ const jobPostSlice = createSlice({
   initialState: {
     jobs: [],
     filteredJobs: [],
-    relatedJobs: [],
     pagination: null,
     loading: false,
     error: null,
@@ -176,9 +150,6 @@ const jobPostSlice = createSlice({
   reducers: {
     addJobPost: (state, action) => {
       state.push(action.payload);
-    },
-        setRelatedJobs: (state, action) => {
-      state.relatedJobs = action.payload;
     },
     clearJobPosts: (state) => {
       state.jobs = [];
@@ -213,18 +184,7 @@ const jobPostSlice = createSlice({
         state.jobs = [];
         state.filteredJobs = [];
       })
-      .addCase(fetchRelatedJobs.pending, (state) => {
-        state.loadingRelated = true;
-        state.errorRelated = null;
-      })
-      .addCase(fetchRelatedJobs.fulfilled, (state, action) => {
-        state.loadingRelated = false;
-        state.relatedJobs = action.payload;
-      })
-      .addCase(fetchRelatedJobs.rejected, (state, action) => {
-        state.loadingRelated = false;
-        state.errorRelated = action.payload;
-      })
+      // related jobs are now fetched on the component level
       // Add these to your extraReducers builder chain
 .addCase(createJobPost.pending, (state) => {
   state.loading = true;

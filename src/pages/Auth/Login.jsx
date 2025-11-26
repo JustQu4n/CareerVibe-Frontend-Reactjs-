@@ -2,7 +2,7 @@ import React, { useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
-
+import logo from '@/assets/logo.png';
 // Custom hooks
 import { useLogin } from '@/hooks/useLogin';
 
@@ -98,7 +98,7 @@ const Login = () => {
               {/* Logo */}
               <div className="flex justify-center mb-6">
                 <img 
-                  src="https://media.licdn.com/dms/image/v2/C561BAQGnoaNjsBLsQg/company-background_10000/company-background_10000/0/1590217283917/jobseeker_hub_cover?e=2147483647&v=beta&t=izGlJYuYMvsHNLdu5MgxzoZzZotna4k65zE2r2yTjD0" 
+                  src={logo}
                   alt="CareerVibe Logo" 
                   className="h-10"
                 />

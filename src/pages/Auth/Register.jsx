@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import logo from '@/assets/logo.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useSelector } from 'react-redux';
@@ -77,7 +78,7 @@ const Register = () => {
               {/* Logo */}
               <div className="flex justify-center mb-4">
                 <img
-                  src="/src/assets/logo.png"
+                  src={logo}
                   alt="CareerVibe"
                   className="h-10"
                 />

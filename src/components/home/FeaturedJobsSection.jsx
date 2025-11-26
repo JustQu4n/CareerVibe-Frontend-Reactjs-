@@ -160,10 +160,6 @@ const FeaturedJobsSection = React.memo(({
                   </div>
                 </div>
                 
-                <p className="text-sm text-gray-600 mb-4 line-clamp-2">
-                  {job.description || 'No description available'}
-                </p>
-                
                 <div className="pt-4 mt-4 border-t border-gray-100 flex justify-between items-center">
                   <div className="flex items-center text-xs text-gray-500">
                     <Clock className="h-3.5 w-3.5 mr-1" />
