@@ -29,7 +29,7 @@ import {
   ApplicationFilters,
   ApplicationCard,
   ApplicationsTable,
-} from '@/components/components_lite/applications';
+} from '@/components/applications';
 
 // Import Custom Hooks
 import useApplicationFilters from '@/hooks/useApplicationFilters';

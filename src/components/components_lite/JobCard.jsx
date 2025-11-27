@@ -17,13 +17,13 @@ const JobCard = ({ job }) => {
     };
 
     return (
-        <div className="w-full bg-white rounded-xl border-2 border-blue-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
-            {/* Top section - Company logo, badges, title, salary, status */}
-            <div className="p-4 md:p-5 border-b border-gray-100">
-                <div className="flex gap-4 items-start">
+        <div className="w-full bg-white rounded-xl border border-blue-200 shadow-sm hover:shadow-md transition-shadow duration-200 overflow-hidden">
+                {/* Top section - Company logo, badges, title, salary, status */}
+                <div className="p-3 md:p-4 border-b border-gray-100">
+                    <div className="flex gap-3 items-start">
                     {/* Company Logo */}
                     <div className="flex-shrink-0">
-                        <div className="w-20 h-20 md:w-24 md:h-24 rounded-lg border-2 border-blue-100 bg-white p-2 flex items-center justify-center">
+                        <div className="w-16 h-16 md:w-20 md:h-20 rounded-lg border border-blue-100 bg-white p-1.5 flex items-center justify-center">
                             <img
                                 src={job.company?.logo_url || 'https://via.placeholder.com/80'}
                                 alt={job.company?.name}
@@ -33,7 +33,7 @@ const JobCard = ({ job }) => {
                     </div>
 
                     {/* Main content */}
-                    <div className="flex-1 flex flex-col gap-2">
+                    <div className="flex-1 flex flex-col gap-1">
                         {/* Badges row */}
                         <div className="flex flex-wrap gap-2 items-center">
                             {job.highlight && (
@@ -49,19 +49,16 @@ const JobCard = ({ job }) => {
                         </div>
 
                         {/* Job Title */}
-                        <h2 className="text-base md:text-lg font-bold text-gray-900 line-clamp-2 leading-tight">
+                        <h2 className="text-sm md:text-base font-bold text-gray-900 line-clamp-2 leading-tight">
                             {job.title}
                         </h2>
 
                         {/* Salary and status */}
-                        <div className="flex items-center gap-3 flex-wrap">
-                            <span className="text-lg font-bold text-green-600">
+                        <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-base text-gray-600">
                                 {job.salary_range || 'Thỏa thuận'}
                             </span>
-                            <span className="inline-flex items-center gap-1 text-green-600 text-sm font-semibold">
-                                <span className="w-2 h-2 rounded-full bg-green-600"></span>
-                                Thỏa thuận
-                            </span>
+                        
                         </div>
 
                         {/* Company info */}
@@ -73,7 +70,7 @@ const JobCard = ({ job }) => {
                         </div>
 
                         {/* Location and time */}
-                        <div className="flex items-center gap-4 text-sm text-gray-600">
+                        <div className="flex items-center gap-3 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                                 <MapPin size={14} className="text-blue-500" />
                                 <span>{job.location || 'Không xác định'}</span>
@@ -88,66 +85,24 @@ const JobCard = ({ job }) => {
                     </div>
 
                     {/* Right side - Quick view link and status */}
-                    <div className="flex flex-col items-end gap-2">
+                    <div className="flex flex-col items-end gap-1">
                         <button
                             onClick={handleQuickView}
-                            className="text-green-600 hover:text-green-700 font-semibold text-sm flex items-center gap-1 transition-colors"
+                            className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center gap-1 transition-colors"
                         >
                             Xem nhanh
                             <ChevronRight size={16} />
                         </button>
                         {job.status === 'active' && (
-                            <span className="inline-flex items-center gap-1 text-green-600 text-xs font-bold">
-                                <span className="w-2 h-2 rounded-full bg-green-600"></span>
-                                Thỏa thuận
+                            <span className="inline-flex items-center gap-1 text-blue-600 text-xs font-bold">
+                                <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                                {job.status === 'active' ? 'Đang tuyển' : 'Hết hạn'}
                             </span>
                         )}
                     </div>
                 </div>
             </div>
 
-            {/* Bottom section - Job details and actions */}
-            <div className="p-4 md:p-5 bg-gray-50">
-                <div className="flex items-center justify-between flex-wrap gap-3">
-                    {/* Job details */}
-                    <div className="flex-1 flex flex-wrap items-center gap-3 text-sm text-gray-600">
-                        {job.employment_type && (
-                            <span>{job.employment_type === 'full-time' ? 'Toàn thời gian' : job.employment_type}</span>
-                        )}
-                        {job.company?.industry && (
-                            <span className="text-gray-400">•</span>
-                        )}
-                        {job.company?.industry && (
-                            <span>{job.company.industry}</span>
-                        )}
-                        {job.category?.name && (
-                            <>
-                                <span className="text-gray-400">•</span>
-                                <span>{job.category.name}</span>
-                            </>
-                        )}
-                        {job.views_count && (
-                            <>
-                                <span className="text-gray-400">+</span>
-                                <span>{job.views_count}</span>
-                            </>
-                        )}
-                    </div>
-
-                    {/* Action buttons */}
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={handleApply}
-                            className="bg-green-600 hover:bg-green-700 text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors flex items-center gap-1"
-                        >
-                            Ứng tuyển
-                        </button>
-                        <button className="p-2 hover:bg-gray-200 rounded-lg transition-colors">
-                            <Bookmark size={18} className="text-gray-500 hover:text-blue-600" />
-                        </button>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
