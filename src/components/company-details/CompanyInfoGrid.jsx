@@ -14,10 +14,15 @@ const CompanyInfoGrid = ({ company, jobPostsCount }) => {
     {
       icon: <Calendar className="w-6 h-6 text-blue-600" />,
       label: "Founded In",
-      value: new Date(company.created_at).toLocaleDateString('en-US', { 
-        year: 'numeric', 
-        month: 'long' 
-      }),
+      value: (() => {
+        const dateStr = company.founded_at || company.created_at;
+        if (!dateStr) return 'Unknown';
+        try {
+          return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'long' });
+        } catch (e) {
+          return dateStr;
+        }
+      })(),
       bgColor: "from-blue-50 to-blue-100"
     },
     {
@@ -28,9 +33,15 @@ const CompanyInfoGrid = ({ company, jobPostsCount }) => {
     },
     {
       icon: <Users className="w-6 h-6 text-green-600" />,
+      label: "Employees",
+      value: company.employees_range || 'Not specified',
+      bgColor: "from-green-50 to-green-100"
+    },
+    {
+      icon: <Briefcase className="w-6 h-6 text-indigo-600" />,
       label: "Open Positions",
       value: `${jobPostsCount} Active Jobs`,
-      bgColor: "from-green-50 to-green-100"
+      bgColor: "from-indigo-50 to-indigo-100"
     },
     {
       icon: <Briefcase className="w-6 h-6 text-orange-600" />,

@@ -25,6 +25,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '@/redux/authSlice';
 import { toast } from 'sonner';
+import logo from '@/assets/logo.png';
 
 export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
   const location = useLocation();
@@ -108,13 +109,8 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
               transition={{ duration: 0.2 }}
               className="flex items-center gap-3"
             >
-              <div className="h-10 w-10 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center">
-                <Sparkles className="h-5 w-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900">CareerVibe</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
-              </div>
+             
+                <img src={logo} alt="CareerVibe Logo" className=" object-contain" />
             </motion.div>
           )}
         </AnimatePresence>
@@ -132,7 +128,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
       </div>
 
       {/* User Info */}
-      <div className={`p-4 border-b border-gray-200 ${isCollapsed ? 'px-2' : ''}`}>
+      {/* <div className={`p-4 border-b border-gray-200 ${isCollapsed ? 'px-2' : ''}`}>
         <div className="flex items-center gap-3">
           <div className="h-8 w-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center overflow-hidden">
                 {user?.avatar ? (
@@ -166,7 +162,7 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
           </AnimatePresence>
         </div>
       </div>
-
+        */}
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto py-4 px-2">
         <div className="space-y-1">

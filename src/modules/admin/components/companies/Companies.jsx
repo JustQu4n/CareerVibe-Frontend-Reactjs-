@@ -29,9 +29,13 @@ import {
   TrendingUp,
   DollarSign
 } from 'lucide-react';
+import apiClient from '@/api/client';
 
 const Companies = () => {
   const { user } = useSelector((state) => state.auth);
+  const [companyDetail, setCompanyDetail] = useState(null);
+  const [loadingCompany, setLoadingCompany] = useState(false);
+  const [companyError, setCompanyError] = useState(null);
   const [input, setInput] = useState("");
   const [isFollowing, setIsFollowing] = useState(false);
   const [showMore, setShowMore] = useState(false);
@@ -41,6 +45,29 @@ const Companies = () => {
   const toggleFollow = () => setIsFollowing(!isFollowing);
   const toggleShowMore = () => setShowMore(!showMore);
   const dispatch = useDispatch();
+
+  const DEFAULT_OVERVIEW = 'No overview available for this company.';
+
+  useEffect(() => {
+    const fetchCompany = async () => {
+      const userId = user?.id || user?.user_id;
+      if (!userId) return;
+      setLoadingCompany(true);
+      setCompanyError(null);
+      try {
+        const resp = await apiClient.get(`/api/employer/companies/detail-company/${userId}`);
+        // Response shape: { data: { ...company } }
+        setCompanyDetail(resp.data?.data || resp.data || null);
+      } catch (err) {
+        console.error('Failed to fetch company detail', err);
+        setCompanyError(err?.message || 'Failed to load');
+      } finally {
+        setLoadingCompany(false);
+      }
+    };
+
+    fetchCompany();
+  }, [user]);
 
   // Example job listings data - in a real app, this would come from an API
   const companyJobs = [
@@ -75,10 +102,9 @@ const Companies = () => {
 
   // Example company stats
   const companyStats = [
-    { label: "Employees", value: "1,000 - 4,999", icon: <Users className="h-5 w-5" /> },
-    { label: "Founded", value: "29/01/2000", icon: <Calendar className="h-5 w-5" /> },
-    { label: "Industry", value: "Manufacturing", icon: <Briefcase className="h-5 w-5" /> },
-    { label: "Revenue", value: "$50M - $100M", icon: <TrendingUp className="h-5 w-5" /> }
+    { label: "Employees", value: companyDetail?.employees_range || user?.company?.employees_range || "-", icon: <Users className="h-5 w-5" /> },
+    { label: "Founded", value: companyDetail?.founded_at ? new Date(companyDetail.founded_at).toLocaleDateString('en-GB') : (user?.company?.founded_at || '-'), icon: <Calendar className="h-5 w-5" /> },
+    { label: "Industry", value: companyDetail?.industry || user?.company?.industry || "-", icon: <Briefcase className="h-5 w-5" /> },
   ];
 
   // Example company benefits
@@ -98,7 +124,7 @@ const Companies = () => {
       <div className="relative h-64 md:h-80 overflow-hidden bg-gradient-to-r from-blue-600 to-indigo-700">
         <div className={`absolute inset-0 transition-opacity duration-300 ${isHeaderExpanded ? 'opacity-30' : 'opacity-10'}`}>
           <img 
-            src={user?.company?.banner || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"} 
+            src={companyDetail?.banner || user?.company?.banner || "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2070&q=80"} 
             alt="Company Banner" 
             className="w-full h-full object-cover"
           />
@@ -109,37 +135,37 @@ const Companies = () => {
             <div className="relative -mb-12 md:-mb-1 z-10">
               <div className="w-24 h-24 md:w-32 md:h-32 rounded-xl bg-white p-1 shadow-lg overflow-hidden">
                 <img
-                  src={user?.company?.logo || "https://via.placeholder.com/150"}
-                  alt="Company Logo"
+                  src={companyDetail?.logo_url || companyDetail?.logo || user?.company?.logo || "https://via.placeholder.com/150"}
+                  alt={companyDetail?.name || user?.company?.name || "Company Logo"}
                   className="w-full h-full object-cover rounded-lg"
                 />
               </div>
             </div>
             
             <div className="mt-16 md:mt-0 md:ml-8 text-white flex-1">
-              <h1 className="text-2xl md:text-3xl font-bold">{user?.company?.name || "Company Name"}</h1>
+              <h1 className="text-2xl md:text-3xl font-bold">{companyDetail?.name || user?.company?.name || "Company Name"}</h1>
               <div className="flex items-center mt-1 text-blue-100">
                 <MapPin className="h-4 w-4 mr-1" />
-                <span className="text-sm">{user?.company?.address || "Address not specified"}</span>
+                <span className="text-sm">{companyDetail?.contact_address || companyDetail?.location || user?.company?.address || "Address not specified"}</span>
               </div>
             </div>
             
-            <div className="mt-4 px-6 md:mt-0 flex gap-4">
-              <button 
-                onClick={toggleFollow} 
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  isFollowing 
-                    ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
-                    : 'bg-white text-blue-700 hover:bg-blue-50'
+            <div className="mt-4 px-6 md:mt-0 flex gap-3 items-center">
+              <button
+                onClick={toggleFollow}
+                className={`flex items-center gap-2 px-4 py-2 rounded-md text-sm font-semibold shadow-sm transition-colors ${
+                  isFollowing
+                    ? 'bg-white text-blue-700 border border-blue-100'
+                    : 'bg-blue-600 text-white hover:bg-blue-700'
                 }`}
               >
                 {isFollowing ? <CheckCircle className="h-4 w-4" /> : <Heart className="h-4 w-4" />}
-                {isFollowing ? 'Following' : 'Follow'}
+                <span>{isFollowing ? 'Following' : 'Follow'}</span>
               </button>
-              
-              <button className="flex items-center gap-2 bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg text-sm font-medium text-white transition-colors">
+
+              <button className="flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium border border-white/20 bg-white/10 text-white hover:bg-white/20 transition-colors">
                 <Share2 className="h-4 w-4" />
-                Share
+                <span>Share</span>
               </button>
             </div>
           </div>
@@ -187,7 +213,7 @@ const Companies = () => {
                 activeTab === 'photos' ? 'border-blue-600 text-blue-600' : 'border-transparent text-gray-600 hover:text-gray-900'
               }`}
             >
-              Photos
+                Photos
             </button>
             <button 
               onClick={() => setActiveTab('reviews')} 
@@ -216,28 +242,19 @@ const Companies = () => {
                       <Building className="mr-2 text-blue-600 h-5 w-5" />
                       Company Overview
                     </h2>
-                    
-                    <div className="prose prose-blue max-w-none">
+
+                    <div className="prose prose-blue max-w-none mb-4">
                       <p className="text-gray-700 leading-relaxed whitespace-pre-line">
-                        {showMore ? 
-                          `Được thành lập ngày 29/01/2000, khởi đầu từ một công ty chuyên kinh doanh các sản phẩm vật liệu hàn, kim loại màu...
-Qua 20 năm hoạt động, đến nay Kim Tín đã phát triển thành 1 tập đoàn gồm hơn 10 công ty thành viên trải dài từ Bắc đến Nam.
-
-Với các sản phẩm dịch vụ có chất lượng cao và khả năng tài chính lành mạnh, tập đoàn Kim Tín đã có uy tín cả trong và ngoài nước
-như là một đối tác tin cậy có trình độ và hiệu quả hoạt động cao. Chính vì thế kết quả kinh doanh của tập đoàn đã liên tục phát triển vững chắc
-trong thời gian qua.
-
-Đằng sau sự tăng trưởng mạnh mẽ của Kim Tín là sức mạnh và sự đóng góp của hơn 2.500 cán bộ công nhân viên có trình độ cao, năng động, trẻ trung và nhiệt huyết.
-Cùng với mục tiêu "Phát triển Kim Tín trở thành một tập đoàn mạnh trong ngành kim khí và gỗ", Kim Tín đã, đang và sẽ đầu tư hàng loạt các dự án mới
-trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT TRIỂN VÀ TRƯỜNG TỒN"` 
-                          : 
-                          `Được thành lập ngày 29/01/2000, khởi đầu từ một công ty chuyên kinh doanh các sản phẩm vật liệu hàn, kim loại màu...`
-                        }
+                        {(() => {
+                          const full = companyDetail?.overview || companyDetail?.description || DEFAULT_OVERVIEW;
+                          if (showMore) return full;
+                          return full.length > 260 ? full.slice(0, 260) + '...' : full;
+                        })()}
                       </p>
                     </div>
-                    
+
                     <button
-                      className="mt-4 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
+                      className="mt-2 text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center"
                       onClick={toggleShowMore}
                     >
                       {showMore ? 'Show Less' : 'Read More'}
@@ -245,7 +262,7 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
                     </button>
                   </div>
                 </div>
-                
+
                 {/* Company Values */}
                 <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
                   <div className="p-6">
@@ -253,34 +270,26 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
                       <Award className="mr-2 text-blue-600 h-5 w-5" />
                       Company Values
                     </h2>
-                    
+
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="bg-blue-50 rounded-lg p-4 border border-blue-100">
                         <h3 className="font-semibold text-gray-800 mb-2">Vision</h3>
-                        <p className="text-gray-600 text-sm">
-                          "THAY ĐỔI ĐỂ PHÁT TRIỂN VÀ TRƯỜNG TỒN"
-                        </p>
+                        <p className="text-gray-600 text-sm">{companyDetail?.vision || 'THAY ĐỔI ĐỂ PHÁT TRIỂN VÀ TRƯỜNG TỒN'}</p>
                       </div>
-                      
+
                       <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-100">
                         <h3 className="font-semibold text-gray-800 mb-2">Mission</h3>
-                        <p className="text-gray-600 text-sm">
-                          "Phát triển Kim Tín trở thành một tập đoàn mạnh trong ngành kim khí và gỗ"
-                        </p>
+                        <p className="text-gray-600 text-sm">{companyDetail?.mission || 'Phát triển Kim Tín trở thành một tập đoàn mạnh trong ngành kim khí và gỗ'}</p>
                       </div>
-                      
+
                       <div className="bg-purple-50 rounded-lg p-4 border border-purple-100">
                         <h3 className="font-semibold text-gray-800 mb-2">Innovation</h3>
-                        <p className="text-gray-600 text-sm">
-                          Luôn đi đầu trong việc ứng dụng công nghệ và đổi mới sáng tạo
-                        </p>
+                        <p className="text-gray-600 text-sm">{companyDetail?.innovation || 'Luôn đi đầu trong việc ứng dụng công nghệ và đổi mới sáng tạo'}</p>
                       </div>
-                      
+
                       <div className="bg-emerald-50 rounded-lg p-4 border border-emerald-100">
                         <h3 className="font-semibold text-gray-800 mb-2">Sustainability</h3>
-                        <p className="text-gray-600 text-sm">
-                          Cam kết phát triển bền vững và có trách nhiệm với môi trường
-                        </p>
+                        <p className="text-gray-600 text-sm">{companyDetail?.sustainability || 'Cam kết phát triển bền vững và có trách nhiệm với môi trường'}</p>
                       </div>
                     </div>
                   </div>
@@ -353,7 +362,7 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
                 
                 <div className="p-6 text-center border-t border-gray-100">
                   <Link to="/jobs/company/1" className="text-blue-600 hover:text-blue-800 font-medium">
-                    View all jobs at {user?.company?.name || "this company"} →
+                    View all jobs at {companyDetail?.name || user?.company?.name || "this company"} →
                   </Link>
                 </div>
               </div>
@@ -566,32 +575,34 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
                 <h3 className="font-semibold text-gray-800">Company Information</h3>
               </div>
               
-              <div className="p-6 space-y-5">
-                {companyStats.map((stat, index) => (
-                  <div key={index} className="flex items-start">
-                    <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                      {stat.icon}
+              <div className="p-6">
+                <div className="grid grid-cols-2 gap-4">
+                  {companyStats.map((stat, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+                      <div className="flex items-center justify-center h-10 w-10 rounded-md bg-blue-50 text-blue-600">
+                        {stat.icon}
+                      </div>
+                      <div>
+                        <p className="text-xs text-gray-500">{stat.label}</p>
+                        <p className="font-semibold text-gray-800 text-sm">{stat.value}</p>
+                      </div>
                     </div>
-                    <div className="ml-4">
-                      <p className="text-sm text-gray-500">{stat.label}</p>
-                      <p className="font-medium text-gray-800">{stat.value}</p>
-                    </div>
+                  ))}
+                </div>
+
+                <div className="mt-4 p-3 bg-white rounded-lg border border-gray-100 shadow-sm flex items-center gap-3">
+                  <div className="flex items-center justify-center h-10 w-10 rounded-md bg-indigo-50 text-indigo-600">
+                    <Globe className="h-5 w-5" />
                   </div>
-                ))}
-                
-                <div className="flex items-start">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Globe className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-500">Website</p>
-                    <a 
-                      href={user?.company?.domain || "https://example.com"} 
-                      target="_blank" 
-                      rel="noopener noreferrer" 
-                      className="font-medium text-blue-600 hover:text-blue-800"
+                  <div>
+                    <p className="text-xs text-gray-500">Website</p>
+                    <a
+                      href={companyDetail?.website || user?.company?.domain || "https://example.com"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-blue-600 hover:text-blue-800 text-sm"
                     >
-                      {user?.company?.domain || "example.com"}
+                      {companyDetail?.website ? companyDetail.website.replace(/^https?:\/\//, '') : (user?.company?.domain || "example.com")}
                     </a>
                   </div>
                 </div>
@@ -604,126 +615,55 @@ trên khắp cả nước, đạt đến tầm nhìn: "THAY ĐỔI ĐỂ PHÁT T
                 <h3 className="font-semibold text-gray-800">Contact Information</h3>
               </div>
               
-              <div className="p-6 space-y-5">
-                <div className="flex items-start">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <MapPin className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-500">Address</p>
-                    <p className="font-medium text-gray-800">{user?.company?.address || "Company Address"}</p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Mail className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-500">Email</p>
-                    <a 
-                      href={`mailto:${user?.company?.email || "contact@example.com"}`} 
-                      className="font-medium text-blue-600 hover:text-blue-800"
-                    >
-                      {user?.company?.email || "contact@example.com"}
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="flex items-start">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
-                    <Phone className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div className="ml-4">
-                    <p className="text-sm text-gray-500">Phone</p>
-                    <a 
-                      href={`tel:${user?.company?.phone || "+1234567890"}`} 
-                      className="font-medium text-blue-600 hover:text-blue-800"
-                    >
-                      {user?.company?.phone || "+1234567890"}
-                    </a>
-                  </div>
-                </div>
-                
-                <div className="border-t border-gray-100 pt-5 mt-5">
-                  <p className="text-sm text-gray-500 mb-3">Connect with us</p>
-                  <div className="flex items-center gap-4">
-                    <a 
-                      href="#" 
-                      className="h-10 w-10 rounded-lg bg-blue-600 hover:bg-blue-700 flex items-center justify-center text-white transition-colors"
-                      aria-label="Facebook"
-                    >
-                      <Facebook className="h-5 w-5" />
-                    </a>
-                    <a 
-                      href="#" 
-                      className="h-10 w-10 rounded-lg bg-blue-500 hover:bg-blue-600 flex items-center justify-center text-white transition-colors"
-                      aria-label="Twitter"
-                    >
-                      <Twitter className="h-5 w-5" />
-                    </a>
-                    <a 
-                      href="#" 
-                      className="h-10 w-10 rounded-lg bg-blue-700 hover:bg-blue-800 flex items-center justify-center text-white transition-colors"
-                      aria-label="LinkedIn"
-                    >
-                      <Linkedin className="h-5 w-5" />
-                    </a>
-                    <a 
-                      href="#" 
-                      className="h-10 w-10 rounded-lg bg-gradient-to-br from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 flex items-center justify-center text-white transition-colors"
-                      aria-label="Instagram"
-                    >
-                      <Instagram className="h-5 w-5" />
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            {/* Similar Companies */}
-            <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100">
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b border-gray-100">
-                <h3 className="font-semibold text-gray-800">Similar Companies</h3>
-              </div>
-              
-              <div className="p-6">
-                <div className="space-y-4">
-                  {[1, 2, 3].map((company) => (
-                    <div key={company} className="flex items-center">
-                      <div className="h-12 w-12 rounded-lg bg-gray-100 flex items-center justify-center overflow-hidden">
-                        <img 
-                          src={`https://source.unsplash.com/random/100x100?logo,${company}`} 
-                          alt="Company logo" 
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-4">
-                        <h4 className="font-medium text-gray-800 hover:text-blue-600 transition-colors">
-                          <Link to={`/companies/${company}`}>
-                            {['AcmeCorp', 'TechVision', 'Innovate Inc.'][company-1]}
-                          </Link>
-                        </h4>
-                        <p className="text-sm text-gray-500">
-                          {['Manufacturing', 'Technology', 'Software'][company-1]}
-                        </p>
-                      </div>
-                      <div className="ml-auto">
-                        <button className="text-gray-400 hover:text-blue-600 transition-colors">
-                          <Heart className="h-5 w-5" />
-                        </button>
-                      </div>
+              <div className="p-6 space-y-4">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center text-blue-600">
+                      <MapPin className="h-5 w-5" />
                     </div>
-                  ))}
+                    <div>
+                      <p className="text-xs text-gray-500">Address</p>
+                      <p className="font-medium text-gray-800 text-sm">{companyDetail?.contact_address || companyDetail?.location || user?.company?.address || "Company Address"}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-indigo-50 to-purple-50 flex items-center justify-center text-indigo-600">
+                      <Mail className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Email</p>
+                      <a href={`mailto:${companyDetail?.contact_email || user?.company?.email || "contact@example.com"}`} className="font-medium text-blue-600 hover:text-blue-800 text-sm">
+                        {companyDetail?.contact_email || user?.company?.email || "contact@example.com"}
+                      </a>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-emerald-50 to-emerald-100 flex items-center justify-center text-emerald-600">
+                      <Phone className="h-5 w-5" />
+                    </div>
+                    <div>
+                      <p className="text-xs text-gray-500">Phone</p>
+                      <a href={`tel:${companyDetail?.contact_phone || user?.company?.phone || "+1234567890"}`} className="font-medium text-blue-600 hover:text-blue-800 text-sm">
+                        {companyDetail?.contact_phone || user?.company?.phone || "+1234567890"}
+                      </a>
+                    </div>
+                  </div>
                 </div>
-                
-                <div className="mt-6 text-center">
-                  <Link to="/companies" className="text-blue-600 hover:text-blue-800 font-medium">
-                    Browse all companies →
-                  </Link>
+
+                <div className="border-t border-gray-100 pt-4">
+                  <p className="text-sm text-gray-500 mb-3">Connect with us</p>
+                  <div className="flex items-center gap-3">
+                    <a href="#" className="p-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 shadow-sm" aria-label="Facebook"><Facebook className="h-4 w-4"/></a>
+                    <a href="#" className="p-2 rounded-full bg-sky-500 text-white hover:bg-sky-600 shadow-sm" aria-label="Twitter"><Twitter className="h-4 w-4"/></a>
+                    <a href="#" className="p-2 rounded-full bg-blue-800 text-white hover:bg-blue-900 shadow-sm" aria-label="LinkedIn"><Linkedin className="h-4 w-4"/></a>
+                    <a href="#" className="p-2 rounded-full bg-gradient-to-br from-pink-500 to-purple-600 text-white hover:opacity-90 shadow-sm" aria-label="Instagram"><Instagram className="h-4 w-4"/></a>
+                  </div>
                 </div>
               </div>
             </div>
+
           </div>
         </div>
       </div>
