@@ -14,3 +14,4 @@ export { default as CompanyBenefits } from './CompanyBenefits';
 export { default as CompanyInfoGrid } from './CompanyInfoGrid';
 export { default as ContactInformation } from './ContactInformation';
 export { default as OpenPositions } from './OpenPositions';
+export { default as CompanyValues } from './CompanyValues';

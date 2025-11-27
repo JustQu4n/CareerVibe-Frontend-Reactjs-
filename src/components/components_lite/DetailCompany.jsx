@@ -29,6 +29,7 @@ import {
   CompanyInfoGrid,
   ContactInformation,
   OpenPositions,
+  CompanyValues,
 } from '../company-details';
 
 // Import Custom Hook
@@ -87,6 +88,16 @@ const DetailCompany = () => {
 
   const { company, jobPosts = [], activeJobPostsCount = 0 } = companyData;
 
+  // Normalize benefits into an array when API returns a string
+  const benefitsList = (() => {
+    if (!company) return undefined;
+    const b = company.benefits;
+    if (!b) return undefined;
+    if (Array.isArray(b)) return b;
+    // Split by newlines, semicolons, or periods and filter empties
+    return b.split(/\r?\n|;|\.|,/).map(s => s.trim()).filter(Boolean);
+  })();
+
   return (
     <div className="bg-gradient-to-b from-gray-50 to-gray-100 min-h-screen">
       {/* Navbar - Sticky navigation */}
@@ -110,11 +121,19 @@ const DetailCompany = () => {
             onViewPositions={handleViewPositions}
           />
 
-          {/* Company Description */}
-          <CompanyDescription description={company.description} />
+          {/* Company Description (use overview if available) */}
+          <CompanyDescription description={company.overview || company.description} />
 
           {/* Company Benefits */}
-          <CompanyBenefits />
+          <CompanyBenefits benefits={benefitsList} />
+
+          {/* Company Values (vision, mission, innovation, sustainability) */}
+          <CompanyValues
+            vision={company.vision}
+            mission={company.mission}
+            innovation={company.innovation}
+            sustainability={company.sustainability}
+          />
 
           {/* Company Info Grid và Contact Information */}
           <div className="flex flex-col md:flex-row gap-6 mb-8">
