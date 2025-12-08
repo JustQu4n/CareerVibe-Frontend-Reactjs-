@@ -9,23 +9,27 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import NotificationItem from './NotificationItem';
 import useNotifications from '@/hooks/useNotifications';
 import { formatDistanceToNow } from 'date-fns';
+import { formatNotification } from '@/lib/notificationUtils';
 
 const NotificationBell = () => {
   const { notifications: apiNotifications = [], unreadCount, markAsRead, refresh } = useNotifications();
 
   // Map API notification shape to the UI notification shape expected by NotificationItem
-  const notifications = apiNotifications.map((n) => ({
-    id: n.id,
-    type: n.type || 'info',
-    icon: FileText,
-    iconBg: 'bg-blue-100',
-    iconColor: 'text-blue-600',
-    title: n.message || (n.metadata && n.metadata.title) || 'Notification',
-    description: (n.metadata && n.metadata.description) || '',
-    time: formatDistanceToNow(new Date(n.created_at || Date.now()), { addSuffix: true }),
-    isNew: !n.is_read,
-    original: n,
-  }));
+  const notifications = apiNotifications.map((n) => {
+    const { title, description } = formatNotification(n);
+    return {
+      id: n.id,
+      type: n.type || 'info',
+      icon: FileText,
+      iconBg: 'bg-blue-100',
+      iconColor: 'text-blue-600',
+      title: title || n.message || (n.metadata && n.metadata.title) || 'Notification',
+      description: description || (n.metadata && n.metadata.description) || '',
+      time: formatDistanceToNow(new Date(n.created_at || Date.now()), { addSuffix: true }),
+      isNew: !n.is_read,
+      original: n,
+    };
+  });
 
   /**
    * Handle dismiss notification

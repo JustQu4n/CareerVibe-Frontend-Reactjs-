@@ -147,9 +147,21 @@ export const useRegister = () => {
       return;
     }
 
-    // Check password strength
-    if (passwordStrength < 2) {
-      toast.error('Please choose a stronger password');
+    // Password validation (matches backend RegisterDto requirements)
+    if (formData.password.length < 8) {
+      toast.error('Mật khẩu phải có ít nhất 8 ký tự');
+      return;
+    }
+
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/;
+    if (!passwordRegex.test(formData.password)) {
+      toast.error('Mật khẩu phải chứa chữ hoa, chữ thường, số và ký tự đặc biệt');
+      return;
+    }
+
+    // Phone validation if provided (matches backend: 10-11 digits)
+    if (formData.phone && !/^[0-9]{10,11}$/.test(formData.phone)) {
+      toast.error('Số điện thoại không hợp lệ (10-11 số)');
       return;
     }
 
@@ -190,22 +202,16 @@ export const useRegister = () => {
       
       // Backend now returns { success: true, message, user }
       if (response.success) {
-        // Show success message from backend
-        toast.success(response.message || 'Registration successful! Welcome to CareerVibe');
+        // Show success message - account created but needs verification
+        toast.success(response.message || 'Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.');
         
-        // Construct full user data
-        const fullUserData = {
-          ...response.user,
-          jobseeker: response.jobSeeker,
-          token: response.token,
-        };
-        
-        // Update Redux store
-        dispatch(setUser(fullUserData));
-        
-        // Navigate to home after short delay to show toast
         setTimeout(() => {
-          navigate(ROUTES.HOME);
+          navigate(ROUTES.LOGIN, { 
+            state: { 
+              email: formData.email,
+              message: 'Vui lòng xác thực email trước khi đăng nhập' 
+            } 
+          });
         }, 1500);
       } else {
         // Handle unsuccessful response

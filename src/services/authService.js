@@ -29,6 +29,13 @@ export const loginUser = async (credentials) => {
 export const registerUser = async (userData) => {
   try {
     console.log('Registering user with FormData');
+    // Debug: log FormData fields
+    if (userData instanceof FormData) {
+      console.log('FormData contents:');
+      for (let pair of userData.entries()) {
+        console.log(`  ${pair[0]}: ${pair[1] instanceof File ? `[File: ${pair[1].name}]` : pair[1]}`);
+      }
+    }
     // Send as multipart/form-data
     const response = await apiClient.post(API_ENDPOINTS.AUTH.REGISTER_JOBSEEKER, userData, {
       headers: {
@@ -38,6 +45,10 @@ export const registerUser = async (userData) => {
     return response.data;
   } catch (error) {
     console.error('Registration error:', error.response?.data || error.message);
+    // Log detailed validation errors if present
+    if (error.response?.data?.message) {
+      console.error('Backend validation errors:', error.response.data.message);
+    }
     throw error;
   }
 };
