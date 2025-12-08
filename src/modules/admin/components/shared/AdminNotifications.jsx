@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import useNotifications from '@/hooks/useNotifications';
+import { formatNotification } from '@/lib/notificationUtils';
 
 export default function AdminNotifications() {
   const [open, setOpen] = useState(false);
@@ -67,21 +68,24 @@ export default function AdminNotifications() {
                 {notifications.length === 0 ? (
                   <div className="p-4 text-sm text-gray-500">No notifications</div>
                 ) : (
-                  notifications.map((n) => (
-                    <div
-                      key={n.id}
-                      onClick={() => handleClick(n)}
-                      className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${!n.is_read ? 'bg-blue-50' : ''}`}
-                    >
-                      <div className="flex gap-3">
-                        <div className={`h-2 w-2 rounded-full mt-2 flex-shrink-0 ${!n.is_read ? 'bg-blue-600' : 'bg-transparent'}`} />
-                        <div className="flex-1 min-w-0">
-                          <p className="font-medium text-sm text-gray-900 whitespace-normal break-words">{n.message}</p>
-                          <p className="text-xs text-gray-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
+                  notifications.map((n) => {
+                    const { title } = formatNotification(n);
+                    return (
+                      <div
+                        key={n.id}
+                        onClick={() => handleClick(n)}
+                        className={`p-3 border-b border-gray-100 hover:bg-gray-50 cursor-pointer transition-colors ${!n.is_read ? 'bg-blue-50' : ''}`}
+                      >
+                        <div className="flex gap-3">
+                          <div className={`h-2 w-2 rounded-full mt-2 flex-shrink-0 ${!n.is_read ? 'bg-blue-600' : 'bg-transparent'}`} />
+                          <div className="flex-1 min-w-0">
+                            <p className="font-medium text-sm text-gray-900 whitespace-normal break-words">{title || n.message}</p>
+                            <p className="text-xs text-gray-400 mt-1">{new Date(n.created_at).toLocaleString()}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 
