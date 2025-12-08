@@ -26,6 +26,7 @@ import SearchResults from "./components/components_lite/SearchResults ";
 import CvMatcher from "./components/components_lite/CvMatcher";
 import SaveJobs from "./components/components_lite/SaveJobs.jsx";
 import FollowedCompanies from "./components/components_lite/FollowedCompanies.jsx";
+import NotificationIcon from "./components/Notifications/NotificationIcon";
 import { useSelector } from "react-redux";
 
 // Admin Module Imports
@@ -214,6 +215,7 @@ function App() {
     <div>
       <RouterProvider router={appRouter}></RouterProvider>
       <ToastContainer position="top-right" autoClose={3000} />
+      <NotificationIcon userId={userId} />
       <ChatPopup userId={userId} />
     </div>
   );
