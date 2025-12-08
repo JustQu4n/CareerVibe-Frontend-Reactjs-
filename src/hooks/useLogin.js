@@ -79,6 +79,18 @@ export const useLogin = () => {
       
       // New API structure: { message, user, accessToken, refreshToken }
       if (response.user && response.accessToken) {
+        // Check role to prevent employer accounts from logging into jobseeker site
+        const rawRoles = response.user.roles || [];
+        const primaryRole = (response.user.role || rawRoles[0] || '').toString().toLowerCase();
+
+        // If role indicates employer/recruiter, block login on this UI
+        if (primaryRole.includes('employ') || primaryRole.includes('recruit') || primaryRole === 'employer' || primaryRole === 'recruiter') {
+          toast.error('This account is registered as an employer. Please sign in via the employer portal.');
+          setIsSubmitting(false);
+          dispatch(setLoading(false));
+          return;
+        }
+
         // Construct full user data with token
         const fullUserData = {
           ...response.user,
@@ -89,23 +101,23 @@ export const useLogin = () => {
           email: response.user.email,
           fullname: response.user.full_name,
           phone: response.user.phone,
-          role: response.user.roles?.[0] || 'jobseeker',
+          role: primaryRole || 'jobseeker',
           avatar_url: response.user.avatar_url,
           // Add job_seeker_id from jobSeeker object
           job_seeker_id: response.user.jobSeeker?.job_seeker_id,
           jobSeeker: response.user.jobSeeker, // Keep full jobSeeker data
         };
-        
+
         // Store tokens in localStorage
         localStorage.setItem('accessToken', response.accessToken);
         localStorage.setItem('refreshToken', response.refreshToken);
-        
+
         // Update Redux store
         dispatch(setUser(fullUserData));
-        
+
         // Show success message
         toast.success(response.message || AUTH_MESSAGES.LOGIN_SUCCESS);
-        
+
         // Small delay for better UX
         setTimeout(() => {
           navigate(ROUTES.HOME);
@@ -113,6 +125,7 @@ export const useLogin = () => {
       } else {
         toast.warning(AUTH_MESSAGES.USER_DATA_NOT_FOUND);
       }
+
     } catch (error) {
       // Error handling
       const errorMessage = error.response?.data?.message || AUTH_MESSAGES.LOGIN_FAILED;
