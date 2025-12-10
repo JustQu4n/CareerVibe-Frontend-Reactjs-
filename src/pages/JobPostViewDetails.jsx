@@ -109,7 +109,7 @@ export default function JobPostViewDetails() {
   if (!singleJob) return <EmptyState />;
 
   // Destructure job data
-  const { title, description, skills = [] } = singleJob;
+  const { title, description, requirements, skills = [] } = singleJob;
 
   return (
     <div className="min-h-screen bg-gray-50 font-sans flex flex-col">
@@ -142,6 +142,7 @@ export default function JobPostViewDetails() {
               activeTab={activeTab}
               setActiveTab={setActiveTab}
               description={description}
+              requirements={requirements}
             />
 
             {/* Skills List - Danh sách kỹ năng */}

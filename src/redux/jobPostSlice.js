@@ -62,7 +62,7 @@ export const createJobPost = createAsyncThunk(
         return rejectWithValue("Title must be at least 5 characters long");
       }
 
-      const { requirements, deadline, ...createPayload } = jobData;
+      const { deadline, ...createPayload } = jobData;
       
       const payload = {
         ...createPayload,
