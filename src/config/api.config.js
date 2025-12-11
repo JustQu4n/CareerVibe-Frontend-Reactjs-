@@ -55,6 +55,10 @@ export const API_ENDPOINTS = {
     DETAIL: (id) => `${API_BASE_URL}/api/job-posts/${id}`,
     SEARCH: `${API_BASE_URL}/api/job-posts/search`,
   },
+
+  RECOMMENDATIONS: {
+    BY_JOBSEEKER: (jobSeekerId) => `http://127.0.0.1:8000/recommendations/${jobSeekerId}`,
+  },
   
   APPLICATIONS: {
     LIST: `${API_BASE_URL}/api/applications`,
