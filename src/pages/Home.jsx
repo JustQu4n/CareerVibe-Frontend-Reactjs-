@@ -5,12 +5,14 @@ import { useNavigate } from 'react-router-dom';
 import { MainLayout } from '@/layouts';
 import useGetAllJobs from '@/hooks/useGetAllJobs';
 import { useHomeData } from '@/hooks/useHomeData';
+import useAIRecommendations from '@/hooks/useAIRecommendations';
 
 import {
   HeroSection,
   StatsSection,
   HowItWorksSection,
   RecommendedJobsSection,
+  AIRecommendedJobsSection,
   FeaturedJobsSection,
 } from '@/components/home';
 
@@ -38,6 +40,13 @@ const Home = () => {
     prevPage,
   } = useHomeData();
 
+  // Fetch AI recommendations from Python service
+  const {
+    recommendations: aiRecommendations,
+    isLoading: isLoadingAI,
+    error: aiError,
+  } = useAIRecommendations();
+
   useEffect(() => {
     if (user?.role === 'Recruiter') {
       navigate('/admin/dashboard');
@@ -64,6 +73,13 @@ const Home = () => {
         jobs={recommendedJobs}
         isLoading={isLoadingRecommendations}
         error={recommendationError}
+        user={user}
+      />
+
+      <AIRecommendedJobsSection
+        recommendations={aiRecommendations}
+        isLoading={isLoadingAI}
+        error={aiError}
         user={user}
       />
 
