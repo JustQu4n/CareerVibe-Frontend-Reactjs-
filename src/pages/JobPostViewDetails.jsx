@@ -125,7 +125,7 @@ export default function JobPostViewDetails() {
       {showSummaryModal && (
         <JDSummaryModal jdText={description} onClose={handleCloseSummary} />
       )}
-
+      
       {/* Hero Section - Hiển thị thông tin chính của job */}
       <JobHeroSection job={singleJob} />
 
