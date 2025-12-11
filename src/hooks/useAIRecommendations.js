@@ -5,6 +5,7 @@
 import { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { API_ENDPOINTS } from '@/config/api.config';
+import apiClient from '@/api/client';
 
 const useAIRecommendations = () => {
   const [recommendations, setRecommendations] = useState([]);
@@ -25,22 +26,12 @@ const useAIRecommendations = () => {
       setError(null);
 
       try {
-        const response = await fetch(API_ENDPOINTS.RECOMMENDATIONS.BY_JOBSEEKER(jobSeekerId), {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error(`Failed to fetch recommendations: ${response.status}`);
-        }
-
-        const data = await response.json();
-        setRecommendations(data || []);
+        const res = await apiClient.get(API_ENDPOINTS.RECOMMENDATIONS.BY_JOBSEEKER(jobSeekerId));
+        setRecommendations(res.data || []);
       } catch (err) {
         console.error('Error fetching AI recommendations:', err);
-        setError(err.message || 'Failed to load recommendations');
+        const message = err?.response?.data?.message || err.message || 'Failed to load recommendations';
+        setError(message);
       } finally {
         setIsLoading(false);
       }
