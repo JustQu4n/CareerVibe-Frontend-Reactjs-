@@ -85,7 +85,7 @@ export const useHomeData = () => {
         params.location = searchLocation.trim();
       }
 
-      await axios.get(`${API_BASE_URL}/api/job-posts/search`, {
+      await axios.get(`${API_BASE_URL}/api/jobseeker/job-posts/search`, {
         params,
       });
 

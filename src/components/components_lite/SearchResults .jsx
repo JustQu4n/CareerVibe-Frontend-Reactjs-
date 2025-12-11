@@ -6,6 +6,8 @@ import axios from "axios";
 import { Navbar } from "../navbar";
 import Footer from "./Footer";
 import JobCard from "./JobCard";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 
 export default function SearchResults() {
   const [searchParams] = useSearchParams();
@@ -25,7 +27,7 @@ export default function SearchResults() {
       setError(null);
       
       try {
-        const response = await axios.get(`http://localhost:5000/api/job-posts/search`, {
+        const response = await axios.get(`${API_BASE_URL}/api/jobseeker/job-posts/search`, {
           params: {
             keyword,
             location
