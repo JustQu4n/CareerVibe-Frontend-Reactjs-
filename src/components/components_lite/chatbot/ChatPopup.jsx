@@ -1,83 +1,111 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MessageCircleMore, SendHorizontal } from 'lucide-react'; // Assuming you have this icon installed
+import { MessageCircleMore, SendHorizontal } from 'lucide-react';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
-const API_URL = 'http://localhost:5000/api/chatbot/chat';
-const API_HISTORY_URL = 'http://localhost:5000/api/chatbot/history'; 
+const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+const CHAT_BASE = `${API_BASE}/api/ai-assistant`;
 
-export default function ChatPopup({ userId }) {
+export default function ChatPopup() {
+  const token = useSelector((s) => s.auth?.token);
+  const user = useSelector((s) => s.auth?.user);
+
   const [open, setOpen] = useState(false);
-  const [fullscreen, setFullscreen] = useState(false);  // trạng thái fullscreen
+  const [fullscreen, setFullscreen] = useState(false);
   const [input, setInput] = useState('');
   const [messages, setMessages] = useState([]);
-  const [sessionId, setSessionId] = useState(() => {
-    return localStorage.getItem('chatSessionId') || `sess_${Date.now()}`;
-  });
   const [loading, setLoading] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [status, setStatus] = useState({ configured: false, message: '' });
 
   const messagesEndRef = useRef(null);
 
   useEffect(() => {
-    localStorage.setItem('chatSessionId', sessionId);
-  }, [sessionId]);
-
-  useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
+    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   useEffect(() => {
-    if (open) {
-      fetchChatHistory();
+    if (open && token) {
+      fetchStatus();
+      fetchHistory();
+      fetchSuggestions();
     }
-  }, [open]);
+  }, [open, token]);
 
-  const fetchChatHistory = async () => {
+  const authHeaders = () => ({ Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' });
+
+  const fetchStatus = async () => {
     try {
-      const res = await fetch(`${API_HISTORY_URL}?sessionId=${sessionId}&userId=${userId}`);
-      if (!res.ok) throw new Error('Failed to fetch history');
-      const data = await res.json();
-      setMessages(data.history || []);
-    } catch (error) {
-      setMessages([]);
-      console.error('Error loading chat history:', error);
+      const res = await axios.get(`${CHAT_BASE}/status`, { headers: authHeaders() });
+      setStatus(res.data || { configured: false, message: '' });
+    } catch (err) {
+      console.error('Status error', err);
+      setStatus({ configured: false, message: 'AI backend unavailable' });
     }
   };
 
-  const toggleOpen = () => setOpen(!open);
+  const fetchSuggestions = async () => {
+    try {
+      const res = await axios.get(`${CHAT_BASE}/suggestions`, { headers: authHeaders() });
+      setSuggestions(res.data.suggestions || []);
+    } catch (err) {
+      console.error('Suggestions error', err);
+      setSuggestions([]);
+    }
+  };
 
-  const toggleFullscreen = () => setFullscreen(!fullscreen);
+  const fetchHistory = async () => {
+    try {
+      const res = await axios.get(`${CHAT_BASE}/history?limit=50`, { headers: authHeaders() });
+      const hist = res.data.history || [];
+      const msgs = [];
+      hist.forEach((h) => {
+        msgs.push({ role: 'user', text: h.userMessage, id: h.id, ts: h.createdAt });
+        msgs.push({ role: 'assistant', text: h.aiResponse, id: `ai_${h.id}`, ts: h.createdAt });
+      });
+      setMessages(msgs);
+    } catch (err) {
+      console.error('History error', err);
+      setMessages([]);
+    }
+  };
 
-  const sendMessage = async () => {
+  const deleteHistory = async () => {
+    if (!confirm('Clear chat history?')) return;
+    try {
+      await axios.delete(`${CHAT_BASE}/history`, { headers: authHeaders() });
+      setMessages([]);
+    } catch (err) {
+      console.error('Delete history error', err);
+      alert('Failed to delete history');
+    }
+  };
+
+  const toggleOpen = () => {
+    if (!token) {
+      window.location.href = '/login';
+      return;
+    }
+    setOpen((v) => !v);
+  };
+
+  const toggleFullscreen = () => setFullscreen((v) => !v);
+
+  const sendMessage = async (model = 'gemini-2.5-flash-latest') => {
     if (!input.trim()) return;
-
-    const userMessage = { role: 'user', text: input };
-    setMessages((prev) => [...prev, userMessage]);
-    const messageToSend = input;
+    const messageToSend = input.trim();
+    setMessages((prev) => [...prev, { role: 'user', text: messageToSend }]);
     setInput('');
     setLoading(true);
 
     try {
-      const res = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          message: messageToSend,
-          sessionId,
-          userId,
-        }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        const assistantReply = { role: 'assistant', text: data.reply };
-        setMessages((prev) => [...prev, assistantReply]);
-      } else {
-        const errorReply = { role: 'assistant', text: data.error || 'Error from server' };
-        setMessages((prev) => [...prev, errorReply]);
-      }
-    } catch (error) {
-      setMessages((prev) => [...prev, { role: 'assistant', text: 'Network error' }]);
+      const res = await axios.post(`${CHAT_BASE}/chat`, { message: messageToSend, model }, { headers: authHeaders() });
+      const data = res.data || {};
+      setMessages((prev) => [...prev, { role: 'assistant', text: data.response || 'No response' }]);
+    } catch (err) {
+      console.error('Send message error', err);
+      setMessages((prev) => [...prev, { role: 'assistant', text: 'Error: unable to reach AI service' }]);
     } finally {
       setLoading(false);
     }
@@ -86,7 +114,7 @@ export default function ChatPopup({ userId }) {
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      if(!loading) sendMessage();
+      if (!loading) sendMessage();
     }
   };
 
@@ -186,15 +214,15 @@ export default function ChatPopup({ userId }) {
               e.preventDefault();
               if(!loading) sendMessage();
             }}
-            className="flex border-t border-gray-300 rounded-b-lg  p-3 space-x-3"
+            className="flex items-end border-t border-gray-300 rounded-b-lg p-3 space-x-3"
           >
             <textarea
-              rows={fullscreen ? 4 : 2}
+              rows={2}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Type a message..."
-              className="flex-grow p-3 resize-none border-none focus:outline-none"
+              className={`flex-grow p-2 resize-none border-none focus:outline-none ${fullscreen ? 'h-10' : 'h-8'}`}
               disabled={loading}
             />
             <button
