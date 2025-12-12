@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import axios from 'axios';
+import apiClient from '@/api/client';
 
 const JOBS_PER_PAGE = 6;
 const RECOMMENDATION_API_URL = import.meta.env.VITE_RECOMMENDATION_API_URL || 'http://localhost:8000';
@@ -85,7 +86,7 @@ export const useHomeData = () => {
         params.location = searchLocation.trim();
       }
 
-      await axios.get(`${API_BASE_URL}/api/jobseeker/job-posts/search`, {
+      await apiClient.get('/api/jobseeker/job-posts/search', {
         params,
       });
 

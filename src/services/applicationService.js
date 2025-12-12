@@ -2,10 +2,10 @@
  * Application Service
  * Xử lý tất cả API calls liên quan đến job applications
  */
-import axios from 'axios';
+import apiClient from '@/api/client';
 
-const APPLICATION_API_BASE = 'http://localhost:5000/api/applications';
-const JOBSEEKER_API_BASE = 'http://localhost:5000/api/jobseeker/applications';
+const APPLICATION_API_BASE = '/api/applications';
+const JOBSEEKER_API_BASE = '/api/jobseeker/applications';
 
 /**
  * Submit job application
@@ -20,20 +20,12 @@ export const submitApplication = async (jobPostId, applicationData, cvFile) => {
   formData.append("cover_letter", applicationData.coverLetter || "");
   formData.append("resume", cvFile);
 
-  const token = localStorage.getItem('accessToken');
-
   try {
-    const response = await axios.post(
-      `${JOBSEEKER_API_BASE}/submit`,
-      formData,
-      {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          "Authorization": `Bearer ${token}`
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await apiClient.post(`${JOBSEEKER_API_BASE}/submit`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
     return response.data;
   } catch (error) {
     // Enhanced error handling
@@ -54,9 +46,7 @@ export const submitApplication = async (jobPostId, applicationData, cvFile) => {
  */
 export const getJobseekerApplications = async (jobseekerId) => {
   try {
-    const response = await axios.get(`${APPLICATION_API_BASE}/jobseeker/${jobseekerId}`, {
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`${APPLICATION_API_BASE}/jobseeker/${jobseekerId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -70,16 +60,7 @@ export const getJobseekerApplications = async (jobseekerId) => {
  */
 export const getJobseekerHistoryApplications = async (jobseekerId) => {
   try {
-    const token = localStorage.getItem('accessToken');
-    const response = await axios.get(
-      `${JOBSEEKER_API_BASE}/history-applications/${jobseekerId}`,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-        withCredentials: true,
-      }
-    );
+    const response = await apiClient.get(`${JOBSEEKER_API_BASE}/history-applications/${jobseekerId}`);
     return response.data; // { data: [], total: number }
   } catch (error) {
     throw error;
@@ -93,9 +74,7 @@ export const getJobseekerHistoryApplications = async (jobseekerId) => {
  */
 export const getApplicationById = async (applicationId) => {
   try {
-    const response = await axios.get(`${APPLICATION_API_BASE}/${applicationId}`, {
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`${APPLICATION_API_BASE}/${applicationId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -109,9 +88,7 @@ export const getApplicationById = async (applicationId) => {
  */
 export const withdrawApplication = async (applicationId) => {
   try {
-    const response = await axios.delete(`${APPLICATION_API_BASE}/${applicationId}`, {
-      withCredentials: true,
-    });
+    const response = await apiClient.delete(`${APPLICATION_API_BASE}/${applicationId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -126,11 +103,7 @@ export const withdrawApplication = async (applicationId) => {
  */
 export const updateApplicationStatus = async (applicationId, status) => {
   try {
-    const response = await axios.patch(
-      `${APPLICATION_API_BASE}/${applicationId}/status`,
-      { status },
-      { withCredentials: true }
-    );
+    const response = await apiClient.patch(`${APPLICATION_API_BASE}/${applicationId}/status`, { status });
     return response.data;
   } catch (error) {
     throw error;

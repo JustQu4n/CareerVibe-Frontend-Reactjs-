@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import ReactMarkdown from 'react-markdown';
-import axios from 'axios';
+import apiClient from '@/api/client';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -21,23 +21,15 @@ export default function JDSummaryModal({ jdText, onClose }) {
       }
 
       try {
-        const res = await axios.post(
-          `${API_BASE}/api/ai-assistant/summarize-jd`,
-          { jobDescription: jdText },
-          {
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            }
-          }
-        );
-        
-        console.log("JD Summary Response:", res.data);
-        setSummary(res.data?.summary || res.data?.response || "Không có nội dung tóm tắt.");
+        const config = token ? { headers: { Authorization: `Bearer ${token}` } } : undefined;
+        const res = await apiClient.post('/api/ai-assistant/summarize-jd', { jobDescription: jdText }, config);
+
+        console.log('JD Summary Response:', res.data);
+        setSummary(res.data?.summary || res.data?.response || 'Không có nội dung tóm tắt.');
       } catch (err) {
-        console.error("Summarize error:", err);
-        setError("Không thể tóm tắt JD. Vui lòng thử lại.");
-        setSummary("Lỗi khi tóm tắt JD.");
+        console.error('Summarize error:', err);
+        setError('Không thể tóm tắt JD. Vui lòng thử lại.');
+        setSummary('Lỗi khi tóm tắt JD.');
       } finally {
         setLoading(false);
       }

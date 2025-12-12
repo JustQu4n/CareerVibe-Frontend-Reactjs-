@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useSelector } from 'react-redux';
 import { motion, AnimatePresence } from 'framer-motion';
-import axios from 'axios';
+import apiClient from '@/api/client';
 import { toast } from 'react-toastify';
 import { format } from 'date-fns';
 import { 
@@ -42,13 +42,8 @@ const SaveJobs = () => {
     const fetchSavedJobs = async () => {
       try {
         setLoading(true);
-        const token = localStorage.getItem("accessToken");
-        
         // Fetch saved jobs
-        const jobsRes = await axios.get('http://localhost:5000/api/jobseeker/saved/jobs', { 
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true
-        });
+        const jobsRes = await apiClient.get('/api/jobseeker/saved/jobs');
         
         // Process saved jobs data
         if (jobsRes.data && jobsRes.data.data) {
@@ -74,11 +69,7 @@ const SaveJobs = () => {
   // Handle removing saved job
   const handleRemoveJob = async (savedJobId, jobPostId) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.delete(`http://localhost:5000/api/jobseeker/saved/jobs/${jobPostId}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true
-      });
+      await apiClient.delete(`/api/jobseeker/saved/jobs/${jobPostId}`);
       
       setSavedJobs(savedJobs.filter(job => job.saved_job_id !== savedJobId));
       toast.success('Job removed from saved list');

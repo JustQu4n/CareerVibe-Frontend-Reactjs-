@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { FaRegBookmark, FaArrowLeft } from "react-icons/fa";
 import { Building2, MapPin } from "lucide-react";
-import axios from "axios";
+import apiClient from '@/api/client';
 import { Navbar } from "../navbar";
 import Footer from "./Footer";
 import JobCard from "./JobCard";
@@ -27,18 +27,15 @@ export default function SearchResults() {
       setError(null);
       
       try {
-        const response = await axios.get(`${API_BASE_URL}/api/jobseeker/job-posts/search`, {
-          params: {
-            keyword,
-            location
-          }
+        const response = await apiClient.get('/api/jobseeker/job-posts/search', {
+          params: { keyword, location }
         });
-        
+
         setSearchResults(response.data.data || []);
-        console.log("Search Results:", response.data.data);
+        console.log('Search Results:', response.data.data);
       } catch (error) {
-        console.error("Search error:", error);
-        setError("Failed to fetch search results. Please try again.");
+        console.error('Search error:', error);
+        setError('Failed to fetch search results. Please try again.');
       } finally {
         setIsLoading(false);
       }

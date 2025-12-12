@@ -2,10 +2,9 @@
  * Company Follow Service
  * Handles all company follow/unfollow related API calls
  */
-import axios from 'axios';
+import apiClient from '@/api/client';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-const COMPANY_FOLLOW_API_BASE = `${API_BASE_URL}/api/jobseeker/company`;
+const COMPANY_FOLLOW_API_BASE = '/api/jobseeker/company';
 
 /**
  * Follow a company
@@ -13,16 +12,9 @@ const COMPANY_FOLLOW_API_BASE = `${API_BASE_URL}/api/jobseeker/company`;
  * @param {string} token - Auth token
  * @returns {Promise<Object>} - Response data
  */
-export const followCompany = async (companyId, token) => {
+export const followCompany = async (companyId /*, token */) => {
   try {
-    const response = await axios.post(
-      `${COMPANY_FOLLOW_API_BASE}/follow-company/${companyId}`,
-      {},
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      }
-    );
+    const response = await apiClient.post(`${COMPANY_FOLLOW_API_BASE}/follow-company/${companyId}`, {});
     return response.data;
   } catch (error) {
     throw error;
@@ -35,15 +27,9 @@ export const followCompany = async (companyId, token) => {
  * @param {string} token - Auth token
  * @returns {Promise<Object>} - Response data
  */
-export const unfollowCompany = async (companyId, token) => {
+export const unfollowCompany = async (companyId /*, token */) => {
   try {
-    const response = await axios.delete(
-      `${COMPANY_FOLLOW_API_BASE}/unfollow-company/${companyId}`,
-      {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      }
-    );
+    const response = await apiClient.delete(`${COMPANY_FOLLOW_API_BASE}/unfollow-company/${companyId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -56,14 +42,10 @@ export const unfollowCompany = async (companyId, token) => {
  * @param {Object} params - Query params (page, limit)
  * @returns {Promise<Object>} - Followed companies data
  */
-export const getFollowedCompanies = async (token, params = {}) => {
+export const getFollowedCompanies = async ( params = {}) => {
   try {
     const { page = 1, limit = 10 } = params;
-    const response = await axios.get(`${COMPANY_FOLLOW_API_BASE}/companies`, {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { page, limit },
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`${COMPANY_FOLLOW_API_BASE}/companies`, { params: { page, limit } });
     return response.data;
   } catch (error) {
     throw error;
@@ -76,12 +58,9 @@ export const getFollowedCompanies = async (token, params = {}) => {
  * @param {string} token - Auth token
  * @returns {Promise<Object>} - { isFollowed: boolean, followedAt: date | null }
  */
-export const checkCompanyFollowed = async (companyId, token) => {
+export const checkCompanyFollowed = async (companyId /*, token */) => {
   try {
-    const response = await axios.get(`${COMPANY_FOLLOW_API_BASE}/check/${companyId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`${COMPANY_FOLLOW_API_BASE}/check/${companyId}`);
     return response.data;
   } catch (error) {
     throw error;

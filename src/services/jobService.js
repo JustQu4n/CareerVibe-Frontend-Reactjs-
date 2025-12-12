@@ -2,7 +2,7 @@
  * Job Service
  * Xử lý tất cả API calls liên quan đến jobs
  */
-import axios from 'axios';
+import apiClient from '@/api/client';
 import { JOB_API_ENDPOINT } from '@/utils/data';
 
 /**
@@ -12,9 +12,7 @@ import { JOB_API_ENDPOINT } from '@/utils/data';
  */
 export const getJobById = async (jobId) => {
   try {
-    const response = await axios.get(`${JOB_API_ENDPOINT}/${jobId}`, {
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`/api/jobseeker/job-posts/${jobId}`);
     return response.data;
   } catch (error) {
     throw error;
@@ -28,10 +26,7 @@ export const getJobById = async (jobId) => {
  */
 export const getAllJobs = async (filters = {}) => {
   try {
-    const response = await axios.get(JOB_API_ENDPOINT, {
-      params: filters,
-      withCredentials: true,
-    });
+    const response = await apiClient.get('/api/jobseeker/job-posts', { params: filters });
     return response.data;
   } catch (error) {
     throw error;
@@ -45,9 +40,7 @@ export const getAllJobs = async (filters = {}) => {
  */
 export const getRelatedJobs = async (jobId) => {
   try {
-    const response = await axios.get(`${JOB_API_ENDPOINT}/${jobId}/related`, {
-      withCredentials: true,
-    });
+    const response = await apiClient.get(`/api/jobseeker/job-posts/${jobId}/related`);
     return response.data;
   } catch (error) {
     throw error;
@@ -61,10 +54,7 @@ export const getRelatedJobs = async (jobId) => {
  */
 export const searchJobs = async (searchParams) => {
   try {
-    const response = await axios.get(`${JOB_API_ENDPOINT}/search`, {
-      params: searchParams,
-      withCredentials: true,
-    });
+    const response = await apiClient.get('/api/jobseeker/job-posts/search', { params: searchParams });
     return response.data;
   } catch (error) {
     throw error;
@@ -79,11 +69,7 @@ export const searchJobs = async (searchParams) => {
  */
 export const applyForJob = async (jobId, applicationData) => {
   try {
-    const response = await axios.post(
-      `${JOB_API_ENDPOINT}/${jobId}/apply`,
-      applicationData,
-      { withCredentials: true }
-    );
+    const response = await apiClient.post(`/api/jobseeker/job-posts/${jobId}/apply`, applicationData);
     return response.data;
   } catch (error) {
     throw error;

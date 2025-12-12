@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import axios from 'axios';
+import apiClient from '@/api/client';
 import { setSingleJob } from '@/redux/jobSlice';
 import { JOB_API_ENDPOINT } from '@/utils/data';
 
@@ -28,7 +28,7 @@ const useJobDetails = (jobId) => {
       setError(null);
 
       try {
-        const response = await axios.get(`${JOB_API_ENDPOINT}/${jobId}`, {
+        const response = await apiClient.get(`/api/jobseeker/job-posts/${jobId}`, {
           withCredentials: true,
         });
 
