@@ -1,19 +1,14 @@
 // src/redux/application/applicationSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
+import apiClient from '@/api/client';
 
 // Thunk: fetch tất cả applications
 export const fetchEmployerApplications = createAsyncThunk(
   "applications/fetchEmployerApplications",
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("accessToken"); // lấy token từ localStorage
-      const response = await axios.get("http://localhost:5000/api/employer/application/job-posts/applications", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return response.data.data;
+      const response = await apiClient.get('/api/employer/application/job-posts/applications');
+      return response.data?.data || response.data || [];
     } catch (error) {
       return rejectWithValue(error.response.data.message || "Something went wrong");
     }
@@ -25,18 +20,9 @@ export const fetchApplicationDetails = createAsyncThunk(
   'applications/fetchDetails',
   async (applicationId, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      const response = await axios.get(
-        `http://localhost:5000/api/employer/application/detail-applications/${applicationId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
+      const response = await apiClient.get(`/api/employer/application/detail-applications/${applicationId}`);
       console.log('Application Details Response:', response.data);
-     return response.data.data;
+      return response.data?.data || response.data;
     } catch (error) {
       console.error('Error fetching application details:', error);
       return rejectWithValue(
@@ -51,24 +37,13 @@ export const updateApplicationStatus = createAsyncThunk(
   "applications/updateStatus",
   async ({ applicationId, status }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem("token");
-      
-      const response = await axios.put(
-        `http://localhost:5000/api/employer/manager/applications/${applicationId}/status`,
-        { status },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`
-          }
-        }
-      );
-      
-      return { 
-        applicationId, 
+      const response = await apiClient.put(`/api/employer/manager/applications/${applicationId}/status`, { status });
+
+      return {
+        applicationId,
         status,
-        success: response.data.success,
-        message: response.data.message
+        success: response.data?.success,
+        message: response.data?.message,
       };
     } catch (error) {
       console.error("Error updating application status:", error);

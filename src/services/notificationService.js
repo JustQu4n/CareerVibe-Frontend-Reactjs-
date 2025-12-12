@@ -4,6 +4,7 @@
  */
 
 import { io } from 'socket.io-client';
+import apiClient from '@/api/client';
 
 const BACKEND_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 
@@ -89,22 +90,10 @@ class NotificationService {
    * @param {number} limit - Number of notifications per page
    * @returns {Promise<Object>} Notifications data with pagination
    */
-  async fetchNotifications(token, page = 1, limit = 20) {
+  async fetchNotifications(_token, page = 1, limit = 20) {
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/notifications/list?page=${page}&limit=${limit}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to fetch notifications: ${response.status}`);
-      }
-
-      return await response.json();
+      const res = await apiClient.get('/api/notifications/list', { params: { page, limit } });
+      return res.data;
     } catch (error) {
       console.error('❌ Error fetching notifications:', error);
       throw error;
@@ -117,23 +106,10 @@ class NotificationService {
    * @param {string} token - JWT token
    * @returns {Promise<Object>} Updated notification
    */
-  async markAsRead(notificationId, token) {
+  async markAsRead(notificationId /*, token */) {
     try {
-      const response = await fetch(
-        `${BACKEND_URL}/api/notifications/${notificationId}/read`,
-        {
-          method: 'PATCH',
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(`Failed to mark notification as read: ${response.status}`);
-      }
-
-      return await response.json();
+      const res = await apiClient.patch(`/api/notifications/${notificationId}/read`);
+      return res.data;
     } catch (error) {
       console.error('❌ Error marking notification as read:', error);
       throw error;

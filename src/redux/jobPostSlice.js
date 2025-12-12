@@ -1,7 +1,7 @@
 // src/redux/jobPostSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import axios from "axios";
-import { EMPLOYER_POST_API_ENDPOINT } from "@/utils/data";// Adjust the import path as necessary
+import apiClient from '@/api/client';
+import { EMPLOYER_POST_API_ENDPOINT } from '@/utils/data'; // Adjust the import path as necessary
 
 // --- Thunk: Fetch job posts by employer ---
 export const fetchJobPostsByEmployer = createAsyncThunk(
@@ -19,10 +19,7 @@ export const fetchJobPostsByEmployer = createAsyncThunk(
       // Use new endpoint: GET /api/employer/job-posts with pagination
       const { page = 1, limit = 10 } = params;
       const url = `${EMPLOYER_POST_API_ENDPOINT}?page=${page}&limit=${limit}`;
-      const res = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
+      const res = await apiClient.get(url);
 
       // Normalize jobs array
       const jobs = res.data.jobs || res.data.data || [];
@@ -69,17 +66,7 @@ export const createJobPost = createAsyncThunk(
         expires_at: jobData.expires_at ? new Date(jobData.expires_at).toISOString() : null,
       };
 
-      const res = await axios.post(
-        EMPLOYER_POST_API_ENDPOINT,
-        payload,
-        {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          },
-          withCredentials: true,
-        }
-      );
+      const res = await apiClient.post(EMPLOYER_POST_API_ENDPOINT, payload);
 
       return res.data.jobPost || res.data.job || res.data.data || res.data;
     } catch (err) {
@@ -98,14 +85,7 @@ export const updateJobPostById = createAsyncThunk(
       const { auth } = getState();
       const token = auth.user?.token || localStorage.getItem("accessToken") || localStorage.getItem("token");
 
-      const res = await axios.patch(
-        `${EMPLOYER_POST_API_ENDPOINT}/${jobId}`,
-        updatedData,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-          withCredentials: true,
-        }
-      );
+      const res = await apiClient.patch(`${EMPLOYER_POST_API_ENDPOINT}/${jobId}`, updatedData);
 
       return res.data.updatedJob || res.data;
     } catch (err) {
@@ -124,10 +104,7 @@ export const deleteJobPostById = createAsyncThunk(
 
       const url = `${EMPLOYER_POST_API_ENDPOINT}/${jobId}`;
 
-      await axios.delete(url, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
+      await apiClient.delete(url);
 
       return jobId;
     } catch (err) {
