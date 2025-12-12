@@ -28,6 +28,9 @@ import SaveJobs from "./components/components_lite/SaveJobs.jsx";
 import FollowedCompanies from "./components/components_lite/FollowedCompanies.jsx";
 import NotificationIcon from "./components/Notifications/NotificationIcon";
 import { useSelector } from "react-redux";
+import { NotificationProvider } from "./contexts/NotificationContext";
+import NotificationToast from "./components/Notifications/NotificationToast";
+import useNotifications from "./hooks/useNotifications";
 
 // Admin Module Imports
 import { AdminLayout, AdminDashboard } from "./modules/admin";
@@ -207,17 +210,35 @@ const appRouter = createBrowserRouter([
   }
 ]);
 
-function App() {
-  // const userId = '67d0ed58633f1ffa7c87a445'; 
- const { user } = useSelector((store) => store.auth);
- const userId = user?.id;
+// AppContent component to use notification hooks
+function AppContent() {
+  const { user } = useSelector((store) => store.auth);
+  const userId = user?.id;
+  const { toastNotification, clearToast } = useNotifications();
+
   return (
     <div>
       <RouterProvider router={appRouter}></RouterProvider>
       <ToastContainer position="top-right" autoClose={3000} />
       <NotificationIcon userId={userId} />
       <ChatPopup userId={userId} />
+      
+      {/* Toast notification for real-time notifications */}
+      {toastNotification && (
+        <NotificationToast
+          notification={toastNotification}
+          onClose={clearToast}
+        />
+      )}
     </div>
+  );
+}
+
+function App() {
+  return (
+    <NotificationProvider>
+      <AppContent />
+    </NotificationProvider>
   );
 }
 

@@ -1,11 +1,19 @@
-// Notifications removed per user request — provide a safe no-op hook to keep imports intact.
+/**
+ * useNotifications Hook
+ * Custom hook to access notification context
+ */
 
-export default function useNotifications() {
-  const notifications = [];
-  const markAsRead = async () => {};
-  const unreadCount = 0;
-  const connected = false;
-  const refresh = async () => {};
+import { useContext } from 'react';
+import { NotificationContext } from '../contexts/NotificationContext';
 
-  return { notifications, markAsRead, unreadCount, connected, refresh };
-}
+export const useNotifications = () => {
+  const context = useContext(NotificationContext);
+
+  if (!context) {
+    throw new Error('useNotifications must be used within NotificationProvider');
+  }
+
+  return context;
+};
+
+export default useNotifications;
