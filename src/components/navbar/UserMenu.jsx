@@ -77,7 +77,7 @@ const UserMenu = ({ user, onLogout, isLoggingOut }) => {
                 })}
 
                 <button
-                  onClick={() => handleNavigate('/admin/settings')}
+                  onClick={() => handleNavigate(isRecruiter ? '/admin/settings' : '/settings')}
                   className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-left"
                 >
                   <Settings className="h-4 w-4 text-gray-600" />

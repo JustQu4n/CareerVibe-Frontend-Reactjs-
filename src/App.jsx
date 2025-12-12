@@ -34,6 +34,7 @@ import useNotifications from "./hooks/useNotifications";
 
 // Admin Module Imports
 import { AdminLayout, AdminDashboard } from "./modules/admin";
+import MainLayout from "./layouts/MainLayout";
 import { Companies, CompanyCreate, CompanySetup } from "./modules/admin/components/companies";
 import { 
   AdminJobs, 
@@ -47,7 +48,8 @@ import { Applicants } from "./modules/admin/components/applicants";
 import JobPostDetailApplication from "./modules/admin/components/applicants/DetailJobPostApplication";
 import JobPostApplications from "./modules/admin/components/applicants/JobPostApplications";
 import CandidateProfile from "./modules/admin/components/applicants/CandidateProfile";
-import Settings from "./modules/admin/pages/Settings";
+import AdminSettings from "./modules/admin/pages/Settings";
+import UserSettings from "./pages/Settings";
 import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
 
 const appRouter = createBrowserRouter([
@@ -84,6 +86,14 @@ const appRouter = createBrowserRouter([
     path: "/profile",
     element: <Profile />,
   },
+      {
+        path: "/settings",
+        element: (
+          <MainLayout>
+            <UserSettings />
+          </MainLayout>
+        ),
+      },
   {
     path: "/profile/edit",
     element: <EditProfile />,
@@ -204,7 +214,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "settings",
-        element: <Settings />
+        element: <AdminSettings />
       }
     ]
   }
