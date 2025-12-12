@@ -27,7 +27,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import * as XLSX from "xlsx";
-import axios from "axios";
+import apiClient from "@/api/client";
 import { APPLICATION_STATUS } from '../../../../constants/application.constants';
 
 export default function JobPostApplications() {
@@ -48,12 +48,8 @@ export default function JobPostApplications() {
   const fetchApplications = async () => {
     try {
       setLoading(true);
-      const token = localStorage.getItem("accessToken");
-      const response = await axios.get(
-        `http://localhost:5000/api/employer/application/job-posts/${jobPostId}/applications`,
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
+      const response = await apiClient.get(
+        `/api/employer/application/job-posts/${jobPostId}/applications`
       );
       setApplications(response.data.data || []);
       setError(null);
@@ -66,16 +62,9 @@ export default function JobPostApplications() {
 
   const updateStatus = async (applicationId, newStatus) => {
     try {
-      const token = localStorage.getItem("accessToken");
-      await axios.patch(
-        `http://localhost:5000/api/employer/application/applications/${applicationId}/status`,
-        { status: newStatus },
-        {
-          headers: { 
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json"
-          }
-        }
+      await apiClient.patch(
+        `/api/employer/application/applications/${applicationId}/status`,
+        { status: newStatus }
       );
       
       // Update local state

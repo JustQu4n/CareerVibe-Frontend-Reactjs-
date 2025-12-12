@@ -3,7 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 import { setSingleJob } from "@/redux/jobSlice";
 import { JOB_API_ENDPOINT } from "@/utils/data";
-import axios from "axios";
+import apiClient from "@/api/client";
 
 const JobPostDetails = () => {
   const params = useParams();
@@ -18,9 +18,7 @@ const JobPostDetails = () => {
       setLoading(true);
       setError(null);
       try {
-        const res = await axios.get(`${JOB_API_ENDPOINT}/${jobId}`, {
-          withCredentials: true,
-        });
+        const res = await apiClient.get(`${JOB_API_ENDPOINT}/${jobId}`);
         console.log("API Response Get Detail Job:", res.data);
         if (res.data.success) {
           dispatch(setSingleJob(res.data.job));

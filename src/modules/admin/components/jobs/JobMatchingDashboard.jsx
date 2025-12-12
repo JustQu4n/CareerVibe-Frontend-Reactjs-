@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { fetchJobPostsByEmployer } from "@/redux/jobPostSlice";
-import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Briefcase,
