@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { MessageCircleMore, SendHorizontal } from 'lucide-react';
-import axios from 'axios';
+import apiClient from '@/api/client';
 import { useSelector } from 'react-redux';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
@@ -33,11 +33,9 @@ export default function ChatPopup() {
     }
   }, [open, token]);
 
-  const authHeaders = () => ({ Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' });
-
   const fetchStatus = async () => {
     try {
-      const res = await axios.get(`${CHAT_BASE}/status`, { headers: authHeaders() });
+      const res = await apiClient.get(`${CHAT_BASE}/status`);
       setStatus(res.data || { configured: false, message: '' });
     } catch (err) {
       console.error('Status error', err);
@@ -47,7 +45,7 @@ export default function ChatPopup() {
 
   const fetchSuggestions = async () => {
     try {
-      const res = await axios.get(`${CHAT_BASE}/suggestions`, { headers: authHeaders() });
+      const res = await apiClient.get(`${CHAT_BASE}/suggestions`);
       setSuggestions(res.data.suggestions || []);
     } catch (err) {
       console.error('Suggestions error', err);
@@ -57,7 +55,7 @@ export default function ChatPopup() {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get(`${CHAT_BASE}/history?limit=50`, { headers: authHeaders() });
+      const res = await apiClient.get(`${CHAT_BASE}/history?limit=50`);
       const hist = res.data.history || [];
       const msgs = [];
       hist.forEach((h) => {
@@ -74,7 +72,7 @@ export default function ChatPopup() {
   const deleteHistory = async () => {
     if (!confirm('Clear chat history?')) return;
     try {
-      await axios.delete(`${CHAT_BASE}/history`, { headers: authHeaders() });
+      await apiClient.delete(`${CHAT_BASE}/history`);
       setMessages([]);
     } catch (err) {
       console.error('Delete history error', err);
@@ -92,7 +90,7 @@ export default function ChatPopup() {
 
   const toggleFullscreen = () => setFullscreen((v) => !v);
 
-  const sendMessage = async (model = 'gemini-2.5-flash-latest') => {
+  const sendMessage = async (model = 'gemini-2.5-flash') => {
     if (!input.trim()) return;
     const messageToSend = input.trim();
     setMessages((prev) => [...prev, { role: 'user', text: messageToSend }]);
@@ -100,9 +98,11 @@ export default function ChatPopup() {
     setLoading(true);
 
     try {
-      const res = await axios.post(`${CHAT_BASE}/chat`, { message: messageToSend, model }, { headers: authHeaders() });
+      const res = await apiClient.post(`${CHAT_BASE}/chat`, { message: messageToSend, model });
       const data = res.data || {};
-      setMessages((prev) => [...prev, { role: 'assistant', text: data.response || 'No response' }]);
+      // sanitize assistant response by collapsing excess newlines
+      const respText = (data.response || 'No response').replace(/\n{3,}/g, '\n\n');
+      setMessages((prev) => [...prev, { role: 'assistant', text: respText }]);
     } catch (err) {
       console.error('Send message error', err);
       setMessages((prev) => [...prev, { role: 'assistant', text: 'Error: unable to reach AI service' }]);
