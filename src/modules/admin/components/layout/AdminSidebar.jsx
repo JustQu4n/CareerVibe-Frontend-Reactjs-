@@ -20,7 +20,8 @@ import {
   BarChart3,
   Calendar,
   Bell,
-  Sparkles
+  Sparkles,
+  Video
 } from 'lucide-react';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '@/redux/authSlice';
@@ -56,6 +57,12 @@ export default function AdminSidebar({ isCollapsed, setIsCollapsed }) {
       title: 'Applicants',
       icon: Users,
       path: '/admin/jobs/applicants',
+      badge: null
+    },
+    {
+      title: 'Interviews',
+      icon: Video,
+      path: '/admin/interviews',
       badge: null
     },
     {
