@@ -1,436 +1,456 @@
 /**
- * InterviewAssignments Component
- * Assign interviews to candidates and manage assignments
+ * InterviewAssignments Component - Refactored
+ * Gán interview cho candidates và quản lý assignments
  */
-
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
-  Plus,
   Users,
-  Search,
-  CheckCircle,
+  Plus,
+  UserCheck,
   Clock,
+  CheckCircle,
   XCircle,
-  Award,
+  AlertCircle,
   Calendar,
-  Eye,
-  UserPlus,
-  Mail,
-  Briefcase
+  Search,
+  Trash2,
+  Eye
 } from 'lucide-react';
-import { toast } from 'sonner';
-import interviewService from '../../services/interviewService';
+import { toast } from 'react-toastify';
+import employerInterviewService from '@/services/employerInterviewService';
 
-export default function InterviewAssignments({ selectedInterview }) {
-  const [assignments, setAssignments] = useState([]);
-  const [candidateDetails, setCandidateDetails] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+export default function InterviewAssignments({ interview }) {
+  const [candidates, setCandidates] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
-  const [applicationId, setApplicationId] = useState('');
-  const [candidateId, setCandidateId] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    if (selectedInterview) {
-      fetchAssignments();
-    }
-  }, [selectedInterview]);
+    loadCandidates();
+  }, [interview]);
 
-  const fetchAssignments = async () => {
+  const loadCandidates = async () => {
     try {
       setLoading(true);
-      const data = await interviewService.getCandidates(selectedInterview.interview_id);
-      console.log('=== ASSIGNMENTS DATA ===', data);
-      const assignmentList = Array.isArray(data) ? data : data.candidates || [];
-      setAssignments(assignmentList);
-
-      // Build a mapping of candidate details if returned by API
-      const detailsMap = {};
-      assignmentList.forEach((a) => {
-        if (a.candidate) {
-          detailsMap[a.candidate_id] = a.candidate;
-        }
-      });
-      setCandidateDetails(detailsMap);
+      const data = await employerInterviewService.getCandidates(interview.interview_id);
+      setCandidates(data);
     } catch (error) {
-      console.error('Error fetching assignments:', error);
-      toast.error('Failed to load candidate assignments');
-      setAssignments([]);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleAssign = async (e) => {
-    e.preventDefault();
-    
-    if (!applicationId.trim()) {
-      toast.error('Application ID is required');
-      return;
-    }
+  const filteredCandidates = candidates.filter(item =>
+    item.candidate?.full_name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.candidate?.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.status?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
-    try {
-      const payload = {
-        application_id: applicationId,
-        candidate_id: candidateId || undefined
-      };
-
-      const newAssignment = await interviewService.assignInterview(selectedInterview.interview_id, payload);
-      setAssignments([newAssignment, ...assignments]);
-      setShowAssignModal(false);
-      setApplicationId('');
-      setCandidateId('');
-      toast.success('Interview assigned to candidate successfully');
-    } catch (error) {
-      console.error('Error assigning interview:', error);
-      toast.error(error.response?.data?.message || 'Failed to assign interview');
-    }
-  };
-
-  const getStatusConfig = (status) => {
-    const configs = {
-      pending: { label: 'Pending', color: 'yellow', bgColor: 'bg-yellow-100', textColor: 'text-yellow-700', icon: Clock },
-      in_progress: { label: 'In Progress', color: 'blue', bgColor: 'bg-blue-100', textColor: 'text-blue-700', icon: Clock },
-      completed: { label: 'Completed', color: 'green', bgColor: 'bg-green-100', textColor: 'text-green-700', icon: CheckCircle },
-      graded: { label: 'Graded', color: 'purple', bgColor: 'bg-purple-100', textColor: 'text-purple-700', icon: Award },
-      failed: { label: 'Failed', color: 'red', bgColor: 'bg-red-100', textColor: 'text-red-700', icon: XCircle }
+  const getStatusStats = () => {
+    return {
+      total: candidates.length,
+      assigned: candidates.filter(c => c.status === 'assigned').length,
+      in_progress: candidates.filter(c => c.status === 'in_progress').length,
+      submitted: candidates.filter(c => c.status === 'submitted').length,
+      timeout: candidates.filter(c => c.status === 'timeout').length,
     };
-    return configs[status] || configs.pending;
   };
 
-  const getResultBadge = (result) => {
-    if (!result) return null;
-    
-    const configs = {
-      pass: { label: 'Pass', color: 'green' },
-      fail: { label: 'Fail', color: 'red' },
-      pending: { label: 'Pending', color: 'gray' }
-    };
-    
-    const config = configs[result] || configs.pending;
-    return (
-      <span className={`px-2 py-1 rounded-full text-xs font-medium bg-${config.color}-100 text-${config.color}-700`}>
-        {config.label}
-      </span>
-    );
-  };
+  const stats = getStatusStats();
 
-  const filteredAssignments = assignments.filter(assignment => {
-    const matchesSearch = 
-      assignment.candidate_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      assignment.application_id?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || assignment.status === statusFilter;
-    return matchesSearch && matchesStatus;
-  });
-
-  if (!selectedInterview) {
+  if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Interview Selected</h3>
-        <p className="text-gray-600">Please select an interview session to manage assignments</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Actions Bar */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search by candidate or application ID..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
-            {/* Status Filter */}
-            <select
-              value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            >
-              <option value="all">All Status</option>
-              <option value="pending">Pending</option>
-              <option value="in_progress">In Progress</option>
-              <option value="completed">Completed</option>
-              <option value="graded">Graded</option>
-              <option value="failed">Failed</option>
-            </select>
-
-            {/* Assign Button */}
-            <button
-              onClick={() => setShowAssignModal(true)}
-              className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center gap-2"
-            >
-              <UserPlus className="h-5 w-5" />
-              Assign Interview
-            </button>
-          </div>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Interview Assignments</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Manage candidate assignments for: <span className="font-semibold">{interview.title}</span>
+          </p>
         </div>
+        <button
+          onClick={() => setShowAssignModal(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+        >
+          <Plus className="h-5 w-5" />
+          Assign Candidate
+        </button>
+      </div>
 
-        {/* Stats */}
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-gray-50 rounded-lg p-3">
-            <p className="text-xs text-gray-600 mb-1">Total Assigned</p>
-            <p className="text-2xl font-bold text-gray-900">{assignments.length}</p>
-          </div>
-          <div className="bg-green-50 rounded-lg p-3">
-            <p className="text-xs text-green-600 mb-1">Completed</p>
-            <p className="text-2xl font-bold text-green-700">
-              {assignments.filter(a => a.status === 'completed').length}
-            </p>
-          </div>
-          <div className="bg-blue-50 rounded-lg p-3">
-            <p className="text-xs text-blue-600 mb-1">In Progress</p>
-            <p className="text-2xl font-bold text-blue-700">
-              {assignments.filter(a => a.status === 'in_progress').length}
-            </p>
-          </div>
-          <div className="bg-yellow-50 rounded-lg p-3">
-            <p className="text-xs text-yellow-600 mb-1">Pending</p>
-            <p className="text-2xl font-bold text-yellow-700">
-              {assignments.filter(a => a.status === 'pending').length}
-            </p>
-          </div>
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+        <StatCard
+          label="Total"
+          value={stats.total}
+          icon={Users}
+          color="bg-blue-100 text-blue-700"
+        />
+        <StatCard
+          label="Assigned"
+          value={stats.assigned}
+          icon={Clock}
+          color="bg-yellow-100 text-yellow-700"
+        />
+        <StatCard
+          label="In Progress"
+          value={stats.in_progress}
+          icon={AlertCircle}
+          color="bg-purple-100 text-purple-700"
+        />
+        <StatCard
+          label="Completed"
+          value={stats.submitted}
+          icon={CheckCircle}
+          color="bg-green-100 text-green-700"
+        />
+        <StatCard
+          label="Timeout"
+          value={stats.timeout}
+          icon={XCircle}
+          color="bg-red-100 text-red-700"
+        />
+      </div>
+
+      {/* Search */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="relative">
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search candidates..."
+            className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+          />
         </div>
       </div>
 
-      {/* Assignments Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        {loading ? (
-          <div className="p-12 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 mt-4">Loading assignments...</p>
-          </div>
-        ) : filteredAssignments.length === 0 ? (
-          <div className="p-12 text-center">
-            <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No assignments yet</h3>
-            <p className="text-gray-600 mb-6">Assign this interview to candidates to begin assessments</p>
+      {/* Candidates List */}
+      {filteredCandidates.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <Users className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">
+            {searchTerm ? 'No candidates found' : 'No assignments yet'}
+          </h3>
+          <p className="text-gray-600 mb-6">
+            {searchTerm ? 'Try adjusting your search' : 'Assign candidates to this interview to get started'}
+          </p>
+          {!searchTerm && (
             <button
               onClick={() => setShowAssignModal(true)}
-              className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all inline-flex items-center gap-2"
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
             >
-              <UserPlus className="h-5 w-5" />
-              Assign Interview
+              Assign First Candidate
             </button>
-          </div>
-        ) : (
+          )}
+        </div>
+      ) : (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Candidate
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Status
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Assigned At
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Started At
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                    Completed At
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Score
                   </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Result
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    Assigned Date
-                  </th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                {filteredAssignments.map((assignment) => {
-                  const statusConfig = getStatusConfig(assignment.status);
-                  const StatusIcon = statusConfig.icon;
-
-                  return (
-                    <motion.tr
-                      key={assignment.candidate_interview_id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      className="hover:bg-gray-50 transition-colors"
-                    >
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-3">
-                          {assignment.candidate?.avatar_url ? (
-                            <img
-                              src={assignment.candidate.avatar_url}
-                              alt={assignment.candidate?.full_name || 'Candidate'}
-                              className="h-10 w-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
-                            />
-                          ) : (
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                              <span className="text-white font-semibold text-sm">
-                                {assignment.candidate?.full_name?.charAt(0).toUpperCase() || assignment.candidate_id?.charAt(0).toUpperCase() || 'C'}
-                              </span>
-                            </div>
-                          )}
-                          <div>
-                            <p className="font-medium text-gray-900">
-                              {assignment.candidate?.full_name || assignment.candidate_id || 'Unknown Candidate'}
-                            </p>
-                            <p className="text-xs text-gray-500">
-                              {assignment.candidate?.email ? assignment.candidate.email : `App: ${assignment.application_id?.substring(0,8)}...`}
-                            </p>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium ${statusConfig.bgColor} ${statusConfig.textColor}`}>
-                          <StatusIcon className="h-3.5 w-3.5" />
-                          {statusConfig.label}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-2">
-                          {assignment.total_score !== null && assignment.total_score !== undefined ? (
-                            <>
-                              <Award className="h-4 w-4 text-amber-500" />
-                              <span className="font-semibold text-gray-900">
-                                {assignment.total_score}
-                              </span>
-                            </>
-                          ) : (
-                            <span className="text-gray-400 text-sm">Not graded</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        {getResultBadge(assignment.result)}
-                      </td>
-                      <td className="px-6 py-4">
-                        <div className="flex items-center gap-1.5 text-sm text-gray-600">
-                          <Calendar className="h-4 w-4" />
-                          {new Date(assignment.assigned_at).toLocaleDateString()}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <button
-                          className="px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors flex items-center gap-1"
-                        >
-                          <Eye className="h-4 w-4" />
-                          View Details
-                        </button>
-                      </td>
-                    </motion.tr>
-                  );
-                })}
+                {filteredCandidates.map((candidate) => (
+                  <CandidateRow
+                    key={candidate.candidate_interview_id}
+                    candidate={candidate}
+                  />
+                ))}
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Assign Modal */}
-      <AnimatePresence>
-        {showAssignModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowAssignModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
-            >
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">Assign Interview</h2>
-                <p className="text-sm text-gray-600 mt-1">Assign this interview to a candidate</p>
+      <AssignModal
+        isOpen={showAssignModal}
+        interview={interview}
+        onClose={() => setShowAssignModal(false)}
+        onSuccess={() => {
+          loadCandidates();
+          setShowAssignModal(false);
+        }}
+      />
+    </div>
+  );
+}
+
+// ========================================
+// Stat Card Component
+// ========================================
+function StatCard({ label, value, icon: Icon, color }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, scale: 0.95 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 p-4"
+    >
+      <div className="flex items-center justify-between mb-2">
+        <div className={`p-2 rounded-lg ${color}`}>
+          <Icon className="h-5 w-5" />
+        </div>
+      </div>
+      <h3 className="text-sm font-medium text-gray-600">{label}</h3>
+      <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+    </motion.div>
+  );
+}
+
+// ========================================
+// Candidate Row Component
+// ========================================
+function CandidateRow({ candidate }) {
+  const getStatusBadge = (status) => {
+    const badges = {
+      assigned: { color: 'bg-yellow-100 text-yellow-700', label: 'Assigned' },
+      in_progress: { color: 'bg-purple-100 text-purple-700', label: 'In Progress' },
+      submitted: { color: 'bg-green-100 text-green-700', label: 'Completed' },
+      timeout: { color: 'bg-red-100 text-red-700', label: 'Timeout' },
+    };
+
+    const badge = badges[status] || { color: 'bg-gray-100 text-gray-700', label: status };
+
+    return (
+      <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${badge.color}`}>
+        {badge.label}
+      </span>
+    );
+  };
+
+  // Extract candidate info from nested object
+  const candidateInfo = candidate.candidate || {};
+  const { full_name, email, phone, avatar_url } = candidateInfo;
+
+  return (
+    <tr className="hover:bg-gray-50">
+      <td className="px-6 py-4 whitespace-nowrap">
+        <div className="flex items-center">
+          {/* Avatar */}
+          {avatar_url ? (
+            <img
+              src={avatar_url}
+              alt={full_name}
+              className="h-10 w-10 rounded-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(full_name || 'User')}&background=random`;
+              }}
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold">
+              {full_name?.charAt(0)?.toUpperCase() || 'C'}
+            </div>
+          )}
+          <div className="ml-4">
+            <div className="text-sm font-medium text-gray-900">
+              {full_name || 'Unknown Candidate'}
+            </div>
+            <div className="text-xs text-gray-500">
+              {email || 'No email'}
+            </div>
+            {phone && (
+              <div className="text-xs text-gray-400">
+                {phone}
               </div>
-
-              <form onSubmit={handleAssign} className="p-6 space-y-6">
-                {/* Application ID */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Application ID <span className="text-red-500">*</span>
-                  </label>
-                  <div className="relative">
-                    <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      required
-                      value={applicationId}
-                      onChange={(e) => setApplicationId(e.target.value)}
-                      placeholder="Enter application ID"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    The application ID of the candidate you want to interview
-                  </p>
-                </div>
-
-                {/* Candidate ID (Optional) */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Candidate ID (Optional)
-                  </label>
-                  <div className="relative">
-                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-                    <input
-                      type="text"
-                      value={candidateId}
-                      onChange={(e) => setCandidateId(e.target.value)}
-                      placeholder="Leave empty to use application's candidate"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                    />
-                  </div>
-                  <p className="text-xs text-gray-500 mt-1">
-                    If omitted, the backend will use the candidate from the application
-                  </p>
-                </div>
-
-                {/* Info Box */}
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <div className="flex items-start gap-3">
-                    <Mail className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                    <div>
-                      <p className="text-sm font-medium text-blue-900 mb-1">Notification</p>
-                      <p className="text-xs text-blue-700">
-                        The candidate will be notified via email about the interview assignment
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowAssignModal(false)}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all"
-                  >
-                    Assign Interview
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
+            )}
+          </div>
+        </div>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {getStatusBadge(candidate.status)}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {candidate.assigned_at ? (
+          <>
+            <Calendar className="h-3 w-3 inline mr-1" />
+            {new Date(candidate.assigned_at).toLocaleDateString()}
+          </>
+        ) : '-'}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {candidate.started_at ? (
+          <>
+            <Clock className="h-3 w-3 inline mr-1" />
+            {new Date(candidate.started_at).toLocaleDateString()}
+          </>
+        ) : '-'}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {candidate.completed_at ? (
+          <>
+            <CheckCircle className="h-3 w-3 inline mr-1" />
+            {new Date(candidate.completed_at).toLocaleDateString()}
+          </>
+        ) : '-'}
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        {candidate.total_score !== null ? (
+          <span className="text-sm font-bold text-gray-900">
+            {candidate.total_score}%
+          </span>
+        ) : (
+          <span className="text-sm text-gray-400">-</span>
         )}
-      </AnimatePresence>
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap">
+        <button
+          className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
+          title="View Details"
+        >
+          <Eye className="h-4 w-4" />
+        </button>
+      </td>
+    </tr>
+  );
+}
+
+// ========================================
+// Assign Modal Component
+// ========================================
+function AssignModal({ isOpen, interview, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    application_id: '',
+    candidate_id: '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.application_id) {
+      toast.error('Application ID is required');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      await employerInterviewService.assignInterview(interview.interview_id, {
+        application_id: formData.application_id,
+        candidate_id: formData.candidate_id || undefined,
+      });
+      toast.success('Interview assigned successfully');
+      setFormData({ application_id: '', candidate_id: '' });
+      onSuccess();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+      >
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">Assign Interview</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Assign <span className="font-semibold">{interview.title}</span> to a candidate
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Application ID *
+            </label>
+            <input
+              type="text"
+              required
+              value={formData.application_id}
+              onChange={(e) => setFormData({ ...formData, application_id: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter application ID (UUID)"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              The UUID of the job application
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Candidate ID (Optional)
+            </label>
+            <input
+              type="text"
+              value={formData.candidate_id}
+              onChange={(e) => setFormData({ ...formData, candidate_id: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Auto-filled from application if empty"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              Leave empty to auto-fill from application
+            </p>
+          </div>
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-blue-800">
+                <p className="font-semibold mb-1">Note:</p>
+                <p>The candidate will be notified and can access the interview from their dashboard.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Assigning...' : 'Assign Interview'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }

@@ -1,529 +1,466 @@
 /**
- * InterviewQuestions Component
- * Manage questions for interview sessions
+ * InterviewQuestions Component - Refactored
+ * Quản lý câu hỏi với CRUD operations đầy đủ
  */
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
-  FileQuestion,
-  Edit2,
+  Edit,
   Trash2,
   Clock,
   Award,
-  Search,
+  Hash,
+  FileQuestion,
   GripVertical
 } from 'lucide-react';
-import { toast } from 'sonner';
-import interviewService from '../../services/interviewService';
+import { toast } from 'react-toastify';
+import employerInterviewService from '@/services/employerInterviewService';
 
-export default function InterviewQuestions({ selectedInterview }) {
+export default function InterviewQuestions({ interview }) {
   const [questions, setQuestions] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedQuestion, setSelectedQuestion] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
-
-  const [formData, setFormData] = useState({
-    question_text: '',
-    time_limit_seconds: '',
-    max_score: ''
-  });
+  const [editingQuestion, setEditingQuestion] = useState(null);
 
   useEffect(() => {
-    if (selectedInterview) {
-      fetchQuestions();
-    }
-  }, [selectedInterview]);
+    loadQuestions();
+  }, [interview]);
 
-  const fetchQuestions = async () => {
+  const loadQuestions = async () => {
     try {
       setLoading(true);
-      const data = await interviewService.getQuestions(selectedInterview.interview_id);
-      setQuestions(Array.isArray(data) ? data : data.questions || []);
+      const data = await employerInterviewService.getQuestions(interview.interview_id);
+      setQuestions(data);
     } catch (error) {
-      console.error('Error fetching questions:', error);
-      toast.error('Failed to load questions');
-      setQuestions([]);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleCreate = async (e) => {
-    e.preventDefault();
-    
-    if (!formData.question_text.trim()) {
-      toast.error('Question text is required');
-      return;
-    }
+  const handleDelete = async (questionId) => {
+    if (!window.confirm('Are you sure you want to delete this question?')) return;
 
     try {
-      const payload = {
-        question_text: formData.question_text,
-        time_limit_seconds: formData.time_limit_seconds ? parseInt(formData.time_limit_seconds) : undefined,
-        max_score: formData.max_score ? parseFloat(formData.max_score) : undefined
-      };
-
-      const newQuestion = await interviewService.createQuestion(selectedInterview.interview_id, payload);
-      setQuestions([...questions, newQuestion]);
-      setShowCreateModal(false);
-      setFormData({ question_text: '', time_limit_seconds: '', max_score: '' });
-      toast.success('Question created successfully');
-    } catch (error) {
-      console.error('Error creating question:', error);
-      toast.error(error.response?.data?.message || 'Failed to create question');
-    }
-  };
-
-  const handleUpdate = async (e) => {
-    e.preventDefault();
-    
-    if (!selectedQuestion) return;
-
-    try {
-      const payload = {};
-      if (formData.question_text) payload.question_text = formData.question_text;
-      if (formData.time_limit_seconds !== '') payload.time_limit_seconds = parseInt(formData.time_limit_seconds) || null;
-      if (formData.max_score !== '') payload.max_score = parseFloat(formData.max_score) || null;
-
-      const updated = await interviewService.updateQuestion(
-        selectedInterview.interview_id,
-        selectedQuestion.question_id,
-        payload
-      );
-      setQuestions(questions.map(q => q.question_id === selectedQuestion.question_id ? updated : q));
-      setShowEditModal(false);
-      setSelectedQuestion(null);
-      setFormData({ question_text: '', time_limit_seconds: '', max_score: '' });
-      toast.success('Question updated successfully');
-    } catch (error) {
-      console.error('Error updating question:', error);
-      toast.error(error.response?.data?.message || 'Failed to update question');
-    }
-  };
-
-  const handleDelete = async () => {
-    if (!selectedQuestion) return;
-
-    try {
-      await interviewService.deleteQuestion(selectedInterview.interview_id, selectedQuestion.question_id);
-      setQuestions(questions.filter(q => q.question_id !== selectedQuestion.question_id));
-      setShowDeleteModal(false);
-      setSelectedQuestion(null);
+      await employerInterviewService.deleteQuestion(interview.interview_id, questionId);
       toast.success('Question deleted successfully');
+      loadQuestions();
     } catch (error) {
-      console.error('Error deleting question:', error);
-      toast.error(error.response?.data?.message || 'Failed to delete question');
+      toast.error(error.message);
     }
   };
 
-  const openEditModal = (question) => {
-    setSelectedQuestion(question);
-    setFormData({
-      question_text: question.question_text,
-      time_limit_seconds: question.time_limit_seconds || '',
-      max_score: question.max_score || ''
-    });
+  const handleEdit = (question) => {
+    setEditingQuestion(question);
     setShowEditModal(true);
   };
 
-  const openDeleteModal = (question) => {
-    setSelectedQuestion(question);
-    setShowDeleteModal(true);
-  };
-
-  const formatTime = (seconds) => {
-    if (!seconds) return 'No limit';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
-
-  const filteredQuestions = questions.filter(q =>
-    q.question_text.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  if (!selectedInterview) {
+  if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <FileQuestion className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Interview Selected</h3>
-        <p className="text-gray-600">Please select an interview session to manage questions</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   return (
     <div className="space-y-6">
-      {/* Actions Bar */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          {/* Search */}
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Search questions..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-
-          {/* Create Button */}
-          <button
-            onClick={() => setShowCreateModal(true)}
-            className="px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center gap-2"
-          >
-            <Plus className="h-5 w-5" />
-            Add Question
-          </button>
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Interview Questions</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Manage questions for: <span className="font-semibold">{interview.title}</span>
+          </p>
         </div>
-
-        {/* Stats */}
-        <div className="mt-4 flex items-center gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <FileQuestion className="h-4 w-4 text-gray-500" />
-            <span className="text-gray-600">Total Questions:</span>
-            <span className="font-semibold text-gray-900">{questions.length}</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Award className="h-4 w-4 text-gray-500" />
-            <span className="text-gray-600">Total Points:</span>
-            <span className="font-semibold text-gray-900">
-              {questions.reduce((sum, q) => sum + (q.max_score || 0), 0)}
-            </span>
-          </div>
-        </div>
+        <button
+          onClick={() => setShowCreateModal(true)}
+          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+        >
+          <Plus className="h-5 w-5" />
+          Add Question
+        </button>
       </div>
 
       {/* Questions List */}
-      {loading ? (
-        <div className="space-y-4">
-          {[...Array(3)].map((_, i) => (
-            <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 animate-pulse">
-              <div className="h-6 bg-gray-200 rounded w-3/4 mb-4"></div>
-              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-            </div>
-          ))}
-        </div>
-      ) : filteredQuestions.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+      {questions.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
           <FileQuestion className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No questions yet</h3>
-          <p className="text-gray-600 mb-6">Add your first question to this interview session</p>
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Questions Yet</h3>
+          <p className="text-gray-600 mb-6">Get started by adding your first question</p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all inline-flex items-center gap-2"
+            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
           >
-            <Plus className="h-5 w-5" />
             Add Question
           </button>
         </div>
       ) : (
         <div className="space-y-4">
-          {filteredQuestions.map((question, index) => (
-            <motion.div
+          {questions.map((question, index) => (
+            <QuestionCard
               key={question.question_id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className="bg-white rounded-xl border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all group"
-            >
-              <div className="p-6">
-                <div className="flex items-start gap-4">
-                  {/* Drag Handle */}
-                  <div className="flex-shrink-0 pt-1 opacity-0 group-hover:opacity-100 transition-opacity cursor-move">
-                    <GripVertical className="h-5 w-5 text-gray-400" />
-                  </div>
-
-                  {/* Question Number */}
-                  <div className="flex-shrink-0">
-                    <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">Q{index + 1}</span>
-                    </div>
-                  </div>
-
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <p className="text-gray-900 font-medium mb-3 leading-relaxed">
-                      {question.question_text}
-                    </p>
-
-                    {/* Meta */}
-                    <div className="flex flex-wrap items-center gap-4 text-sm">
-                      {question.time_limit_seconds && (
-                        <div className="flex items-center gap-1.5 text-gray-600">
-                          <Clock className="h-4 w-4 text-blue-500" />
-                          <span>{formatTime(question.time_limit_seconds)}</span>
-                        </div>
-                      )}
-                      {question.max_score && (
-                        <div className="flex items-center gap-1.5 text-gray-600">
-                          <Award className="h-4 w-4 text-amber-500" />
-                          <span>{question.max_score} points</span>
-                        </div>
-                      )}
-                      <div className="text-xs text-gray-500">
-                        Created {new Date(question.created_at).toLocaleDateString()}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex-shrink-0 flex items-center gap-2">
-                    <button
-                      onClick={() => openEditModal(question)}
-                      className="p-2 text-gray-600 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                    >
-                      <Edit2 className="h-4 w-4" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(question)}
-                      className="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              question={question}
+              index={index}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
           ))}
         </div>
       )}
 
-      {/* Create Modal */}
-      <AnimatePresence>
-        {showCreateModal && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowCreateModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      {/* Modals */}
+      <CreateQuestionModal
+        isOpen={showCreateModal}
+        interview={interview}
+        onClose={() => setShowCreateModal(false)}
+        onSuccess={() => {
+          loadQuestions();
+          setShowCreateModal(false);
+        }}
+      />
+
+      <EditQuestionModal
+        isOpen={showEditModal}
+        interview={interview}
+        question={editingQuestion}
+        onClose={() => {
+          setShowEditModal(false);
+          setEditingQuestion(null);
+        }}
+        onSuccess={() => {
+          loadQuestions();
+          setShowEditModal(false);
+          setEditingQuestion(null);
+        }}
+      />
+    </div>
+  );
+}
+
+// ========================================
+// Question Card Component
+// ========================================
+function QuestionCard({ question, index, onEdit, onDelete }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all"
+    >
+      <div className="p-6">
+        <div className="flex items-start gap-4">
+          {/* Drag Handle */}
+          <div className="flex items-center gap-2 pt-1">
+            <GripVertical className="h-5 w-5 text-gray-400" />
+            <span className="text-lg font-bold text-gray-900">#{index + 1}</span>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1">
+            <p className="text-gray-900 text-base leading-relaxed mb-4">
+              {question.question_text}
+            </p>
+
+            <div className="flex flex-wrap items-center gap-4">
+              {question.time_limit_seconds && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span>{Math.floor(question.time_limit_seconds / 60)} minutes</span>
+                </div>
+              )}
+              {question.max_score && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Award className="h-4 w-4 text-yellow-600" />
+                  <span>{question.max_score} points</span>
+                </div>
+              )}
+              {question.order_index !== undefined && (
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  <Hash className="h-4 w-4 text-purple-600" />
+                  <span>Order: {question.order_index}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => onEdit(question)}
+              className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
             >
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">Add Question</h2>
-                <p className="text-sm text-gray-600 mt-1">Create a new question for this interview</p>
-              </div>
-
-              <form onSubmit={handleCreate} className="p-6 space-y-6">
-                {/* Question Text */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Question <span className="text-red-500">*</span>
-                  </label>
-                  <textarea
-                    required
-                    value={formData.question_text}
-                    onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
-                    placeholder="Enter the interview question..."
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  />
-                </div>
-
-                {/* Time Limit */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Time Limit (seconds)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.time_limit_seconds}
-                    onChange={(e) => setFormData({ ...formData, time_limit_seconds: e.target.value })}
-                    placeholder="e.g., 300 (5 minutes)"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Leave empty for no time limit</p>
-                </div>
-
-                {/* Max Score */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum Score (points)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={formData.max_score}
-                    onChange={(e) => setFormData({ ...formData, max_score: e.target.value })}
-                    placeholder="e.g., 10"
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
-
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowCreateModal(false)}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all"
-                  >
-                    Add Question
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Edit Modal */}
-      <AnimatePresence>
-        {showEditModal && selectedQuestion && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowEditModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+              <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => onDelete(question.question_id)}
+              className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
             >
-              <div className="p-6 border-b border-gray-200">
-                <h2 className="text-2xl font-bold text-gray-900">Edit Question</h2>
-                <p className="text-sm text-gray-600 mt-1">Update question details</p>
-              </div>
+              <Trash2 className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
-              <form onSubmit={handleUpdate} className="p-6 space-y-6">
-                {/* Question Text */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Question
-                  </label>
-                  <textarea
-                    value={formData.question_text}
-                    onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
-                    rows={4}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                  />
-                </div>
+// ========================================
+// Create Question Modal
+// ========================================
+function CreateQuestionModal({ isOpen, interview, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    question_text: '',
+    time_limit_seconds: '',
+    max_score: '',
+    order_index: '',
+  });
+  const [loading, setLoading] = useState(false);
 
-                {/* Time Limit */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Time Limit (seconds)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    value={formData.time_limit_seconds}
-                    onChange={(e) => setFormData({ ...formData, time_limit_seconds: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await employerInterviewService.createQuestion(interview.interview_id, {
+        ...formData,
+        time_limit_seconds: formData.time_limit_seconds ? parseInt(formData.time_limit_seconds) : null,
+        max_score: formData.max_score ? parseFloat(formData.max_score) : null,
+        order_index: formData.order_index ? parseInt(formData.order_index) : null,
+      });
+      toast.success('Question created successfully');
+      onSuccess();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-                {/* Max Score */}
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Maximum Score (points)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="0.1"
-                    value={formData.max_score}
-                    onChange={(e) => setFormData({ ...formData, max_score: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                </div>
+  if (!isOpen) return null;
 
-                {/* Actions */}
-                <div className="flex items-center gap-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => setShowEditModal(false)}
-                    className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all"
-                  >
-                    Save Changes
-                  </button>
-                </div>
-              </form>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">Add Question</h2>
+        </div>
 
-      {/* Delete Modal */}
-      <AnimatePresence>
-        {showDeleteModal && selectedQuestion && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            onClick={() => setShowDeleteModal(false)}
-          >
-            <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              onClick={(e) => e.stopPropagation()}
-              className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Question Text *
+            </label>
+            <textarea
+              required
+              value={formData.question_text}
+              onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Enter your question..."
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Time Limit (seconds)
+              </label>
+              <input
+                type="number"
+                value={formData.time_limit_seconds}
+                onChange={(e) => setFormData({ ...formData, time_limit_seconds: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="300"
+              />
+              <p className="text-xs text-gray-500 mt-1">e.g., 300 = 5 minutes</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Max Score
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                value={formData.max_score}
+                onChange={(e) => setFormData({ ...formData, max_score: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="10"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Order Index
+              </label>
+              <input
+                type="number"
+                value={formData.order_index}
+                onChange={(e) => setFormData({ ...formData, order_index: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="1"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-12 w-12 rounded-full bg-red-100 flex items-center justify-center">
-                  <Trash2 className="h-6 w-6 text-red-600" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-gray-900">Delete Question</h3>
-                  <p className="text-sm text-gray-600">This action cannot be undone</p>
-                </div>
-              </div>
+              {loading ? 'Creating...' : 'Create Question'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
 
-              <p className="text-gray-700 mb-6">
-                Are you sure you want to delete this question? All associated answers will also be removed.
-              </p>
+// ========================================
+// Edit Question Modal
+// ========================================
+function EditQuestionModal({ isOpen, interview, question, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    question_text: '',
+    time_limit_seconds: '',
+    max_score: '',
+    order_index: '',
+  });
+  const [loading, setLoading] = useState(false);
 
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowDeleteModal(false)}
-                  className="flex-1 px-4 py-3 border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleDelete}
-                  className="flex-1 px-4 py-3 bg-red-600 text-white rounded-lg font-medium hover:bg-red-700 transition-colors"
-                >
-                  Delete
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  useEffect(() => {
+    if (question) {
+      setFormData({
+        question_text: question.question_text || '',
+        time_limit_seconds: question.time_limit_seconds || '',
+        max_score: question.max_score || '',
+        order_index: question.order_index || '',
+      });
+    }
+  }, [question]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      await employerInterviewService.updateQuestion(
+        interview.interview_id,
+        question.question_id,
+        {
+          ...formData,
+          time_limit_seconds: formData.time_limit_seconds ? parseInt(formData.time_limit_seconds) : null,
+          max_score: formData.max_score ? parseFloat(formData.max_score) : null,
+          order_index: formData.order_index ? parseInt(formData.order_index) : null,
+        }
+      );
+      toast.success('Question updated successfully');
+      onSuccess();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div className="p-6 border-b border-gray-200">
+          <h2 className="text-2xl font-bold text-gray-900">Edit Question</h2>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Question Text *
+            </label>
+            <textarea
+              required
+              value={formData.question_text}
+              onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+            />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Time Limit (seconds)
+              </label>
+              <input
+                type="number"
+                value={formData.time_limit_seconds}
+                onChange={(e) => setFormData({ ...formData, time_limit_seconds: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Max Score
+              </label>
+              <input
+                type="number"
+                step="0.1"
+                value={formData.max_score}
+                onChange={(e) => setFormData({ ...formData, max_score: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Order Index
+              </label>
+              <input
+                type="number"
+                value={formData.order_index}
+                onChange={(e) => setFormData({ ...formData, order_index: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Updating...' : 'Update Question'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </motion.div>
     </div>
   );
 }

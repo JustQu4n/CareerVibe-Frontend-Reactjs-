@@ -1,482 +1,464 @@
 /**
- * InterviewAnswers Component
- * View and grade candidate answers
+ * InterviewAnswers Component - Refactored
+ * Xem và chấm điểm câu trả lời của candidates
  */
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   MessageSquare,
+  User,
+  FileQuestion,
   Award,
   Clock,
-  User,
-  FileText,
   CheckCircle,
   Save,
-  Eye,
-  ChevronDown,
-  ChevronUp,
-  Calendar
+  ArrowLeft,
+  Calendar,
+  TrendingUp
 } from 'lucide-react';
-import { toast } from 'sonner';
-import interviewService from '../../services/interviewService';
+import { toast } from 'react-toastify';
+import employerInterviewService from '@/services/employerInterviewService';
 
-export default function InterviewAnswers({ selectedInterview }) {
+export default function InterviewAnswers({ interview }) {
   const [candidates, setCandidates] = useState([]);
   const [selectedCandidate, setSelectedCandidate] = useState(null);
   const [answers, setAnswers] = useState([]);
-  const [candidateInfo, setCandidateInfo] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [expandedAnswers, setExpandedAnswers] = useState({});
-  const [gradingData, setGradingData] = useState({});
+  const [loading, setLoading] = useState(true);
+  const [answersLoading, setAnswersLoading] = useState(false);
 
   useEffect(() => {
-    if (selectedInterview) {
-      fetchCandidates();
-    }
-  }, [selectedInterview]);
+    loadCandidates();
+  }, [interview]);
 
-  useEffect(() => {
-    if (selectedCandidate) {
-      fetchAnswers();
-    }
-  }, [selectedCandidate]);
-
-  const fetchCandidates = async () => {
-    try {
-      const data = await interviewService.getCandidates(selectedInterview.interview_id);
-      const candidateList = Array.isArray(data) ? data : data.candidates || [];
-      setCandidates(candidateList.filter(c => c.status === 'completed' || c.status === 'graded'));
-    } catch (error) {
-      console.error('Error fetching candidates:', error);
-      toast.error('Failed to load candidates');
-      setCandidates([]);
-    }
-  };
-
-  const fetchAnswers = async () => {
+  const loadCandidates = async () => {
     try {
       setLoading(true);
-      const data = await interviewService.getCandidateAnswers(
-        selectedInterview.interview_id,
-        selectedCandidate.candidate_interview_id
-      );
-      const answerList = Array.isArray(data) ? data : data.answers || [];
-      setAnswers(answerList);
-      // Extract candidate info from first answer
-      if (answerList.length > 0 && answerList[0].candidate) {
-        setCandidateInfo(answerList[0].candidate);
-      }
-      
-      // Initialize grading data
-      const initialGrading = {};
-      (Array.isArray(data) ? data : data.answers || []).forEach(answer => {
-        initialGrading[answer.interview_answer_id] = {
-          score: answer.score || '',
-          feedback: answer.feedback || ''
-        };
-      });
-      setGradingData(initialGrading);
+      const data = await employerInterviewService.getCandidates(interview.interview_id);
+      // Only show candidates who have submitted
+      const submittedCandidates = data.filter(c => c.status === 'submitted');
+      setCandidates(submittedCandidates);
     } catch (error) {
-      console.error('Error fetching answers:', error);
-      toast.error('Failed to load answers');
-      setAnswers([]);
+      toast.error(error.message);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleGrade = async (answerId) => {
-    const grading = gradingData[answerId];
-    
-    if (!grading) return;
-
+  const loadCandidateAnswers = async (candidateInterviewId) => {
     try {
-      const payload = {
-        score: grading.score ? parseFloat(grading.score) : undefined,
-        feedback: grading.feedback || undefined
-      };
-
-      await interviewService.gradeAnswer(
-        selectedInterview.interview_id,
-        selectedCandidate.candidate_interview_id,
-        answerId,
-        payload
+      setAnswersLoading(true);
+      const data = await employerInterviewService.getCandidateAnswers(
+        interview.interview_id,
+        candidateInterviewId
       );
-
-      // Update local state
-      setAnswers(answers.map(a => 
-        a.interview_answer_id === answerId 
-          ? { ...a, score: payload.score, feedback: payload.feedback, graded_at: new Date().toISOString() }
-          : a
-      ));
-
-      toast.success('Answer graded successfully');
-      
-      // Refresh candidate data to update total score
-      fetchCandidates();
+      setAnswers(data);
     } catch (error) {
-      console.error('Error grading answer:', error);
-      toast.error(error.response?.data?.message || 'Failed to grade answer');
+      toast.error(error.message);
+    } finally {
+      setAnswersLoading(false);
     }
   };
 
-  const toggleAnswerExpand = (answerId) => {
-    setExpandedAnswers(prev => ({
-      ...prev,
-      [answerId]: !prev[answerId]
-    }));
+  const handleSelectCandidate = async (candidate) => {
+    setSelectedCandidate(candidate);
+    await loadCandidateAnswers(candidate.candidate_interview_id);
   };
 
-  const updateGradingData = (answerId, field, value) => {
-    setGradingData(prev => ({
-      ...prev,
-      [answerId]: {
-        ...prev[answerId],
-        [field]: value
-      }
-    }));
+  const handleBackToList = () => {
+    setSelectedCandidate(null);
+    setAnswers([]);
   };
 
-  const formatTime = (seconds) => {
-    if (!seconds && seconds !== 0) return 'N/A';
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins}m ${secs}s`;
-  };
-
-  const calculateTotalScore = () => {
-    return answers.reduce((sum, a) => sum + (a.score || 0), 0);
-  };
-
-  const calculateMaxScore = () => {
-    return answers.reduce((sum, a) => sum + (a.question?.max_score || 0), 0);
-  };
-
-  if (!selectedInterview) {
+  if (loading) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-        <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Interview Selected</h3>
-        <p className="text-gray-600">Please select an interview session to view answers</p>
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
-  return (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Candidates List */}
-      <div className="lg:col-span-1">
-        <div className="bg-white rounded-xl border border-gray-200 overflow-hidden sticky top-6">
-          <div className="p-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-            <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-              <User className="h-5 w-5 text-blue-600" />
-              Candidates ({candidates.length})
-            </h3>
-          </div>
+  // Show candidate list
+  if (!selectedCandidate) {
+    return (
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h2 className="text-2xl font-bold text-gray-900">Candidate Answers & Grading</h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Select a candidate to view and grade their answers for: <span className="font-semibold">{interview.title}</span>
+          </p>
+        </div>
 
-          <div className="max-h-[calc(100vh-200px)] overflow-y-auto">
-            {candidates.length === 0 ? (
-              <div className="p-8 text-center">
-                <User className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-sm text-gray-600">No completed interviews</p>
-              </div>
+        {/* Candidates List */}
+        {candidates.length === 0 ? (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+            <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Submissions Yet</h3>
+            <p className="text-gray-600">
+              No candidates have completed this interview yet
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {candidates.map((candidate) => (
+              <CandidateCard
+                key={candidate.candidate_interview_id}
+                candidate={candidate}
+                onSelect={handleSelectCandidate}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // Show answers grading view
+  return (
+    <div className="space-y-6">
+      {/* Header with Back Button */}
+      <div className="flex items-center gap-4">
+        <button
+          onClick={handleBackToList}
+          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-700" />
+        </button>
+        <div className="flex-1">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Grading: {selectedCandidate.candidate?.full_name || 'Candidate'}
+          </h2>
+          <p className="text-sm text-gray-600 mt-1">
+            Review and grade answers for <span className="font-semibold">{interview.title}</span>
+          </p>
+        </div>
+      </div>
+
+      {/* Candidate Info Card */}
+      <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            {selectedCandidate.candidate?.avatar_url ? (
+              <img
+                src={selectedCandidate.candidate.avatar_url}
+                alt={selectedCandidate.candidate.full_name}
+                className="h-16 w-16 rounded-full object-cover border-4 border-white/30"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(selectedCandidate.candidate.full_name || 'User')}&background=random`;
+                }}
+              />
             ) : (
-              <div className="divide-y divide-gray-200">
-                {candidates.map((candidate) => (
-                  <motion.button
-                    key={candidate.candidate_interview_id}
-                    whileHover={{ x: 4 }}
-                    onClick={() => setSelectedCandidate(candidate)}
-                    className={`
-                      w-full p-4 text-left transition-colors
-                      ${selectedCandidate?.candidate_interview_id === candidate.candidate_interview_id
-                        ? 'bg-blue-50 border-l-4 border-blue-600'
-                        : 'hover:bg-gray-50'
-                      }
-                    `}
-                  >
-                    <div className="flex items-start gap-3">
-                      {(selectedCandidate?.candidate_interview_id === candidate.candidate_interview_id && candidateInfo?.avatar_url) ? (
-                        <img
-                          src={candidateInfo.avatar_url}
-                          alt={candidateInfo.full_name || 'Candidate'}
-                          className="h-10 w-10 rounded-full object-cover flex-shrink-0 border-2 border-white shadow-sm"
-                        />
-                      ) : (
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center flex-shrink-0">
-                          <span className="text-white font-semibold text-sm">
-                            {(selectedCandidate?.candidate_interview_id === candidate.candidate_interview_id && candidateInfo?.full_name) ? candidateInfo.full_name.charAt(0).toUpperCase() : candidate.candidate_id.substring(0, 2).toUpperCase()}
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 truncate mb-1">
-                          {(selectedCandidate?.candidate_interview_id === candidate.candidate_interview_id && candidateInfo?.full_name) || candidate.candidate_id}
-                        </p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
-                          <Award className="h-3 w-3" />
-                          <span>Score: {candidate.total_score || 0}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-gray-500 mt-1">
-                          <Calendar className="h-3 w-3" />
-                          <span>{new Date(candidate.completed_at).toLocaleDateString()}</span>
-                        </div>
-                      </div>
-                      {candidate.status === 'graded' && (
-                        <CheckCircle className="h-5 w-5 text-green-500 flex-shrink-0" />
-                      )}
-                    </div>
-                  </motion.button>
-                ))}
+              <div className="h-16 w-16 rounded-full bg-white/20 flex items-center justify-center text-2xl font-bold">
+                {selectedCandidate.candidate?.full_name?.charAt(0)?.toUpperCase() || 'C'}
               </div>
             )}
+            <div>
+              <h3 className="text-xl font-bold">{selectedCandidate.candidate?.full_name || 'Unknown'}</h3>
+              {selectedCandidate.candidate?.email && (
+                <p className="text-blue-100 text-sm">
+                  {selectedCandidate.candidate.email}
+                </p>
+              )}
+              {selectedCandidate.candidate?.phone && (
+                <p className="text-blue-100 text-sm">
+                   {selectedCandidate.candidate.phone}
+                </p>
+              )}
+              <p className="text-blue-200 text-xs mt-1">
+                Completed: {selectedCandidate.completed_at ? new Date(selectedCandidate.completed_at).toLocaleString() : 'N/A'}
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-3xl font-bold">
+              {selectedCandidate.total_score !== null ? `${selectedCandidate.total_score}%` : '-'}
+            </div>
+            <p className="text-blue-100 text-sm">Current Score</p>
           </div>
         </div>
       </div>
 
-      {/* Answers & Grading */}
-      <div className="lg:col-span-2">
-        {!selectedCandidate ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <Eye className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Select a Candidate</h3>
-            <p className="text-gray-600">Choose a candidate from the list to view and grade their answers</p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {/* Candidate Info Card */}
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  {candidateInfo?.avatar_url ? (
-                    <img
-                      src={candidateInfo.avatar_url}
-                      alt={candidateInfo.full_name || 'Candidate'}
-                      className="h-14 w-14 rounded-full object-cover border-2 border-blue-200 shadow-lg"
-                    />
-                  ) : (
-                    <div className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center shadow-lg">
-                      <span className="text-white font-bold text-lg">
-                        {candidateInfo?.full_name?.charAt(0).toUpperCase() || selectedCandidate.candidate_id.substring(0, 2).toUpperCase()}
-                      </span>
-                    </div>
-                  )}
-                  <div>
-                    <h2 className="text-xl font-bold text-gray-900">
-                      {candidateInfo?.full_name || selectedCandidate.candidate_id}
-                    </h2>
-                    <p className="text-sm text-gray-600">
-                      {candidateInfo?.email || ''}
-                    </p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      Application ID: {selectedCandidate.application_id}
-                    </p>
-                  </div>
-                </div>
-                <span className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  selectedCandidate.status === 'graded' 
-                    ? 'bg-green-100 text-green-700' 
-                    : 'bg-blue-100 text-blue-700'
-                }`}>
-                  {selectedCandidate.status === 'graded' ? 'Graded' : 'Pending Grading'}
-                </span>
-              </div>
+      {/* Answers List */}
+      {answersLoading ? (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        </div>
+      ) : answers.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
+          <FileQuestion className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Answers Found</h3>
+          <p className="text-gray-600">
+            This candidate has not submitted any answers
+          </p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {answers.map((answer, index) => (
+            <AnswerCard
+              key={answer.interview_answer_id}
+              answer={answer}
+              index={index}
+              interview={interview}
+              candidateInterviewId={selectedCandidate.candidate_interview_id}
+              onGradeSuccess={() => {
+                loadCandidateAnswers(selectedCandidate.candidate_interview_id);
+                loadCandidates(); // Refresh to update total score
+              }}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
-              {/* Score Summary */}
-              <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-200">
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Total Score</p>
-                  <p className="text-2xl font-bold text-gray-900">
-                    {selectedCandidate.total_score || 0}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Completed At</p>
-                  <p className="text-sm font-medium text-gray-900">
-                    {new Date(selectedCandidate.completed_at).toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 mb-1">Result</p>
-                  <span className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                    selectedCandidate.result === 'pass' 
-                      ? 'bg-green-100 text-green-700'
-                      : selectedCandidate.result === 'fail'
-                        ? 'bg-red-100 text-red-700'
-                        : 'bg-gray-100 text-gray-700'
-                  }`}>
-                    {selectedCandidate.result || 'Pending'}
-                  </span>
-                </div>
-              </div>
+// ========================================
+// Candidate Card Component
+// ========================================
+function CandidateCard({ candidate, onSelect }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      whileHover={{ scale: 1.02 }}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all cursor-pointer"
+      onClick={() => onSelect(candidate)}
+    >
+      <div className="p-6">
+        <div className="flex items-center gap-4 mb-4">
+          {candidate.candidate?.avatar_url ? (
+            <img
+              src={candidate.candidate.avatar_url}
+              alt={candidate.candidate.full_name}
+              className="h-12 w-12 rounded-full object-cover"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.candidate.full_name || 'User')}&background=random`;
+              }}
+            />
+          ) : (
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg">
+              {candidate.candidate?.full_name?.charAt(0)?.toUpperCase() || 'C'}
             </div>
+          )}
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-gray-900">
+              {candidate.candidate?.full_name || 'Unknown Candidate'}
+            </h3>
+            {candidate.candidate?.email && (
+              <p className="text-sm text-gray-600">
+                {candidate.candidate.email}
+              </p>
+            )}
+            {candidate.candidate?.phone && (
+              <p className="text-xs text-gray-500">
+                {candidate.candidate.phone}
+              </p>
+            )}
+            <p className="text-xs text-gray-400 mt-1">
+              Completed: {candidate.completed_at ? new Date(candidate.completed_at).toLocaleDateString() : '-'}
+            </p>
+          </div>
+        </div>
 
-            {/* Answers List */}
-            {loading ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                <p className="text-gray-600">Loading answers...</p>
-              </div>
-            ) : answers.length === 0 ? (
-              <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">No Answers Found</h3>
-                <p className="text-gray-600">This candidate hasn't submitted any answers yet</p>
-              </div>
-            ) : (
-              <div className="space-y-4">
-                {answers.map((answer, index) => {
-                  const isExpanded = expandedAnswers[answer.interview_answer_id];
-                  const grading = gradingData[answer.interview_answer_id] || {};
+        <div className="space-y-2">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">Score</span>
+            <span className={`font-bold ${
+              candidate.total_score !== null
+                ? candidate.total_score >= 70 ? 'text-green-600' : candidate.total_score >= 50 ? 'text-yellow-600' : 'text-red-600'
+                : 'text-gray-400'
+            }`}>
+              {candidate.total_score !== null ? `${candidate.total_score}%` : 'Not graded'}
+            </span>
+          </div>
+          
+          <div className="pt-3 border-t border-gray-100">
+            <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
+              <MessageSquare className="h-4 w-4" />
+              View & Grade Answers
+            </button>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
 
-                  return (
-                    <motion.div
-                      key={answer.interview_answer_id}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.05 }}
-                      className="bg-white rounded-xl border border-gray-200 overflow-hidden"
-                    >
-                      {/* Question Header */}
-                      <div 
-                        className="p-6 bg-gradient-to-r from-gray-50 to-blue-50 cursor-pointer"
-                        onClick={() => toggleAnswerExpand(answer.interview_answer_id)}
-                      >
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-3 mb-2">
-                              <span className="h-8 w-8 rounded-lg bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
-                                Q{index + 1}
-                              </span>
-                              {answer.graded_at && (
-                                <span className="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium flex items-center gap-1">
-                                  <CheckCircle className="h-3 w-3" />
-                                  Graded
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-gray-900 font-medium mb-2 leading-relaxed">
-                              {answer.question || answer.question_text || 'Question not available'}
-                            </p>
-                            <div className="flex items-center gap-4 text-sm text-gray-600">
-                              <span className="flex items-center gap-1">
-                                <Clock className="h-4 w-4" />
-                                {formatTime(answer.elapsed_seconds)}
-                              </span>
-                              {answer.score !== null && answer.score !== undefined && (
-                                <span className="flex items-center gap-1 font-medium text-blue-600">
-                                  <Award className="h-4 w-4" />
-                                  {answer.score} points
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                          <button className="p-2 hover:bg-white/50 rounded-lg transition-colors">
-                            {isExpanded ? (
-                              <ChevronUp className="h-5 w-5 text-gray-600" />
-                            ) : (
-                              <ChevronDown className="h-5 w-5 text-gray-600" />
-                            )}
-                          </button>
-                        </div>
-                      </div>
+// ========================================
+// Answer Card Component
+// ========================================
+function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuccess }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [gradeData, setGradeData] = useState({
+    score: answer.score || '',
+    feedback: answer.feedback || '',
+  });
+  const [saving, setSaving] = useState(false);
 
-                      {/* Answer Content & Grading */}
-                      <AnimatePresence>
-                        {isExpanded && (
-                          <motion.div
-                            initial={{ height: 0, opacity: 0 }}
-                            animate={{ height: 'auto', opacity: 1 }}
-                            exit={{ height: 0, opacity: 0 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <div className="p-6 space-y-6">
-                              {/* Candidate Answer */}
-                              <div>
-                                <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                  Candidate's Answer
-                                </label>
-                                <div className="bg-gray-50 rounded-lg p-4 border border-gray-200">
-                                  <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
-                                    {answer.answer_text || 'No answer provided'}
-                                  </p>
-                                </div>
-                              </div>
+  const handleSaveGrade = async () => {
+    try {
+      setSaving(true);
+      await employerInterviewService.gradeAnswer(
+        interview.interview_id,
+        candidateInterviewId,
+        answer.interview_answer_id,
+        {
+          score: gradeData.score ? parseFloat(gradeData.score) : null,
+          feedback: gradeData.feedback,
+        }
+      );
+      toast.success('Grade saved successfully');
+      setIsEditing(false);
+      onGradeSuccess();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setSaving(false);
+    }
+  };
 
-                              {/* Grading Form */}
-                              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                {/* Score Input */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Score (points)
-                                  </label>
-                                  <input
-                                    type="number"
-                                    min="0"
-                                    step="0.1"
-                                    value={grading.score}
-                                    onChange={(e) => updateGradingData(answer.interview_answer_id, 'score', e.target.value)}
-                                    placeholder="Enter score"
-                                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  />
-                                </div>
+  const isGraded = answer.score !== null && answer.score !== undefined;
 
-                                {/* Max Score Display */}
-                                <div>
-                                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Maximum Score
-                                  </label>
-                                  <div className="px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700 font-medium">
-                                    {answer.question?.max_score || 'Not set'}
-                                  </div>
-                                </div>
-                              </div>
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden"
+    >
+      {/* Question Section */}
+      <div className="bg-gradient-to-r from-gray-50 to-blue-50 p-6 border-b border-gray-200">
+        <div className="flex items-start gap-3">
+          <div className="flex-shrink-0 h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold">
+            {index + 1}
+          </div>
+          <div className="flex-1">
+            <h3 className="text-lg font-bold text-gray-900 mb-2">
+              {answer.question_text || 'Question'}
+            </h3>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              {answer.max_score && (
+                <div className="flex items-center gap-1">
+                  <Award className="h-4 w-4 text-yellow-600" />
+                  <span>Max: {answer.max_score} points</span>
+                </div>
+              )}
+              {answer.elapsed_seconds && (
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4 text-blue-600" />
+                  <span>Time: {Math.floor(answer.elapsed_seconds / 60)}m {answer.elapsed_seconds % 60}s</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
 
-                              {/* Feedback */}
-                              <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                  Feedback
-                                </label>
-                                <textarea
-                                  value={grading.feedback}
-                                  onChange={(e) => updateGradingData(answer.interview_answer_id, 'feedback', e.target.value)}
-                                  placeholder="Provide detailed feedback for the candidate..."
-                                  rows={4}
-                                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
-                                />
-                              </div>
+      {/* Answer Section */}
+      <div className="p-6">
+        <h4 className="text-sm font-semibold text-gray-700 mb-2">Candidate's Answer:</h4>
+        <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
+          <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
+            {answer.answer_text || <span className="text-gray-400 italic">No answer provided</span>}
+          </p>
+        </div>
 
-                              {/* Grading Info */}
-                              {answer.graded_at && (
-                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                  <p className="text-sm text-blue-900">
-                                    <strong>Previously graded:</strong> {new Date(answer.graded_at).toLocaleString()}
-                                    {answer.graded_by && ` by ${answer.graded_by}`}
-                                  </p>
-                                </div>
-                              )}
-
-                              {/* Save Button */}
-                              <button
-                                onClick={() => handleGrade(answer.interview_answer_id)}
-                                className="w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-lg font-medium hover:shadow-lg hover:shadow-blue-500/30 transition-all flex items-center justify-center gap-2"
-                              >
-                                <Save className="h-5 w-5" />
-                                Save Grade
-                              </button>
-                            </div>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </motion.div>
-                  );
-                })}
-              </div>
+        {/* Grading Section */}
+        <div className="border-t border-gray-200 pt-4">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-sm font-semibold text-gray-700">Grading:</h4>
+            {isGraded && !isEditing && (
+              <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
+                <CheckCircle className="h-4 w-4" />
+                Graded
+              </span>
             )}
           </div>
-        )}
+
+          {isEditing || !isGraded ? (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Score (out of {answer.max_score || 100})
+                </label>
+                <input
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  max={answer.max_score || 100}
+                  value={gradeData.score}
+                  onChange={(e) => setGradeData({ ...gradeData, score: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter score"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Feedback
+                </label>
+                <textarea
+                  value={gradeData.feedback}
+                  onChange={(e) => setGradeData({ ...gradeData, feedback: e.target.value })}
+                  rows={3}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Provide feedback to the candidate..."
+                />
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleSaveGrade}
+                  disabled={saving}
+                  className="flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                >
+                  <Save className="h-4 w-4" />
+                  {saving ? 'Saving...' : 'Save Grade'}
+                </button>
+                {isGraded && (
+                  <button
+                    onClick={() => {
+                      setIsEditing(false);
+                      setGradeData({
+                        score: answer.score || '',
+                        feedback: answer.feedback || '',
+                      });
+                    }}
+                    className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
+                  >
+                    Cancel
+                  </button>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
+                <div>
+                  <span className="text-sm text-gray-600">Score:</span>
+                  <span className="ml-2 text-2xl font-bold text-green-700">
+                    {answer.score} / {answer.max_score || 100}
+                  </span>
+                </div>
+                <button
+                  onClick={() => setIsEditing(true)}
+                  className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 transition-colors"
+                >
+                  Edit Grade
+                </button>
+              </div>
+              
+              {answer.feedback && (
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h5 className="text-sm font-semibold text-gray-700 mb-2">Feedback:</h5>
+                  <p className="text-gray-900 text-sm leading-relaxed">{answer.feedback}</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

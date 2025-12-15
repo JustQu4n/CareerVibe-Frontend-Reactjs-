@@ -112,7 +112,11 @@ export default function CandidateAnswers({ selectedInterview }) {
   };
 
   const filteredCandidates = candidates.filter(candidate => {
+    const candidateInfo = candidate.candidate || {};
     const matchesSearch = 
+      candidateInfo.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidateInfo.email?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      candidateInfo.phone?.includes(searchQuery) ||
       candidate.candidate_id?.toLowerCase().includes(searchQuery.toLowerCase()) ||
       candidate.application_id?.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesStatus = statusFilter === 'all' || candidate.status === statusFilter;
