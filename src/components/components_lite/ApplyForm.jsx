@@ -30,6 +30,7 @@ import Navbar from '../navbar/Navbar';
 import useApplyForm from '@/hooks/useApplyForm';
 import useFileUpload from '@/hooks/useFileUpload';
 import useJobData from '@/hooks/useJobData';
+import { useInterviewPreview } from '@/hooks/useInterview';
 
 // ========================================
 // Components
@@ -41,6 +42,7 @@ import {
   CoverLetterSection,
   SubmitSection
 } from '@/components/apply-form';
+import { InterviewInvitationModal } from '@/components/interviews';
 
 // ========================================
 // Services
@@ -60,6 +62,9 @@ export default function ApplyForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [showInterviewModal, setShowInterviewModal] = useState(false);
+  const [interviewData, setInterviewData] = useState(null);
+  const [applicationId, setApplicationId] = useState(null);
   
   // ========================================
   // Custom Hooks
@@ -105,14 +110,21 @@ export default function ApplyForm() {
 
     try {
       setLoading(true);
-      await submitApplication(params.id, applicationData, cvFile);
+      const response = await submitApplication(params.id, applicationData, cvFile);
 
       setSuccess(true);
 
-      // Redirect to applications page after 2 seconds
-      setTimeout(() => {
-        navigate('/jobseeker-applications');
-      }, 2000);
+      // Check if interview is required
+      if (response.interview && response.interview.has_interview) {
+        setInterviewData(response.interview);
+        setApplicationId(response.data?.application_id);
+        setShowInterviewModal(true);
+      } else {
+        // Redirect to applications page after 2 seconds if no interview
+        setTimeout(() => {
+          navigate('/jobseeker-applications');
+        }, 2000);
+      }
     } catch (err) {
       setError(err.message || 'Failed to submit application. Please try again.');
     } finally {
@@ -283,6 +295,34 @@ export default function ApplyForm() {
           </p>
         </div>
       </div>
+
+      {/* Interview Invitation Modal */}
+      <InterviewInvitationModal
+        open={showInterviewModal}
+        onOpenChange={setShowInterviewModal}
+        interviewData={interviewData}
+        onStartNow={async () => {
+          try {
+            // Accept interview
+            const interviewService = (await import('@/services/interview.service')).default;
+            const candidateInterview = await interviewService.acceptInterview(
+              interviewData.interview_id,
+              applicationId
+            );
+            
+            // Navigate to interview session
+            navigate(`/interview/${candidateInterview.candidate_interview_id}`);
+          } catch (error) {
+            console.error('Error accepting interview:', error);
+            setError('Không thể bắt đầu interview');
+          }
+        }}
+        onDoLater={() => {
+          setShowInterviewModal(false);
+          // Redirect to applications page
+          navigate('/jobseeker-applications');
+        }}
+      />
     </div>
   );
 }

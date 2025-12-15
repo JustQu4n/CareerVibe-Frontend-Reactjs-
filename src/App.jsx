@@ -52,6 +52,7 @@ import InterviewManagement from "./modules/admin/components/interviews/Interview
 import AdminSettings from "./modules/admin/pages/Settings";
 import UserSettings from "./pages/Settings";
 import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
+import { InterviewSession } from "./components/interviews";
 
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
@@ -146,6 +147,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/followed-companies",
     element: <FollowedCompanies />,
+  },
+  {
+    path: "/interview/:candidateInterviewId",
+    element: <InterviewSession />,
   },
 
   // Admin Routes with AdminLayout

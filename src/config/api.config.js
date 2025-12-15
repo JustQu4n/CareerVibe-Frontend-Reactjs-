@@ -74,6 +74,13 @@ export const API_ENDPOINTS = {
     LIST: `${API_BASE_URL}/api/jobseeker/saved/jobs`,
   },
   
+  INTERVIEWS: {
+    // Jobseeker endpoints
+    GET_QUESTIONS: (candidateInterviewId) => `${API_BASE_URL}/api/jobseeker/interviews/${candidateInterviewId}`,
+    START: (candidateInterviewId) => `${API_BASE_URL}/api/jobseeker/interviews/${candidateInterviewId}/start`,
+    SUBMIT: (candidateInterviewId) => `${API_BASE_URL}/api/jobseeker/interviews/${candidateInterviewId}/submit`,
+  },
+  
   COMPANIES: {
     LIST: `${API_BASE_URL}/api/employer/companies`,
     DETAIL: (id) => `${API_BASE_URL}/api/employer/companies/${id}`,
@@ -92,6 +99,32 @@ export const API_ENDPOINTS = {
     
     // Legacy endpoint (backward compatibility)
     LEGACY_JOB_POSTS: `${API_BASE_URL}/api/employer/jobposts`,
+    
+    // Interview endpoints for Employer
+    INTERVIEWS: {
+      LIST: `${API_BASE_URL}/api/employer/interviews`,
+      CREATE: `${API_BASE_URL}/api/employer/interviews`,
+      DETAIL: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}`,
+      UPDATE: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}`,
+      DELETE: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}`,
+      ATTACH_JOBPOST: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/attach-jobpost`,
+      DETACH_JOBPOST: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/detach-jobpost`,
+      STATISTICS: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/statistics`,
+      
+      // Questions
+      QUESTIONS: {
+        LIST: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/questions`,
+        CREATE: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/questions`,
+        UPDATE: (interviewId, questionId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/questions/${questionId}`,
+        DELETE: (interviewId, questionId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/questions/${questionId}`,
+      },
+      
+      // Assignments & Candidates
+      ASSIGN: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/assign`,
+      CANDIDATES: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates`,
+      CANDIDATE_ANSWERS: (interviewId, candidateInterviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers`,
+      GRADE_ANSWER: (interviewId, candidateInterviewId, answerId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers/${answerId}/grade`,
+    },
   },
 };
 
