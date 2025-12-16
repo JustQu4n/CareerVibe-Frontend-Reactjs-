@@ -51,6 +51,7 @@ export default function InterviewAnswers({ interview }) {
         interview.interview_id,
         candidateInterviewId
       );
+      console.log('Candidate Answers:', data);
       setAnswers(data);
     } catch (error) {
       toast.error(error.message);
@@ -335,7 +336,7 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-bold text-gray-900 mb-2">
-              {answer.question_text || 'Question'}
+              {answer.question|| 'Question'}
             </h3>
             <div className="flex items-center gap-4 text-sm text-gray-600">
               {answer.max_score && (

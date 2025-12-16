@@ -14,7 +14,8 @@ import {
   MessageSquare,
   Calendar,
   Users,
-  FileUser
+  FileUser,
+  GraduationCap
 } from 'lucide-react';
 
 /**
@@ -94,6 +95,12 @@ export const USER_MENU_ITEMS = {
       icon: ClipboardList,
       label: 'Manage Applications',
       to: '/jobseeker-applications',
+    },
+    {
+      id: 'interviews',
+      icon: GraduationCap,
+      label: 'My Interviews',
+      to: '/interviews',
     },
     {
       id: 'saved',

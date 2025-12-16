@@ -10,7 +10,8 @@ import {
   ResetPassword,
   Home, 
   JobPostViewDetails, 
-  JobseekerApplications, 
+  JobseekerApplications,
+  InterviewPage,
   Browse,
   Profile,
   EditProfile
@@ -103,6 +104,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/jobseeker-applications",
     element: <JobseekerApplications />,
+  },
+  {
+    path: "/interviews",
+    element: <InterviewPage />,
   },
   {
     path: "/Home",
