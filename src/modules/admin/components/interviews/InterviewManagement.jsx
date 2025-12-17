@@ -342,46 +342,48 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all"
+      className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all h-full flex flex-col"
     >
-      <div className="p-6">
+      <div className="p-6 flex flex-col flex-1">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 mb-1">{interview.title}</h3>
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1" title={interview.title}>
+              {interview.title}
+            </h3>
             {getStatusBadge(interview.status)}
           </div>
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2">
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
           {interview.description || 'No description'}
         </p>
 
-        {/* Meta Info */}
-        <div className="space-y-2 mb-4">
+        {/* Meta Info - Fixed height container */}
+        <div className="space-y-2 mb-4 min-h-[4.5rem]">
           {interview.total_time_minutes && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="h-4 w-4" />
-              <span>{interview.total_time_minutes} minutes</span>
+              <Clock className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">{interview.total_time_minutes} minutes</span>
             </div>
           )}
           {interview.deadline && (
             <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4" />
-              <span>Deadline: {new Date(interview.deadline).toLocaleDateString()}</span>
+              <Calendar className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">Deadline: {new Date(interview.deadline).toLocaleDateString()}</span>
             </div>
           )}
           {interview.job_post_id && (
             <div className="flex items-center gap-2 text-sm text-green-600">
-              <LinkIcon className="h-4 w-4" />
-              <span>Linked to Job Post</span>
+              <LinkIcon className="h-4 w-4 flex-shrink-0" />
+              <span className="truncate">Linked to Job Post</span>
             </div>
           )}
         </div>
 
-        {/* Actions */}
-        <div className="flex items-center gap-2">
+        {/* Actions - Push to bottom */}
+        <div className="flex items-center gap-2 mt-auto pt-4 border-t border-gray-100">
           <button
             onClick={() => onViewDetails(interview)}
             className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
@@ -391,20 +393,22 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
           </button>
           <button
             onClick={() => onEdit(interview)}
-            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
+            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex-shrink-0"
+            title="Edit"
           >
             <Edit className="h-4 w-4" />
           </button>
           <button
             onClick={() => onDelete(interview.interview_id)}
-            className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors"
+            className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors flex-shrink-0"
+            title="Delete"
           >
             <Trash2 className="h-4 w-4" />
           </button>
           {interview.job_post_id ? (
             <button
               onClick={() => onDetachJobPost(interview)}
-              className="p-2 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors"
+              className="p-2 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors flex-shrink-0"
               title="Detach from Job Post"
             >
               <Unlink className="h-4 w-4" />
@@ -412,7 +416,7 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
           ) : (
             <button
               onClick={() => onAttachJobPost(interview)}
-              className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors"
+              className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors flex-shrink-0"
               title="Attach to Job Post"
             >
               <LinkIcon className="h-4 w-4" />
