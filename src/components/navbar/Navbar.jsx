@@ -15,6 +15,7 @@ import NavLinks from './NavLinks';
 import NotificationBell from './NotificationBell';
 import UserMenu from './UserMenu';
 import MobileMenu from './MobileMenu';
+// company search moved to dedicated Companies page
 
 const Navbar = () => {
   // Redux state
@@ -28,6 +29,7 @@ const Navbar = () => {
     handleLogout,
     handleNavigateToProfile,
   } = useNavbar();
+
 
   return (
     <header className="bg-white shadow-sm">

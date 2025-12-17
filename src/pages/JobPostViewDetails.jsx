@@ -54,6 +54,16 @@ export default function JobPostViewDetails() {
   const { bookmarked, toggleBookmark } = useJobBookmark(jobId, user);
   const { daysRemaining } = useJobDateInfo(singleJob?.expires_at);
 
+  // Ensure page scrolls to top when viewing a job detail (fix focus under footer)
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch (err) {
+      // fallback for environments where window might be undefined
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
+    }
+  }, [jobId]);
+
   // Fetch related jobs when component mounts
   useEffect(() => {
     let mounted = true;

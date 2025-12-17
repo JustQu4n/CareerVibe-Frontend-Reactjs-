@@ -11,7 +11,7 @@
  * - Tuân thủ React best practices
  */
 
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Navbar } from '../navbar';
 import Footer from './Footer';
@@ -43,6 +43,15 @@ const DetailCompany = () => {
   
   // Custom hook - Tách logic fetch data và state management
   const { companyData, loading, error } = useCompanyDetails(id);
+
+  // Ensure page scrolls to top when viewing company detail (fix focus under footer)
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+    } catch (err) {
+      if (typeof window !== 'undefined') window.scrollTo(0, 0);
+    }
+  }, [id]);
 
   // Handler: Scroll to open positions section - sử dụng useCallback
   const handleViewPositions = useCallback(() => {

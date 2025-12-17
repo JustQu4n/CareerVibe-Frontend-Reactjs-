@@ -14,6 +14,7 @@ import {
   RecommendedJobsSection,
   AIRecommendedJobsSection,
   FeaturedJobsSection,
+  MostViewedJobsSection,
 } from '@/components/home';
 
 const Home = () => {
@@ -26,6 +27,14 @@ const Home = () => {
     currentJobs,
     currentPage,
     totalPages,
+    featuredJobs,
+    featuredPage,
+    featuredTotalPages,
+    isLoadingFeatured,
+    mostViewedJobs,
+    mostViewedPage,
+    mostViewedTotalPages,
+    isLoadingMostViewed,
     recommendedJobs,
     isLoadingRecommendations,
     recommendationError,
@@ -38,6 +47,10 @@ const Home = () => {
     handleSearch,
     nextPage,
     prevPage,
+    nextFeaturedPage,
+    prevFeaturedPage,
+    nextMostViewedPage,
+    prevMostViewedPage,
   } = useHomeData();
 
   // Fetch AI recommendations from Python service
@@ -84,11 +97,21 @@ const Home = () => {
       />
 
       <FeaturedJobsSection
-        jobs={currentJobs}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onNextPage={nextPage}
-        onPrevPage={prevPage}
+        jobs={featuredJobs}
+        currentPage={featuredPage - 1}
+        totalPages={featuredTotalPages}
+        onNextPage={nextFeaturedPage}
+        onPrevPage={prevFeaturedPage}
+        isLoading={isLoadingFeatured}
+      />
+
+      <MostViewedJobsSection
+        jobs={mostViewedJobs}
+        currentPage={mostViewedPage - 1}
+        totalPages={mostViewedTotalPages}
+        onNextPage={nextMostViewedPage}
+        onPrevPage={prevMostViewedPage}
+        isLoading={isLoadingMostViewed}
       />
     </MainLayout>
   );

@@ -22,6 +22,20 @@ export const useHomeData = () => {
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(false);
   const [recommendationError, setRecommendationError] = useState(null);
   
+  // Featured jobs state
+  const [featuredJobs, setFeaturedJobs] = useState([]);
+  const [isLoadingFeatured, setIsLoadingFeatured] = useState(false);
+  const [featuredError, setFeaturedError] = useState(null);
+  const [featuredPage, setFeaturedPage] = useState(1);
+  const [featuredTotalPages, setFeaturedTotalPages] = useState(1);
+  
+  // Most viewed jobs state
+  const [mostViewedJobs, setMostViewedJobs] = useState([]);
+  const [isLoadingMostViewed, setIsLoadingMostViewed] = useState(false);
+  const [mostViewedError, setMostViewedError] = useState(null);
+  const [mostViewedPage, setMostViewedPage] = useState(1);
+  const [mostViewedTotalPages, setMostViewedTotalPages] = useState(1);
+  
   const [searchTitle, setSearchTitle] = useState('');
   const [searchLocation, setSearchLocation] = useState('');
   const [isSearching, setIsSearching] = useState(false);
@@ -33,6 +47,68 @@ export const useHomeData = () => {
     currentPage * JOBS_PER_PAGE,
     (currentPage + 1) * JOBS_PER_PAGE
   );
+
+  // Fetch featured jobs from API
+  useEffect(() => {
+    const fetchFeaturedJobs = async () => {
+      setIsLoadingFeatured(true);
+      setFeaturedError(null);
+
+      try {
+        const response = await apiClient.get('/api/jobseeker/job-posts/featured', {
+          params: {
+            page: featuredPage,
+            limit: 6,
+          },
+        });
+
+        const data = response.data?.data || response.data || [];
+        const pagination = response.data?.pagination || {};
+        
+        setFeaturedJobs(Array.isArray(data) ? data : []);
+        setFeaturedTotalPages(pagination.totalPages || 1);
+      } catch (err) {
+        console.error('Error fetching featured jobs:', err);
+        setFeaturedError('Failed to load featured jobs');
+        setFeaturedJobs([]);
+      } finally {
+        setIsLoadingFeatured(false);
+      }
+    };
+
+    fetchFeaturedJobs();
+  }, [featuredPage]);
+
+  // Fetch most viewed jobs from API
+  useEffect(() => {
+    const fetchMostViewedJobs = async () => {
+      setIsLoadingMostViewed(true);
+      setMostViewedError(null);
+
+      try {
+        const response = await apiClient.get('/api/jobseeker/job-posts/most-viewed', {
+          params: {
+            page: mostViewedPage,
+            limit: 6,
+          },
+        });
+
+        const data = response.data?.data || response.data || [];
+        const pagination = response.data?.pagination || {};
+        
+        setMostViewedJobs(Array.isArray(data) ? data : []);
+        setMostViewedTotalPages(pagination.totalPages || 1);
+      } catch (err) {
+        console.error('Error fetching most viewed jobs:', err);
+        setMostViewedError('Failed to load most viewed jobs');
+        setMostViewedJobs([]);
+      } finally {
+        setIsLoadingMostViewed(false);
+      }
+    };
+
+    fetchMostViewedJobs();
+  }, [mostViewedPage]);
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -127,12 +203,52 @@ export const useHomeData = () => {
     }
   }, [currentPage]);
 
+  // Featured jobs pagination
+  const nextFeaturedPage = useCallback(() => {
+    if (featuredPage < featuredTotalPages) {
+      setFeaturedPage((prev) => prev + 1);
+    }
+  }, [featuredPage, featuredTotalPages]);
+
+  const prevFeaturedPage = useCallback(() => {
+    if (featuredPage > 1) {
+      setFeaturedPage((prev) => prev - 1);
+    }
+  }, [featuredPage]);
+
+  // Most viewed jobs pagination
+  const nextMostViewedPage = useCallback(() => {
+    if (mostViewedPage < mostViewedTotalPages) {
+      setMostViewedPage((prev) => prev + 1);
+    }
+  }, [mostViewedPage, mostViewedTotalPages]);
+
+  const prevMostViewedPage = useCallback(() => {
+    if (mostViewedPage > 1) {
+      setMostViewedPage((prev) => prev - 1);
+    }
+  }, [mostViewedPage]);
+
   return {
     user,
     allJobs,
     currentJobs,
     currentPage,
     totalPages,
+    
+    // Featured jobs data
+    featuredJobs,
+    isLoadingFeatured,
+    featuredError,
+    featuredPage,
+    featuredTotalPages,
+    
+    // Most viewed jobs data
+    mostViewedJobs,
+    isLoadingMostViewed,
+    mostViewedError,
+    mostViewedPage,
+    mostViewedTotalPages,
     
     recommendedJobs,
     isLoadingRecommendations,
@@ -149,6 +265,10 @@ export const useHomeData = () => {
     
     nextPage,
     prevPage,
+    nextFeaturedPage,
+    prevFeaturedPage,
+    nextMostViewedPage,
+    prevMostViewedPage,
   };
 };
 

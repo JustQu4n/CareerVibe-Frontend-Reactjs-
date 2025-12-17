@@ -13,6 +13,7 @@ import {
   JobseekerApplications,
   InterviewPage,
   Browse,
+  Companies,
   Profile,
   EditProfile
 } from "./pages";
@@ -36,7 +37,7 @@ import useNotifications from "./hooks/useNotifications";
 // Admin Module Imports
 import { AdminLayout, AdminDashboard } from "./modules/admin";
 import MainLayout from "./layouts/MainLayout";
-import { Companies, CompanyCreate, CompanySetup } from "./modules/admin/components/companies";
+import { Companies as AdminCompanies, CompanyCreate, CompanySetup } from "./modules/admin/components/companies";
 import { 
   AdminJobs, 
   CreateJobPost,
@@ -118,6 +119,10 @@ const appRouter = createBrowserRouter([
     element: <Browse />,
   },
   {
+    path: "/companies",
+    element: <Companies />,
+  },
+  {
     path:"/Creator",
     element: <Creator/>
   },
@@ -177,7 +182,7 @@ const appRouter = createBrowserRouter([
       },
       {
         path: "companies",
-        element: <Companies />
+        element: <AdminCompanies />
       },
       {
         path: "companies/create",

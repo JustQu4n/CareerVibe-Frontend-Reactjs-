@@ -1,6 +1,6 @@
 /**
- * FeaturedJobsSection Component
- * Displays featured jobs with pagination
+ * MostViewedJobsSection Component
+ * Displays most viewed jobs with pagination
  */
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -9,22 +9,21 @@ import { useNavigate } from 'react-router-dom';
 import {
   ChevronLeft,
   ChevronRight,
-  Star,
+  Eye,
   Bookmark,
   Building2,
   Clock,
   MapPin,
   Briefcase,
   DollarSign,
-  Users,
-  Award,
+  TrendingUp,
   ArrowRight,
   ChevronsRight,
 } from 'lucide-react';
 
 const getTimeAgo = () => '3 hours ago';
 
-const FeaturedJobsSection = React.memo(({
+const MostViewedJobsSection = React.memo(({
   jobs,
   currentPage,
   totalPages,
@@ -37,16 +36,16 @@ const FeaturedJobsSection = React.memo(({
   // Loading skeleton
   if (isLoading) {
     return (
-      <section className="py-16 px-6">
+      <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
-              <span className="text-blue-600 font-semibold text-sm bg-blue-50 px-4 py-1.5 rounded-full">
-                Explore Opportunities
+              <span className="text-purple-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
+                Popular Now
               </span>
-              <h2 className="text-3xl font-bold mt-3 text-gray-900">Featured Jobs</h2>
+              <h2 className="text-3xl font-bold mt-3 text-gray-900">Most Viewed Jobs</h2>
               <p className="text-gray-600 mt-2">
-                Discover handpicked positions from top employers
+                Trending positions that jobseekers are exploring
               </p>
             </div>
           </div>
@@ -76,16 +75,16 @@ const FeaturedJobsSection = React.memo(({
   }
 
   return (
-    <section className="py-16 px-6">
+    <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
           <div>
-            <span className="text-blue-600 font-semibold text-sm bg-blue-50 px-4 py-1.5 rounded-full">
-              Explore Opportunities
+            <span className="text-purple-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
+              Popular Now
             </span>
-            <h2 className="text-3xl font-bold mt-3 text-gray-900">Featured Jobs</h2>
+            <h2 className="text-3xl font-bold mt-3 text-gray-900">Most Viewed Jobs</h2>
             <p className="text-gray-600 mt-2">
-              Discover handpicked positions from top employers
+              Trending positions that jobseekers are exploring
             </p>
           </div>
           
@@ -119,7 +118,7 @@ const FeaturedJobsSection = React.memo(({
             <button
               type="button"
               onClick={() => navigate('/Browse')}
-              className="flex items-center text-blue-600 hover:text-blue-800 font-medium"
+              className="flex items-center text-purple-600 hover:text-purple-800 font-medium"
             >
               Browse All Jobs
               <ChevronRight className="h-5 w-5 ml-1" />
@@ -136,20 +135,24 @@ const FeaturedJobsSection = React.memo(({
               transition={{ duration: 0.3, delay: idx * 0.1 }}
               whileHover={{ y: -5 }}
               onClick={() => navigate(`/view-job-detail/${job.job_post_id}`)}
-              className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-300 cursor-pointer relative group"
+              className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-md hover:border-purple-200 transition-all duration-300 cursor-pointer relative group"
             >
               <div className="absolute top-4 right-4 z-10">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
-                  <Star className="h-3 w-3 mr-1 fill-white" />
-                  Featured
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-600 text-white">
+                  <Eye className="h-3 w-3 mr-1" />
+                  {job.views_count }
                 </span>
               </div>
               
               <button
                 type="button"
                 className="absolute top-4 left-4 z-10 opacity-0 group-hover:opacity-100 transition-opacity h-8 w-8 bg-white rounded-full shadow-md flex items-center justify-center hover:bg-gray-50"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  // Handle bookmark
+                }}
               >
-                <Bookmark className="h-4 w-4 text-gray-500 hover:text-blue-600" />
+                <Bookmark className="h-4 w-4 text-gray-500 hover:text-purple-600" />
               </button>
               
               <div className="p-6">
@@ -175,13 +178,13 @@ const FeaturedJobsSection = React.memo(({
                   </div>
                 </div>
                 
-                <h2 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <h2 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors">
                   {job.title}
                 </h2>
                 
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-sm text-gray-600">
-                    <MapPin className="h-4 w-4 text-blue-500 mr-2 flex-shrink-0" />
+                    <MapPin className="h-4 w-4 text-purple-500 mr-2 flex-shrink-0" />
                     <span className="truncate">{job.location || 'Not specified'}</span>
                   </div>
                   <div className="flex items-center text-sm text-gray-600">
@@ -204,10 +207,10 @@ const FeaturedJobsSection = React.memo(({
                 
                 <div className="pt-4 mt-4 border-t border-gray-100 flex justify-between items-center">
                   <div className="flex items-center text-xs text-gray-500">
-                    <Clock className="h-3.5 w-3.5 mr-1" />
-                    Deadline: {new Date(job.deadline).toLocaleDateString('en-GB')}
+                    <TrendingUp className="h-3.5 w-3.5 mr-1 text-purple-500" />
+                    Trending
                   </div>
-                  <span className="inline-flex items-center text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform">
+                  <span className="inline-flex items-center text-sm font-medium text-purple-600 group-hover:translate-x-1 transition-transform">
                     View Details
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </span>
@@ -250,8 +253,8 @@ const FeaturedJobsSection = React.memo(({
         <div className="mt-8 text-center md:hidden">
           <button
             type="button"
-            onClick={() => navigate('/find-job')}
-            className="inline-flex items-center text-blue-600 font-medium"
+            onClick={() => navigate('/Browse')}
+            className="inline-flex items-center text-purple-600 font-medium"
           >
             Browse All Jobs
             <ChevronsRight className="ml-1 h-5 w-5" />
@@ -262,9 +265,9 @@ const FeaturedJobsSection = React.memo(({
   );
 });
 
-FeaturedJobsSection.displayName = 'FeaturedJobsSection';
+MostViewedJobsSection.displayName = 'MostViewedJobsSection';
 
-FeaturedJobsSection.propTypes = {
+MostViewedJobsSection.propTypes = {
   jobs: PropTypes.array.isRequired,
   currentPage: PropTypes.number.isRequired,
   totalPages: PropTypes.number.isRequired,
@@ -273,4 +276,4 @@ FeaturedJobsSection.propTypes = {
   isLoading: PropTypes.bool,
 };
 
-export default FeaturedJobsSection;
+export default MostViewedJobsSection;

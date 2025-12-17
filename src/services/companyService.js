@@ -110,6 +110,26 @@ export const getCompanyDetails = async (companyId) => {
   }
 };
 
+/**
+ * Jobseeker: search companies by keyword (backend endpoint)
+ * @param {string} keyword
+ */
+export const jobseekerSearchCompanies = async (keyword) => {
+  if (!keyword || String(keyword).trim().length < 1) return { data: [] };
+  const response = await apiClient.get('/api/jobseeker/company/search', {
+    params: { keyword },
+  });
+  return response.data || { data: [] };
+};
+
+/**
+ * Jobseeker: list companies (backend endpoint)
+ */
+export const jobseekerListCompanies = async () => {
+  const response = await apiClient.get('/api/jobseeker/company/list');
+  return response.data || { data: [] };
+};
+
 export default {
   getAllCompanies,
   searchCompaniesByName,
