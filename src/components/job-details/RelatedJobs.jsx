@@ -13,7 +13,7 @@ import RelatedJobCard from './RelatedJobCard';
  */
 const RelatedJobs = ({ jobs = [], loading = false }) => {
   return (
-    <div className="bg-gradient-to-b from-white to-gray-50 py-12">
+    <div className="bg-white py-12">
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="flex items-center justify-between mb-8">

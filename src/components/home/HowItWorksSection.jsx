@@ -25,7 +25,7 @@ const STEPS = [
 
 const HowItWorksSection = React.memo(() => {
   return (
-    <section className="py-16 px-6 bg-gradient-to-b from-white to-gray-50">
+    <section className="py-16 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12">
           <span className="text-blue-600 font-semibold text-sm bg-blue-50 px-4 py-1.5 rounded-full">

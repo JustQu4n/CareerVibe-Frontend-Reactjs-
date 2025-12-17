@@ -36,7 +36,7 @@ const MostViewedJobsSection = React.memo(({
   // Loading skeleton
   if (isLoading) {
     return (
-      <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-16 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
@@ -75,7 +75,7 @@ const MostViewedJobsSection = React.memo(({
   }
 
   return (
-    <section className="py-16 px-6 bg-gradient-to-b from-gray-50 to-white">
+    <section className="py-16 px-6 bg-white">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
           <div>
