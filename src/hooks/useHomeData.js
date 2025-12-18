@@ -118,9 +118,7 @@ export const useHomeData = () => {
       setRecommendationError(null);
 
       try {
-        const response = await axios.get(
-          `${RECOMMENDATION_API_URL}/recommend/${user.jobseeker.id}`
-        );
+        const response = await apiClient.get(API_ENDPOINTS.RECOMMENDATIONS.BY_JOBSEEKER(jobSeekerId));
 
         const filteredRecommendations = response.data.recommendations.filter(
           (rec) => rec.score > 0

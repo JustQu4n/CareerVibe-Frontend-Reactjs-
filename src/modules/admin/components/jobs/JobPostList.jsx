@@ -461,7 +461,7 @@ const JobPostList = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="group bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:border-blue-200 transition-all duration-300"
+              className="group bg-white rounded-2xl  overflow-hidden shadow-xl border-blue-200 transition-all duration-300"
             >
               {/* Job Header with Gradient */}
               <div className="relative p-5 pb-3 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -469,7 +469,7 @@ const JobPostList = () => {
                   <span
                     className={`px-2.5 py-0.5 text-xs rounded-full font-semibold shadow-sm ${
                       job.status === "active"
-                        ? "bg-green-500 text-white"
+                        ? "bg-blue-500 text-white"
                         : "bg-gray-400 text-white"
                     }`}
                   >

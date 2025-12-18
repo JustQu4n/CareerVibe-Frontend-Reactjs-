@@ -168,24 +168,24 @@ const AIRecommendedJobsSection = React.memo(({
                   {/* Company Info */}
                   <div className="flex items-start space-x-3 mb-4">
                     <div className="h-12 w-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
-                      {job.company?.logo_url ? (
-                        <img
-                          src={job.company.logo_url}
-                          alt={`${job.company.name} logo`}
-                          className="h-full w-full object-contain"
-                        />
-                      ) : (
-                        <Building2 className="h-6 w-6 text-gray-400" />
-                      )}
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-gray-900 truncate">
-                        {job.company?.name || 'Company Name'}
-                      </h3>
-                      <span className="block text-gray-500 text-xs mt-0.5">
-                        {job.company?.industry || 'Technology'}
-                      </span>
-                    </div>
+                        {(job.company_logo || job.company?.logo_url) ? (
+                          <img
+                            src={job.company_logo || job.company.logo_url}
+                            alt={`${job.company_name || job.company?.name || 'Company'} logo`}
+                            className="h-full w-full object-contain"
+                          />
+                        ) : (
+                          <Building2 className="h-6 w-6 text-gray-400" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 truncate">
+                          {job.company_name || job.company?.name || 'Company Name'}
+                        </h3>
+                        <span className="block text-gray-500 text-xs mt-0.5">
+                          {job.company?.industry || 'Technology'}
+                        </span>
+                      </div>
                   </div>
                   
                   {/* Job Title */}

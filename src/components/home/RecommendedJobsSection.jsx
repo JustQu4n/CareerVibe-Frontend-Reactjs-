@@ -123,16 +123,18 @@ const RecommendedJobsSection = React.memo(({
                 <div className="p-6">
                   <div className="flex justify-between items-start mb-3">
                     <div className="flex items-center">
-                      <div className="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center mr-3">
-                        <img
-                          src={job.company_id?.logo || 'https://via.placeholder.com/40x40'}
-                          alt={`${job.company_id?.name || 'Company'} logo`}
-                          className="h-full w-full object-cover"
-                        />
-                      </div>
+                      {(job.company_logo || job.company_id?.logo) && (
+                        <div className="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 flex items-center justify-center mr-3">
+                          <img
+                            src={job.company_logo || job.company_id?.logo || 'https://via.placeholder.com/40x40'}
+                            alt={`${job.company_name || job.company_id?.name || 'Company'} logo`}
+                            className="h-full w-full object-cover"
+                          />
+                        </div>
+                      )}
                       <div>
                         <h3 className="font-semibold text-gray-900">
-                          {job.company_id?.name || 'Company'}
+                          {job.company_name || job.company_id?.name || 'Company'}
                         </h3>
                         <div className="flex items-center text-xs text-gray-500">
                           <MapPin className="h-3 w-3 mr-1" />
@@ -142,7 +144,7 @@ const RecommendedJobsSection = React.memo(({
                     </div>
                     <div className="px-2 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-md flex items-center">
                       <Star className="h-3 w-3 mr-1" />
-                      {Math.round(job.score * 100)}% Match
+                      {Math.round((job.score || 0) * 100)}% Match
                     </div>
                   </div>
                   
@@ -158,17 +160,43 @@ const RecommendedJobsSection = React.memo(({
                           ? 'Full-time'
                           : job.job_type === 'part_time'
                           ? 'Part-time'
-                          : job.job_type}
+                          : job.job_type === 'contract'
+                          ? 'Contract'
+                          : job.job_type === 'internship'
+                          ? 'Internship'
+                          : job.job_type || 'N/A'}
                       </span>
                     </div>
-                    <div className="flex items-center">
-                      <Clock className="h-4 w-4 mr-1 text-gray-400" />
-                      <span>{getTimeAgo(job.created_at)}</span>
-                    </div>
+                    {job.experience_level && (
+                      <div className="flex items-center">
+                        <Star className="h-4 w-4 mr-1 text-gray-400" />
+                        <span>{job.experience_level}</span>
+                      </div>
+                    )}
+                    {job.posted_date && (
+                      <div className="flex items-center">
+                        <Clock className="h-4 w-4 mr-1 text-gray-400" />
+                        <span>{getTimeAgo(job.posted_date)}</span>
+                      </div>
+                    )}
                   </div>
                   
+                  {job.salary_range && (
+                    <div className="mb-3 px-3 py-2 bg-green-50 rounded-lg">
+                      <p className="text-sm font-semibold text-green-700">
+                        💰 {job.salary_range}
+                      </p>
+                    </div>
+                  )}
+                  
+                  {job.snippet && (
+                    <div className="mb-3 text-sm text-gray-600 line-clamp-2"
+                         dangerouslySetInnerHTML={{ __html: job.snippet }}
+                    />
+                  )}
+                  
                   <div className="mb-4 flex flex-wrap gap-2">
-                    {job.skills?.slice(0, 3).map((skill, idx) => (
+                    {job.matched_skills?.slice(0, 3).map((skill, idx) => (
                       <span
                         key={idx}
                         className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
@@ -176,7 +204,20 @@ const RecommendedJobsSection = React.memo(({
                         {skill}
                       </span>
                     ))}
-                    {job.skills?.length > 3 && (
+                    {job.matched_skills && job.matched_skills.length > 3 && (
+                      <span className="inline-block px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
+                        +{job.matched_skills.length - 3} more
+                      </span>
+                    )}
+                    {(!job.matched_skills || job.matched_skills.length === 0) && job.skills?.slice(0, 3).map((skill, idx) => (
+                      <span
+                        key={idx}
+                        className="inline-block px-2.5 py-0.5 bg-blue-50 text-blue-700 text-xs font-medium rounded-full"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {(!job.matched_skills || job.matched_skills.length === 0) && job.skills && job.skills.length > 3 && (
                       <span className="inline-block px-2.5 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
                         +{job.skills.length - 3} more
                       </span>
@@ -184,11 +225,15 @@ const RecommendedJobsSection = React.memo(({
                   </div>
                   
                   <div className="flex justify-between items-center pt-3 border-t border-gray-100">
-                    <div className="text-blue-600 text-sm font-medium"></div>
+                    {job.application_deadline && (
+                      <div className="text-xs text-gray-500">
+                        ⏰ Deadline: {new Date(job.application_deadline).toLocaleDateString()}
+                      </div>
+                    )}
                     <button
                       type="button"
-                      onClick={() => navigate(`/view-job-detail/${job._id}`)}
-                      className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors"
+                      onClick={() => navigate(`/view-job-detail/${job.job_post_id || job._id}`)}
+                      className="px-3 py-1.5 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-600 hover:text-white transition-colors ml-auto"
                     >
                       View Details
                     </button>
