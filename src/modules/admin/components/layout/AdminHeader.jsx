@@ -168,7 +168,7 @@ export default function AdminHeader({ isCollapsed, setIsCollapsed }) {
                     </div>
                     <div className="p-2">
                       <button
-                        onClick={() => navigate('/profile')}
+                        onClick={() => navigate('/admin/profile')}
                         className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-left"
                       >
                         <User className="h-4 w-4 text-gray-600" />

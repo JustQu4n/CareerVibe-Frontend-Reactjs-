@@ -125,6 +125,15 @@ export const API_ENDPOINTS = {
       CANDIDATE_ANSWERS: (interviewId, candidateInterviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers`,
       GRADE_ANSWER: (interviewId, candidateInterviewId, answerId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers/${answerId}/grade`,
     },
+    // Employer profile endpoints
+    PROFILE: {
+      GET: (id) => `${API_BASE_URL}/api/employer/profile/${id}`,
+      UPDATE: `${API_BASE_URL}/api/employer/profile`,
+      AVATAR_UPDATE: `${API_BASE_URL}/api/employer/profile/avatar`,
+      DELETE: `${API_BASE_URL}/api/employer/profile`,
+      COMPANY_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}`,
+      COMPANY_AVATAR_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}/avatar`
+    },
   },
 };
 

@@ -52,6 +52,7 @@ import JobPostApplications from "./modules/admin/components/applicants/JobPostAp
 import CandidateProfile from "./modules/admin/components/applicants/CandidateProfile";
 import InterviewManagement from "./modules/admin/components/interviews/InterviewManagement";
 import AdminSettings from "./modules/admin/pages/Settings";
+import EmployerProfilePage from "./modules/admin/pages/EmployerProfile";
 import UserSettings from "./pages/Settings";
 import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
 import { InterviewSession } from "./components/interviews";
@@ -235,6 +236,11 @@ const appRouter = createBrowserRouter([
       {
         path: "settings",
         element: <AdminSettings />
+      }
+      ,
+      {
+        path: "profile",
+        element: <EmployerProfilePage />
       }
     ]
   }
