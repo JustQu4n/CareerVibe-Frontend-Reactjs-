@@ -50,6 +50,14 @@ const employerService = {
     });
     return res.data;
   }
+  ,
+  // Get dashboard stats for employer
+  getDashboardStats: async () => {
+    // Endpoint requires Authorization header handled by apiClient
+    const url = BASE.STATS.DASHBOARD;
+    const res = await apiClient.get(url);
+    return res.data;
+  }
 };
 
 export default employerService;

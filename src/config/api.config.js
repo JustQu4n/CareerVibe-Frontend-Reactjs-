@@ -134,6 +134,10 @@ export const API_ENDPOINTS = {
       COMPANY_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}`,
       COMPANY_AVATAR_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}/avatar`
     },
+    // Employer stats (dashboard)
+    STATS: {
+      DASHBOARD: `${API_BASE_URL}/api/employer/stats/dashboard`
+    }
   },
 };
 

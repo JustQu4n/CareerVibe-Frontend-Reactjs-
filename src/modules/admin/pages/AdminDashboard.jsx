@@ -39,71 +39,51 @@ import {
   Legend,
   ResponsiveContainer
 } from 'recharts';
+import employerService from '@/modules/admin/services/employerService';
+import { toast } from 'react-toastify';
 
 export default function AdminDashboard() {
   const [timeRange, setTimeRange] = useState('week');
+  const [loading, setLoading] = useState(true);
 
-  // Stats Cards Data
-  const stats = [
-    {
-      title: 'Total Applications',
-      value: '2,847',
-      change: '+12.5%',
-      trending: 'up',
-      icon: FileText,
-      color: 'blue',
-      bgGradient: 'from-blue-500 to-cyan-500'
-    },
-    {
-      title: 'Active Jobs',
-      value: '156',
-      change: '+8.2%',
-      trending: 'up',
-      icon: Briefcase,
-      color: 'purple',
-      bgGradient: 'from-purple-500 to-pink-500'
-    },
-    {
-      title: 'Companies',
-      value: '89',
-      change: '+5.7%',
-      trending: 'up',
-      icon: Building2,
-      color: 'green',
-      bgGradient: 'from-green-500 to-emerald-500'
-    },
-    {
-      title: 'Total Candidates',
-      value: '1,429',
-      change: '-2.3%',
-      trending: 'down',
-      icon: Users,
-      color: 'orange',
-      bgGradient: 'from-orange-500 to-red-500'
-    }
+  // State populated from backend
+  const [statsData, setStatsData] = useState([]);
+  const [applicationsData, setApplicationsData] = useState([]);
+  const [jobStatusData, setJobStatusData] = useState([]);
+  const [recentActivitiesState, setRecentActivitiesState] = useState([]);
+  const [topJobsState, setTopJobsState] = useState([]);
+
+  // Placeholder until backend data arrives
+  const stats = statsData.length ? statsData : [
+    { title: 'Total Applications', value: '—', change: '', trending: 'up', icon: FileText, color: 'blue', bgGradient: 'from-blue-500 to-cyan-500' },
+    { title: 'Active Jobs', value: '—', change: '', trending: 'up', icon: Briefcase, color: 'purple', bgGradient: 'from-purple-500 to-pink-500' },
+    { title: 'Companies', value: '—', change: '', trending: 'up', icon: Building2, color: 'green', bgGradient: 'from-green-500 to-emerald-500' },
+    { title: 'Total Candidates', value: '—', change: '', trending: 'down', icon: Users, color: 'orange', bgGradient: 'from-orange-500 to-red-500' },
   ];
 
-  // Applications Chart Data
-  const applicationsData = [
-    { name: 'Mon', applications: 65, interviews: 28 },
-    { name: 'Tue', applications: 78, interviews: 35 },
-    { name: 'Wed', applications: 90, interviews: 42 },
-    { name: 'Thu', applications: 81, interviews: 38 },
-    { name: 'Fri', applications: 95, interviews: 45 },
-    { name: 'Sat', applications: 45, interviews: 20 },
-    { name: 'Sun', applications: 38, interviews: 15 }
+  // Applications Chart Data (from backend)
+  const applicationsDataDefault = [
+    { name: 'Mon', applications: 0, interviews: 0 },
+    { name: 'Tue', applications: 0, interviews: 0 },
+    { name: 'Wed', applications: 0, interviews: 0 },
+    { name: 'Thu', applications: 0, interviews: 0 },
+    { name: 'Fri', applications: 0, interviews: 0 },
+    { name: 'Sat', applications: 0, interviews: 0 },
+    { name: 'Sun', applications: 0, interviews: 0 }
   ];
+  const displayedApplicationsData = applicationsData.length ? applicationsData : applicationsDataDefault;
 
   // Job Status Distribution
-  const jobStatusData = [
-    { name: 'Active', value: 156, color: '#10b981' },
-    { name: 'Pending', value: 42, color: '#f59e0b' },
-    { name: 'Closed', value: 78, color: '#6366f1' },
-    { name: 'Draft', value: 24, color: '#8b5cf6' }
+  const jobStatusDataDefault = [
+    { name: 'Active', value: 0, color: '#10b981' },
+    { name: 'Pending', value: 0, color: '#f59e0b' },
+    { name: 'Closed', value: 0, color: '#6366f1' },
+    { name: 'Draft', value: 0, color: '#8b5cf6' }
   ];
+  const displayedJobStatusData = jobStatusData.length ? jobStatusData : jobStatusDataDefault;
 
   // Recent Activities
-  const recentActivities = [
+  const recentActivities = recentActivitiesState.length ? recentActivitiesState : [
     {
       id: 1,
       type: 'application',
@@ -143,7 +123,7 @@ export default function AdminDashboard() {
   ];
 
   // Top Jobs
-  const topJobs = [
+  const topJobs = topJobsState.length ? topJobsState : [
     {
       id: 1,
       title: 'Senior Frontend Developer',
@@ -177,6 +157,33 @@ export default function AdminDashboard() {
       trending: 'up'
     }
   ];
+
+  // Fetch dashboard stats from backend
+  useEffect(() => {
+    let mounted = true;
+    const fetchDashboard = async () => {
+      setLoading(true);
+      try {
+        const data = await employerService.getDashboardStats();
+        if (!mounted) return;
+
+        setStatsData(data.stats || []);
+        setApplicationsData(data.applicationsData || []);
+        setJobStatusData(data.jobStatusData || []);
+        setRecentActivitiesState(data.recentActivities || []);
+        setTopJobsState(data.topJobs || []);
+      } catch (err) {
+        console.error('Failed to fetch dashboard stats', err);
+        const msg = err?.response?.data?.message || err.message || 'Failed to load dashboard data';
+        toast.error(msg);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+    return () => { mounted = false; };
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -226,7 +233,7 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <motion.div variants={itemVariants} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
-          const Icon = stat.icon;
+          const Icon = stat.icon || FileText;
           return (
             <motion.div
               key={stat.title}
@@ -285,7 +292,7 @@ export default function AdminDashboard() {
             </div>
           </div>
           <ResponsiveContainer width="100%" height={300}>
-            <AreaChart data={applicationsData}>
+            <AreaChart data={displayedApplicationsData}>
               <defs>
                 <linearGradient id="colorApplications" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
@@ -339,7 +346,7 @@ export default function AdminDashboard() {
           <ResponsiveContainer width="100%" height={250}>
             <RePieChart>
               <Pie
-                data={jobStatusData}
+                data={displayedJobStatusData}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -347,7 +354,7 @@ export default function AdminDashboard() {
                 paddingAngle={5}
                 dataKey="value"
               >
-                {jobStatusData.map((entry, index) => (
+                {displayedJobStatusData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -355,7 +362,7 @@ export default function AdminDashboard() {
             </RePieChart>
           </ResponsiveContainer>
           <div className="mt-4 space-y-2">
-            {jobStatusData.map((item) => (
+            {displayedJobStatusData.map((item) => (
               <div key={item.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full" style={{ backgroundColor: item.color }} />
@@ -386,7 +393,7 @@ export default function AdminDashboard() {
           </div>
           <div className="space-y-4">
             {recentActivities.map((activity) => {
-              const Icon = activity.icon;
+              const Icon = activity.icon || FileText;
               return (
                 <motion.div
                   key={activity.id}
