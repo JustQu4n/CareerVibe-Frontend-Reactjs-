@@ -14,10 +14,14 @@ import {
   Save,
   ArrowLeft,
   Calendar,
-  TrendingUp
+  TrendingUp,
+  Brain,
+  Sparkles,
+  RefreshCw
 } from 'lucide-react';
 import { toast } from 'react-toastify';
 import employerInterviewService from '@/services/employerInterviewService';
+import AIEvaluationPanel from './AIEvaluationPanel';
 
 export default function InterviewAnswers({ interview }) {
   const [candidates, setCandidates] = useState([]);
@@ -25,6 +29,9 @@ export default function InterviewAnswers({ interview }) {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [answersLoading, setAnswersLoading] = useState(false);
+  const [aiEvaluation, setAiEvaluation] = useState(null);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAIPanel, setShowAIPanel] = useState(false);
 
   useEffect(() => {
     loadCandidates();
@@ -63,11 +70,51 @@ export default function InterviewAnswers({ interview }) {
   const handleSelectCandidate = async (candidate) => {
     setSelectedCandidate(candidate);
     await loadCandidateAnswers(candidate.candidate_interview_id);
+    // Auto-load AI evaluation if it exists
+    loadAIEvaluation(candidate.candidate_interview_id);
   };
 
   const handleBackToList = () => {
     setSelectedCandidate(null);
     setAnswers([]);
+    setAiEvaluation(null);
+    setShowAIPanel(false);
+  };
+
+  const loadAIEvaluation = async (candidateInterviewId) => {
+    try {
+      const data = await employerInterviewService.getAIEvaluation(candidateInterviewId);
+      setAiEvaluation(data);
+      setShowAIPanel(true);
+    } catch (error) {
+      // Silently fail - evaluation might not exist yet
+      setAiEvaluation(null);
+      setShowAIPanel(false);
+    }
+  };
+
+  const handleAIScore = async () => {
+    if (!selectedCandidate) return;
+
+    try {
+      setAiLoading(true);
+      toast.info('AI is analyzing the interview answers...');
+      
+      const result = await employerInterviewService.scoreInterviewWithAI(
+        selectedCandidate.candidate_interview_id
+      );
+      
+      setAiEvaluation(result);
+      setShowAIPanel(true);
+      toast.success('AI evaluation completed successfully!');
+      
+      // Refresh candidates to update scores
+      loadCandidates();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   if (loading) {
@@ -171,14 +218,39 @@ export default function InterviewAnswers({ interview }) {
               </p>
             </div>
           </div>
-          <div className="text-right">
-            <div className="text-3xl font-bold">
-              {selectedCandidate.total_score !== null ? `${selectedCandidate.total_score}%` : '-'}
+          <div className="flex flex-col items-end gap-3">
+            <div className="text-right">
+              <div className="text-3xl font-bold">
+                {selectedCandidate.total_score !== null ? `${selectedCandidate.total_score}%` : '-'}
+              </div>
+              <p className="text-blue-100 text-sm">Current Score</p>
             </div>
-            <p className="text-blue-100 text-sm">Current Score</p>
+            <button
+              onClick={handleAIScore}
+              disabled={aiLoading}
+              className="flex items-center gap-2 px-4 py-2 bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 rounded-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {aiLoading ? (
+                <RefreshCw className="h-4 w-4 animate-spin" />
+              ) : (
+                <Brain className="h-4 w-4" />
+              )}
+              <span className="font-semibold text-sm">
+                {aiLoading ? 'Analyzing...' : aiEvaluation ? 'Re-evaluate with AI' : 'Evaluate with AI'}
+              </span>
+              <Sparkles className="h-4 w-4" />
+            </button>
           </div>
         </div>
       </div>
+
+      {/* AI Evaluation Panel */}
+      {showAIPanel && aiEvaluation && (
+        <AIEvaluationPanel
+          evaluation={aiEvaluation}
+          loading={aiLoading}
+        />
+      )}
 
       {/* Answers List */}
       {answersLoading ? (

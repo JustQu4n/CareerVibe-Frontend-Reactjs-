@@ -243,6 +243,35 @@ export const gradeAnswer = async (interviewId, candidateInterviewId, answerId, d
   }
 };
 
+/**
+ * Chấm điểm interview bằng AI
+ */
+export const scoreInterviewWithAI = async (candidateInterviewId) => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.EMPLOYER.INTERVIEWS.AI_SCORE,
+      { candidateInterviewId }
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to score interview with AI');
+  }
+};
+
+/**
+ * Lấy kết quả đánh giá AI
+ */
+export const getAIEvaluation = async (candidateInterviewId) => {
+  try {
+    const response = await apiClient.get(
+      API_ENDPOINTS.EMPLOYER.INTERVIEWS.AI_EVALUATION(candidateInterviewId)
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch AI evaluation');
+  }
+};
+
 export default {
   // Interview CRUD
   getInterviews,
@@ -266,4 +295,8 @@ export default {
   getCandidates,
   getCandidateAnswers,
   gradeAnswer,
+  
+  // AI Scoring
+  scoreInterviewWithAI,
+  getAIEvaluation,
 };

@@ -125,6 +125,10 @@ export const API_ENDPOINTS = {
       CANDIDATES: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates`,
       CANDIDATE_ANSWERS: (interviewId, candidateInterviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers`,
       GRADE_ANSWER: (interviewId, candidateInterviewId, answerId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers/${answerId}/grade`,
+      
+      // AI Scoring endpoints
+      AI_SCORE: `${API_BASE_URL}/api/interview-scoring/score`,
+      AI_EVALUATION: (candidateInterviewId) => `${API_BASE_URL}/api/interview-scoring/evaluation/${candidateInterviewId}`,
     },
     // Employer profile endpoints
     PROFILE: {
