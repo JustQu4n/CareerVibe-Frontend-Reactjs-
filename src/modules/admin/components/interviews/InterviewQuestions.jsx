@@ -2,7 +2,7 @@
  * InterviewQuestions Component - Refactored
  * Quản lý câu hỏi với CRUD operations đầy đủ
  */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus,
@@ -15,6 +15,8 @@ import {
   GripVertical
 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import parseExcel from '@/utils/parseExcel';
+import * as XLSX from 'xlsx';
 import employerInterviewService from '@/services/employerInterviewService';
 
 export default function InterviewQuestions({ interview }) {
@@ -22,7 +24,9 @@ export default function InterviewQuestions({ interview }) {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showImportModal, setShowImportModal] = useState(false);
   const [editingQuestion, setEditingQuestion] = useState(null);
+  const fileInputRef = useRef();
 
   useEffect(() => {
     loadQuestions();
@@ -75,13 +79,23 @@ export default function InterviewQuestions({ interview }) {
             Manage questions for: <span className="font-semibold">{interview.title}</span>
           </p>
         </div>
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
-        >
-          <Plus className="h-5 w-5" />
-          Add Question
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowImportModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all"
+          >
+            <FileQuestion className="h-4 w-4" />
+            Import Excel
+          </button>
+
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+          >
+            <Plus className="h-5 w-5" />
+            Add Question
+          </button>
+        </div>
       </div>
 
       {/* Questions List */}
@@ -119,6 +133,16 @@ export default function InterviewQuestions({ interview }) {
         onSuccess={() => {
           loadQuestions();
           setShowCreateModal(false);
+        }}
+      />
+
+      <ImportExcelModal
+        isOpen={showImportModal}
+        interview={interview}
+        onClose={() => setShowImportModal(false)}
+        onSuccess={() => {
+          loadQuestions();
+          setShowImportModal(false);
         }}
       />
 
@@ -326,6 +350,156 @@ function CreateQuestionModal({ isOpen, interview, onClose, onSuccess }) {
             </button>
           </div>
         </form>
+      </motion.div>
+    </div>
+  );
+}
+
+// ========================================
+// Import Excel Modal
+// ========================================
+function ImportExcelModal({ isOpen, interview, onClose, onSuccess }) {
+  const [file, setFile] = useState(null);
+  const [parsed, setParsed] = useState([]);
+  const [parsing, setParsing] = useState(false);
+  const [importing, setImporting] = useState(false);
+  const [progress, setProgress] = useState({ done: 0, total: 0 });
+
+  useEffect(() => {
+    if (!isOpen) {
+      setFile(null);
+      setParsed([]);
+      setParsing(false);
+      setImporting(false);
+      setProgress({ done: 0, total: 0 });
+    }
+  }, [isOpen]);
+
+  const handleFile = async (f) => {
+    if (!f) return;
+    setParsing(true);
+    try {
+      const rows = await parseExcel(f);
+      setParsed(rows);
+    } catch (err) {
+      toast.error('Failed to parse Excel file');
+    } finally {
+      setParsing(false);
+    }
+  };
+
+  const handleImport = async () => {
+    if (!parsed || parsed.length === 0) {
+      toast.info('No questions to import');
+      return;
+    }
+
+    setImporting(true);
+    setProgress({ done: 0, total: parsed.length });
+    try {
+      for (let i = 0; i < parsed.length; i++) {
+        const q = parsed[i];
+        try {
+          await employerInterviewService.createQuestion(interview.interview_id, {
+            question_text: q.question_text,
+            time_limit_seconds: q.time_limit_seconds || null,
+            max_score: q.max_score || null,
+            order_index: q.order_index || null,
+          });
+        } catch (err) {
+          // continue on error for individual rows
+          console.error('import row failed', i, err);
+        }
+        setProgress((p) => ({ ...p, done: p.done + 1 }));
+      }
+
+      toast.success('Import completed');
+      onSuccess();
+    } catch (err) {
+      toast.error('Import failed');
+    } finally {
+      setImporting(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+      >
+        <div className="p-6 border-b border-gray-200 flex items-center justify-between">
+          <h2 className="text-2xl font-bold text-gray-900">Import Questions from Excel</h2>
+          <button onClick={onClose} className="text-sm text-gray-500">Close</button>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <p className="text-sm text-gray-600">Upload a .xlsx/.xls file. Columns accepted: question_text, time_limit_seconds, max_score, order_index (case-insensitive). The first sheet will be used.</p>
+
+          <div className="flex items-center gap-3">
+            <input
+              type="file"
+              accept=".xls,.xlsx"
+              onChange={(e) => {
+                const f = e.target.files?.[0];
+                setFile(f);
+                handleFile(f);
+              }}
+              className=""
+            />
+            <button
+              onClick={() => {
+                const sample = [
+                  {
+                    question_text: 'Example: Describe a challenge you solved',
+                    time_limit_seconds: 300,
+                    max_score: 10,
+                    order_index: 1,
+                  },
+                ];
+                const ws = XLSX.utils.json_to_sheet(sample);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, 'Questions');
+                XLSX.writeFile(wb, 'interview_questions_template.xlsx');
+              }}
+              className="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-sm text-gray-700 hover:bg-gray-200"
+            >
+              Download Template
+            </button>
+            {parsing && <div className="text-sm text-gray-500">Parsing...</div>}
+          </div>
+
+          <div className="bg-gray-50 rounded-lg p-4">
+            <h4 className="text-sm font-semibold mb-2">Preview ({parsed.length})</h4>
+            {parsed.length === 0 ? (
+              <div className="text-sm text-gray-500">No rows parsed yet</div>
+            ) : (
+              <div className="space-y-2 max-h-52 overflow-y-auto">
+                {parsed.slice(0, 20).map((r, i) => (
+                  <div key={i} className="p-2 bg-white border rounded-lg">
+                    <div className="font-medium">{r.question_text || '<empty>'}</div>
+                    <div className="text-xs text-gray-500">Time: {r.time_limit_seconds ?? '-'}s • Score: {r.max_score ?? '-'} • Order: {r.order_index ?? '-'}</div>
+                  </div>
+                ))}
+                {parsed.length > 20 && <div className="text-xs text-gray-500">Showing first 20 rows</div>}
+              </div>
+            )}
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              onClick={handleImport}
+              disabled={importing || parsed.length === 0}
+              className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {importing ? `Importing (${progress.done}/${progress.total})` : 'Import Questions'}
+            </button>
+            <button onClick={onClose} className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl">Cancel</button>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
