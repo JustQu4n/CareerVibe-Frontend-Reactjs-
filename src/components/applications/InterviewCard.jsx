@@ -8,7 +8,8 @@ import {
   AlertCircle,
   FileText,
   Building2,
-  Briefcase
+  Briefcase,
+  Mail
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,6 +20,9 @@ import { useNavigate } from 'react-router-dom';
 const InterviewCard = ({ application }) => {
   const navigate = useNavigate();
   const { jobPost, interview, candidateInterview } = application;
+  
+  // Check if this is a direct invitation (no jobPost)
+  const isDirectInvitation = !jobPost || application.isDirectInvitation;
 
   // Format date
   const formatDate = (dateString) => {
@@ -88,13 +92,33 @@ const InterviewCard = ({ application }) => {
       <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 border-b border-gray-100">
         <div className="flex items-start justify-between mb-2">
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 mb-1">
-              {jobPost?.title || 'N/A'}
-            </h3>
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <Building2 className="w-4 h-4 mr-1" />
-              <span>{jobPost?.company?.company_name || 'N/A'}</span>
-            </div>
+            {isDirectInvitation ? (
+              <>
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-3 py-1 rounded-full text-xs font-medium border bg-purple-100 text-purple-700 border-purple-200 flex items-center gap-1">
+                    <Mail className="w-3 h-3" />
+                    Direct Invitation
+                  </span>
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  {interview?.title || 'Interview'}
+                </h3>
+                <div className="flex items-center text-sm text-gray-600">
+                  <Mail className="w-4 h-4 mr-1" />
+                  <span>Invited by email</span>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-bold text-gray-900 mb-1">
+                  {jobPost?.title || 'N/A'}
+                </h3>
+                <div className="flex items-center text-sm text-gray-600 mb-2">
+                  <Building2 className="w-4 h-4 mr-1" />
+                  <span>{jobPost?.company?.company_name || 'N/A'}</span>
+                </div>
+              </>
+            )}
           </div>
           {candidateInterview && getStatusBadge(candidateInterview.status)}
         </div>
@@ -102,14 +126,16 @@ const InterviewCard = ({ application }) => {
 
       {/* Interview Details */}
       <div className="p-4 space-y-3">
-        {/* Interview Title */}
-        <div className="flex items-start gap-2">
-          <FileText className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-gray-700">Bài phỏng vấn</p>
-            <p className="text-base font-semibold text-gray-900">{interview?.title || 'N/A'}</p>
+        {/* Interview Title (only show if not direct invitation) */}
+        {!isDirectInvitation && (
+          <div className="flex items-start gap-2">
+            <FileText className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-medium text-gray-700">Bài phỏng vấn</p>
+              <p className="text-base font-semibold text-gray-900">{interview?.title || 'N/A'}</p>
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Interview Description */}
         {interview?.description && (

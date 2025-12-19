@@ -188,6 +188,21 @@ export const assignInterview = async (interviewId, data) => {
 };
 
 /**
+ * Mời candidate bằng email (direct invitation)
+ */
+export const inviteCandidate = async (interviewId, data) => {
+  try {
+    const response = await apiClient.post(
+      API_ENDPOINTS.EMPLOYER.INTERVIEWS.INVITE_CANDIDATE(interviewId),
+      data
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to invite candidate');
+  }
+};
+
+/**
  * Lấy danh sách ứng viên đã làm interview
  */
 export const getCandidates = async (interviewId) => {
@@ -247,6 +262,7 @@ export default {
   
   // Assignments & Grading
   assignInterview,
+  inviteCandidate,
   getCandidates,
   getCandidateAnswers,
   gradeAnswer,

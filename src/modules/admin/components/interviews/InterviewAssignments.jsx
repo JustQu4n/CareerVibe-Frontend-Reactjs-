@@ -7,6 +7,7 @@ import { motion } from 'framer-motion';
 import {
   Users,
   Plus,
+  Mail,
   UserCheck,
   Clock,
   CheckCircle,
@@ -24,6 +25,7 @@ export default function InterviewAssignments({ interview }) {
   const [candidates, setCandidates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAssignModal, setShowAssignModal] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -78,13 +80,22 @@ export default function InterviewAssignments({ interview }) {
             Manage candidate assignments for: <span className="font-semibold">{interview.title}</span>
           </p>
         </div>
-        <button
-          onClick={() => setShowAssignModal(true)}
-          className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
-        >
-          <Plus className="h-5 w-5" />
-          Assign Candidate
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setShowInviteModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all"
+          >
+            <Mail className="h-4 w-4" />
+            Invite by Email
+          </button>
+          <button
+            onClick={() => setShowAssignModal(true)}
+            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+          >
+            <Plus className="h-5 w-5" />
+            Assign Candidate
+          </button>
+        </div>
       </div>
 
       {/* Statistics Cards */}
@@ -204,6 +215,17 @@ export default function InterviewAssignments({ interview }) {
         onSuccess={() => {
           loadCandidates();
           setShowAssignModal(false);
+        }}
+      />
+
+      {/* Invite by Email Modal */}
+      <InviteCandidateModal
+        isOpen={showInviteModal}
+        interview={interview}
+        onClose={() => setShowInviteModal(false)}
+        onSuccess={() => {
+          loadCandidates();
+          setShowInviteModal(false);
         }}
       />
     </div>
@@ -440,6 +462,134 @@ function AssignModal({ isOpen, interview, onClose, onSuccess }) {
               className="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {loading ? 'Assigning...' : 'Assign Interview'}
+            </button>
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-xl transition-colors"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </motion.div>
+    </div>
+  );
+}
+
+// ========================================
+// Invite Candidate Modal Component
+// ========================================
+function InviteCandidateModal({ isOpen, interview, onClose, onSuccess }) {
+  const [formData, setFormData] = useState({
+    email: '',
+    message: '',
+  });
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!formData.email) {
+      toast.error('Email is required');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      const result = await employerInterviewService.inviteCandidate(interview.interview_id, {
+        email: formData.email,
+        message: formData.message || undefined,
+      });
+      toast.success(`Invitation sent to ${result.candidate?.full_name || formData.email}`);
+      setFormData({ email: '', message: '' });
+      onSuccess();
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="bg-white rounded-2xl shadow-2xl max-w-md w-full"
+      >
+        <div className="p-6 border-b border-gray-200">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-100 rounded-lg">
+              <Mail className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">Invite Candidate</h2>
+              <p className="text-sm text-gray-600">
+                Send direct invitation to <span className="font-semibold">{interview.title}</span>
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Candidate Email *
+            </label>
+            <input
+              type="email"
+              required
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="candidate@example.com"
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              The candidate must have an account with this email
+            </p>
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Custom Message (Optional)
+            </label>
+            <textarea
+              value={formData.message}
+              onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+              rows={4}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500"
+              placeholder="Add a personalized message for the candidate..."
+            />
+            <p className="text-xs text-gray-500 mt-1">
+              This message will be included in the invitation email
+            </p>
+          </div>
+
+          <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+              <div className="text-sm text-purple-800">
+                <p className="font-semibold mb-1">What happens next:</p>
+                <ul className="list-disc list-inside space-y-1">
+                  <li>Candidate receives email notification</li>
+                  <li>In-app notification is sent</li>
+                  <li>Direct link to interview is provided</li>
+                  <li>No job application required</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 pt-4">
+            <button
+              type="submit"
+              disabled={loading}
+              className="flex-1 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-xl disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {loading ? 'Sending Invitation...' : 'Send Invitation'}
             </button>
             <button
               type="button"

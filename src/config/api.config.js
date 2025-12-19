@@ -121,6 +121,7 @@ export const API_ENDPOINTS = {
       
       // Assignments & Candidates
       ASSIGN: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/assign`,
+      INVITE_CANDIDATE: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/invite-candidate`,
       CANDIDATES: (interviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates`,
       CANDIDATE_ANSWERS: (interviewId, candidateInterviewId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers`,
       GRADE_ANSWER: (interviewId, candidateInterviewId, answerId) => `${API_BASE_URL}/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/answers/${answerId}/grade`,
