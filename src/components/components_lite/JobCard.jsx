@@ -56,7 +56,7 @@ const JobCard = ({ job }) => {
                         {/* Salary and status */}
                         <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-base text-gray-600">
-                                {job.salary_range || 'Thỏa thuận'}
+                                {!job.salary_range || job.salary_range === 0 ? 'Thỏa thuận' : job.salary_range}
                             </span>
                         
                         </div>

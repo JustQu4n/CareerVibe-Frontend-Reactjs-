@@ -43,16 +43,16 @@ const InterviewHistoryCard = ({ interviewData }) => {
   const getResultBadge = (result) => {
     if (result === 'pass') {
       return (
-        <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold border border-green-200">
-          <CheckCircle className="w-4 h-4" />
-          Đạt
+        <span className="flex items-center gap-1 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs font-semibold border border-green-200">
+          <CheckCircle className="w-3 h-3" />
+          Passed
         </span>
       );
     }
     return (
-      <span className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold border border-red-200">
-        <XCircle className="w-4 h-4" />
-        Chưa đạt
+      <span className="flex items-center gap-1 px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-semibold border border-red-200">
+        <XCircle className="w-3 h-3" />
+        Failed
       </span>
     );
   };
@@ -69,18 +69,20 @@ const InterviewHistoryCard = ({ interviewData }) => {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all overflow-hidden"
+      whileHover={{ y: -4 }}
+      className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-lg transition-all overflow-hidden group"
     >
+     
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-4 border-b border-gray-100">
-        <div className="flex items-start justify-between mb-2">
-          <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 mb-1">
+      <div className="bg-gradient-to-r from-purple-50 to-indigo-50 p-3 border-b border-gray-100">
+        <div className="flex items-start justify-between mb-1">
+          <div className="flex-1 min-w-0">
+            <h3 className="text-sm font-bold text-gray-900 mb-1 line-clamp-1">
               {jobPost?.title || 'N/A'}
             </h3>
-            <div className="flex items-center text-sm text-gray-600 mb-2">
-              <Building2 className="w-4 h-4 mr-1" />
-              <span>{jobPost?.company?.company_name || 'N/A'}</span>
+            <div className="flex items-center text-xs text-gray-600">
+              <Building2 className="w-3 h-3 mr-1" />
+              <span className="truncate">{jobPost?.company?.company_name || 'N/A'}</span>
             </div>
           </div>
           {result && getResultBadge(result)}
@@ -88,46 +90,46 @@ const InterviewHistoryCard = ({ interviewData }) => {
       </div>
 
       {/* Score Section */}
-      <div className="p-4 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-gray-100">
+      <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 border-b border-gray-100">
         <div className="flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-600 mb-1">Điểm số</p>
-            <p className="text-3xl font-bold text-blue-600">
-              {total_score || 0}<span className="text-lg text-gray-500">/{max_score || 100}</span>
+            <p className="text-xs text-gray-600 mb-0.5">Score</p>
+            <p className="text-2xl font-bold text-blue-600">
+              {total_score || 0}<span className="text-sm text-gray-500">/{max_score || 100}</span>
             </p>
           </div>
           <div className="text-right">
-            <p className="text-sm text-gray-600 mb-1">Phần trăm</p>
-            <p className="text-3xl font-bold text-indigo-600">{percentage || 0}%</p>
+            <p className="text-xs text-gray-600 mb-0.5">Percentage</p>
+            <p className="text-2xl font-bold text-indigo-600">{percentage || 0}%</p>
           </div>
         </div>
       </div>
 
       {/* Interview Details */}
-      <div className="p-4 space-y-3">
+      <div className="p-3 space-y-2">
         {/* Interview Title */}
         <div className="flex items-start gap-2">
-          <FileText className="w-5 h-5 text-purple-600 mt-0.5 flex-shrink-0" />
-          <div>
-            <p className="text-sm font-medium text-gray-700">Bài phỏng vấn</p>
-            <p className="text-base font-semibold text-gray-900">{interview?.title || 'N/A'}</p>
+          <FileText className="w-4 h-4 text-purple-600 mt-0.5 flex-shrink-0" />
+          <div className="min-w-0">
+            <p className="text-xs font-medium text-gray-600">Interview</p>
+            <p className="text-sm font-semibold text-gray-900 line-clamp-1">{interview?.title || 'N/A'}</p>
           </div>
         </div>
 
         {/* Time Info */}
-        <div className="grid grid-cols-2 gap-3 text-sm">
-          <div className="flex items-center gap-2">
-            <Calendar className="w-4 h-4 text-gray-400" />
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="flex items-center gap-1.5">
+            <Calendar className="w-3.5 h-3.5 text-gray-400" />
             <div>
-              <p className="text-xs text-gray-500">Hoàn thành</p>
-              <p className="font-medium text-gray-900">{formatDate(completed_at)}</p>
+              <p className="text-xs text-gray-500">Completed</p>
+              <p className="font-medium text-gray-900 text-xs">{formatDate(completed_at)}</p>
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-gray-400" />
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-gray-400" />
             <div>
-              <p className="text-xs text-gray-500">Thời gian làm</p>
-              <p className="font-medium text-gray-900">{calculateDuration(started_at, completed_at)}</p>
+              <p className="text-xs text-gray-500">Duration</p>
+              <p className="font-medium text-gray-900 text-xs">{calculateDuration(started_at, completed_at)}</p>
             </div>
           </div>
         </div>
@@ -135,17 +137,17 @@ const InterviewHistoryCard = ({ interviewData }) => {
         {/* Expand Button */}
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium text-gray-700"
+          className="w-full flex items-center justify-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors text-xs font-medium text-gray-700"
         >
           {isExpanded ? (
             <>
-              <ChevronUp className="w-4 h-4" />
-              Ẩn chi tiết câu trả lời
+              <ChevronUp className="w-3.5 h-3.5" />
+              Hide Details
             </>
           ) : (
             <>
-              <ChevronDown className="w-4 h-4" />
-              Xem chi tiết câu trả lời ({answers?.length || 0} câu)
+              <ChevronDown className="w-3.5 h-3.5" />
+              View Answers ({answers?.length || 0})
             </>
           )}
         </button>
@@ -158,42 +160,42 @@ const InterviewHistoryCard = ({ interviewData }) => {
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
               transition={{ duration: 0.3 }}
-              className="space-y-3 pt-3 border-t border-gray-200"
+              className="space-y-2 pt-2 border-t border-gray-200"
             >
               {answers.map((answer, index) => (
                 <div
                   key={answer.question_id || index}
-                  className="bg-gray-50 rounded-lg p-4 space-y-2"
+                  className="bg-gray-50 rounded-lg p-2.5 space-y-1.5"
                 >
                   {/* Question */}
-                  <div className="flex items-start gap-2">
-                    <span className="flex-shrink-0 w-6 h-6 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">
+                  <div className="flex items-start gap-1.5">
+                    <span className="flex-shrink-0 w-5 h-5 bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-xs font-bold">
                       {index + 1}
                     </span>
-                    <p className="text-sm font-semibold text-gray-900">{answer.question_text}</p>
+                    <p className="text-xs font-semibold text-gray-900">{answer.question_text}</p>
                   </div>
 
                   {/* Answer */}
-                  <div className="ml-8">
-                    <p className="text-sm text-gray-700 mb-2">
-                      <span className="font-medium">Câu trả lời:</span> {answer.answer_text || 'Không có câu trả lời'}
+                  <div className="ml-6">
+                    <p className="text-xs text-gray-700 mb-1">
+                      <span className="font-medium">Answer:</span> {answer.answer_text || 'No answer'}
                     </p>
 
                     {/* Score */}
                     <div className="flex items-center justify-between text-xs">
                       <span className="text-gray-600">
-                        Điểm: <span className="font-bold text-blue-600">{answer.score || 0}/{answer.max_score || 10}</span>
+                        Score: <span className="font-bold text-blue-600">{answer.score || 0}/{answer.max_score || 10}</span>
                       </span>
                       <span className="text-gray-500">
-                        Thời gian: {answer.elapsed_seconds || 0}s
+                        Time: {answer.elapsed_seconds || 0}s
                       </span>
                     </div>
 
                     {/* Feedback */}
                     {answer.feedback && (
-                      <div className="mt-2 p-2 bg-blue-50 border border-blue-100 rounded text-xs">
+                      <div className="mt-1.5 p-1.5 bg-blue-50 border border-blue-100 rounded text-xs">
                         <p className="text-blue-900">
-                          <span className="font-semibold">Nhận xét:</span> {answer.feedback}
+                          <span className="font-semibold">Feedback:</span> {answer.feedback}
                         </p>
                       </div>
                     )}
@@ -238,10 +240,10 @@ const InterviewHistory = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="bg-white rounded-xl shadow-sm p-8 mb-8">
+      <div className="bg-white rounded-2xl shadow-sm p-6 mb-6">
         <div className="flex items-center justify-center">
-          <Loader2 className="w-8 h-8 text-purple-600 animate-spin" />
-          <span className="ml-3 text-gray-600">Đang tải lịch sử interview...</span>
+          <Loader2 className="w-6 h-6 text-purple-600 animate-spin" />
+          <span className="ml-3 text-gray-600 text-sm">Loading interview history...</span>
         </div>
       </div>
     );
@@ -253,18 +255,18 @@ const InterviewHistory = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-red-50 border border-red-200 rounded-xl p-6 mb-8"
+        className="bg-red-50 border border-red-200 rounded-2xl p-5 mb-6"
       >
         <div className="flex items-start gap-3">
-          <AlertCircle className="w-6 h-6 text-red-600 flex-shrink-0 mt-0.5" />
+          <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
           <div>
-            <h3 className="text-lg font-semibold text-red-900 mb-1">Lỗi tải dữ liệu</h3>
+            <h3 className="text-base font-semibold text-red-900 mb-1">Error Loading Data</h3>
             <p className="text-sm text-red-700 mb-3">{error}</p>
             <button
               onClick={fetchInterviewHistory}
               className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-sm font-medium"
             >
-              Thử lại
+              Retry
             </button>
           </div>
         </div>
@@ -278,17 +280,17 @@ const InterviewHistory = () => {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl shadow-sm p-8 mb-8 text-center"
+        className="bg-gradient-to-br from-purple-50 to-indigo-50 rounded-2xl shadow-sm p-6 mb-6 text-center border border-purple-100"
       >
         <div className="flex flex-col items-center">
-          <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mb-4">
-            <History className="w-8 h-8 text-purple-600" />
+          <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center mb-3 shadow-lg">
+            <History className="w-7 h-7 text-white" />
           </div>
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">
-            Chưa có lịch sử interview
+          <h3 className="text-base font-semibold text-gray-900 mb-2">
+            No Interview History
           </h3>
           <p className="text-sm text-gray-600 max-w-md">
-            Bạn chưa hoàn thành interview nào. Lịch sử các interview đã làm sẽ hiển thị ở đây.
+            You haven't completed any interviews yet. Your interview history will appear here.
           </p>
         </div>
       </motion.div>
@@ -296,17 +298,17 @@ const InterviewHistory = () => {
   }
 
   return (
-    <div className="mb-8">
+    <div className="mb-6">
       {/* Section Header */}
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-bold text-gray-800 flex items-center">
+        <h2 className="text-lg font-bold text-gray-800 flex items-center">
           <History className="mr-2 h-5 w-5 text-purple-500" />
           Interview History ({interviews.length})
         </h2>
       </div>
 
       {/* Interview History Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {interviews.map((interview, index) => (
           <InterviewHistoryCard
             key={interview.candidate_interview_id || index}

@@ -83,14 +83,20 @@ const Companies = () => {
       </div>
 
       {/* Hero Section */}
-      <div className="bg-blue-600 text-white py-16 px-4">
-        <div className="container mx-auto max-w-6xl">
+      <div className="relative bg-blue-100 text-gray-800 py-16 px-4 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+          <div className="absolute top-0 left-0 w-full h-full">
+            <div className="absolute top-20 left-10 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+            <div className="absolute top-40 right-10 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+            <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-4000"></div>
+          </div>
+        </div>
+        <div className="container mx-auto max-w-6xl relative z-10">
           <div className="text-center mb-8">
-            <h1 className="text-2xl md:text-2xl font-bold mb-4 flex items-center justify-center gap-3">
-              <Building2 className="h-12 w-12" />
+            <h1 className="text-6xl md:text-2xl font-bold text-gray-800 mb-4 flex items-center justify-center gap-3">
               Explore Top Companies
             </h1>
-            <p className="text-lg md:text-xl text-blue-100 max-w-2xl mx-auto">
+            <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto">
               Discover amazing companies and find your dream career opportunity
             </p>
           </div>
@@ -114,18 +120,18 @@ const Companies = () => {
           <div className="mt-10 grid grid-cols-2 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center border border-white/20">
               <div className="text-3xl font-bold">{results.length}+</div>
-              <div className="text-sm text-blue-100">Companies</div>
+              <div className="text-sm text-gray-700">Companies</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center border border-white/20">
               <div className="text-3xl font-bold flex items-center justify-center gap-1">
                 <TrendingUp className="h-6 w-6" />
                 100+
               </div>
-              <div className="text-sm text-blue-100">Industries</div>
+              <div className="text-sm text-gray-700">Industries</div>
             </div>
             <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 text-center border border-white/20 col-span-2 md:col-span-1">
               <div className="text-3xl font-bold">1000+</div>
-              <div className="text-sm text-blue-100">Job Opportunities</div>
+              <div className="text-sm text-gray-700">Job Opportunities</div>
             </div>
           </div>
         </div>

@@ -214,35 +214,35 @@ const SaveJobs = () => {
         </div>
         
         {/* Search and filter bar */}
-        <div className="bg-white rounded-xl shadow-sm p-5 mb-8 border border-gray-100">
-          <div className="flex flex-col md:flex-row md:items-center gap-4">
+        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 border border-gray-100">
+          <div className="flex flex-col md:flex-row md:items-center gap-3">
             <div className="relative flex-grow">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="text"
-                placeholder="Search job titles or companies"
+                placeholder="Search job titles or companies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full py-3 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                className="pl-10 w-full py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
               />
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex items-center space-x-2">
               <div className="relative">
                 <button
                   onClick={() => setShowSortMenu(!showSortMenu)}
-                  className="flex items-center px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700"
+                  className="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700"
                 >
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
+                  <ArrowUpDown className="h-4 w-4 mr-1.5" />
                   Sort
-                  <ChevronDown className="h-4 w-4 ml-1" />
+                  <ChevronDown className="h-3.5 w-3.5 ml-1" />
                 </button>
                 
                 {showSortMenu && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl p-2 z-10 border border-gray-100">
-                    <div className="px-2 py-1.5 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort Options</div>
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl p-2 z-10 border border-gray-200">
+                    <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort By</div>
                     <button 
                       onClick={() => {setSortBy('dateDesc'); setShowSortMenu(false);}}
                       className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'dateDesc' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
@@ -279,12 +279,12 @@ const SaveJobs = () => {
               
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center px-4 py-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium text-gray-700 relative"
+                className="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700 relative"
               >
-                <Filter className="h-4 w-4 mr-2" />
+                <Filter className="h-4 w-4 mr-1.5" />
                 Filters
                 {getAppliedFiltersCount() > 0 && (
-                  <span className="absolute -top-2 -right-2 h-5 w-5 bg-indigo-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  <span className="ml-1.5 h-5 w-5 bg-indigo-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {getAppliedFiltersCount()}
                   </span>
                 )}
@@ -302,14 +302,14 @@ const SaveJobs = () => {
                 transition={{ duration: 0.3 }}
                 className="overflow-hidden"
               >
-                <div className="mt-6 pt-4 border-t border-gray-200">
-                  <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Job Type</h3>
+                      <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Job Type</h3>
                       <select
                         value={filters.jobType}
                         onChange={(e) => setFilters({...filters, jobType: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       >
                         <option value="all">All types</option>
                         <option value="full_time">Full Time</option>
@@ -321,7 +321,7 @@ const SaveJobs = () => {
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Salary Range</h3>
+                      <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Salary Range</h3>
                       <div className="px-2">
                         <input
                           type="range"
@@ -340,22 +340,22 @@ const SaveJobs = () => {
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Location</h3>
+                      <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Location</h3>
                       <input
                         type="text"
                         placeholder="Any location"
                         value={filters.location}
                         onChange={(e) => setFilters({...filters, location: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       />
                     </div>
                     
                     <div>
-                      <h3 className="text-sm font-medium text-gray-700 mb-2">Date Saved</h3>
+                      <h3 className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Date Saved</h3>
                       <select
                         value={filters.date}
                         onChange={(e) => setFilters({...filters, date: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                       >
                         <option value="all">All time</option>
                         <option value="today">Today</option>
@@ -365,13 +365,13 @@ const SaveJobs = () => {
                     </div>
                   </div>
                   
-                  <div className="mt-6 flex justify-end">
+                  <div className="mt-4 flex justify-end">
                     <button
                       onClick={resetFilters}
-                      className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 flex items-center"
+                      className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-indigo-600 hover:bg-gray-50 rounded-lg transition-colors flex items-center"
                     >
                       <X className="h-4 w-4 mr-1" />
-                      Reset filters
+                      Reset All
                     </button>
                   </div>
                 </div>
@@ -392,12 +392,12 @@ const SaveJobs = () => {
         ) : (
           <>
             {filteredJobs.length === 0 ? (
-              <div className="bg-white rounded-xl shadow-sm p-12 text-center">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-indigo-100 text-indigo-600 mb-6">
+              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl shadow-sm p-12 text-center border border-indigo-100">
+                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white mb-6 shadow-lg">
                   <Bookmark className="h-10 w-10" />
                 </div>
                 <h3 className="text-2xl font-bold text-gray-900 mb-3">No saved jobs found</h3>
-                <p className="text-gray-500 mb-8 max-w-md mx-auto">
+                <p className="text-gray-600 mb-8 max-w-md mx-auto">
                   {searchQuery || getAppliedFiltersCount() > 0 
                     ? "We couldn't find any saved jobs matching your current filters. Try adjusting your search criteria."
                     : "You haven't saved any jobs yet. Save jobs that interest you to view them here later."}
@@ -405,7 +405,7 @@ const SaveJobs = () => {
                 {(searchQuery || getAppliedFiltersCount() > 0) && (
                   <button
                     onClick={resetFilters}
-                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md font-medium"
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
                   >
                     Clear Filters
                   </button>
@@ -413,7 +413,7 @@ const SaveJobs = () => {
                 {!searchQuery && getAppliedFiltersCount() === 0 && (
                   <a
                     href="/browse"
-                    className="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all shadow-sm hover:shadow-md font-medium inline-block"
+                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold inline-block"
                   >
                     Browse Jobs
                   </a>
@@ -421,14 +421,14 @@ const SaveJobs = () => {
               </div>
             ) : (
               <div>
-                <div className="mb-6 flex justify-between items-center">
+                <div className="mb-5 flex justify-between items-center">
                   <p className="text-sm text-gray-600">
-                    Showing <span className="font-medium text-indigo-600">{filteredJobs.length}</span> saved jobs
+                    Showing <span className="font-bold text-indigo-600">{filteredJobs.length}</span> of <span className="font-semibold">{savedJobs.length}</span> saved jobs
                   </p>
                 </div>
                 
                 {/* Modern Job Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                   <AnimatePresence>
                     {filteredJobs.map((savedJob) => {
                       const job = savedJob.jobPost;
@@ -441,38 +441,38 @@ const SaveJobs = () => {
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -20 }}
                           transition={{ duration: 0.3 }}
-                          className="group bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-indigo-200 transition-all shadow-sm hover:shadow-md"
+                          className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-indigo-300 transition-all shadow-sm hover:shadow-xl relative"
                         >
                           {/* Job Card Header */}
-                          <div className="h-2 bg-gradient-to-r from-indigo-500 to-purple-600"></div>
+                          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
                           
-                          <div className="p-6">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-start space-x-4">
-                                <div className="h-14 w-14 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-4">
+                              <div className="flex items-start space-x-3 flex-1 min-w-0">
+                                <div className="h-12 w-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center overflow-hidden border border-gray-200 group-hover:scale-110 transition-transform flex-shrink-0">
                                   {company?.logo_url ? (
                                     <img src={company.logo_url} alt={company.name} className="h-full w-full object-cover" />
                                   ) : (
                                     <Building2 className="h-7 w-7 text-gray-400" />
                                   )}
                                 </div>
-                                <div>
-                                  <h3 className="font-semibold text-lg text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2">
+                                <div className="min-w-0">
+                                  <h3 className="font-bold text-base text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-1">
                                     <a href={`/view-job-detail/${job.job_post_id}`}>{job.title}</a>
                                   </h3>
-                                  <p className="text-gray-600">{company?.name}</p>
+                                  <p className="text-sm text-gray-600 truncate">{company?.name}</p>
                                 </div>
                               </div>
                               <button 
                                 onClick={() => handleRemoveJob(savedJob.saved_job_id, job.job_post_id)}
-                                className="text-gray-400 hover:text-red-500 transition-colors ml-2 p-1 hover:bg-red-50 rounded-full"
+                                className="text-gray-400 hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-lg flex-shrink-0"
                                 aria-label="Remove from saved"
                               >
-                                <Trash2 className="h-5 w-5" />
+                                <Trash2 className="h-4 w-4" />
                               </button>
                             </div>
                             
-                            <div className="mt-5 space-y-2">
+                            <div className="space-y-2">
                               <div className="flex items-center text-sm text-gray-500">
                                 <div className="bg-gray-100 p-1 rounded-full mr-2">
                                   <MapPin className="h-3.5 w-3.5 text-gray-600" />
@@ -493,17 +493,17 @@ const SaveJobs = () => {
                               </div>
                             </div>
                             
-                            <div className="mt-6 pt-5 border-t border-gray-100 flex justify-between items-center">
+                            <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
                               <div className="flex items-center text-xs text-gray-500">
-                                <Clock className="h-3.5 w-3.5 mr-1" />
-                                Saved {savedJob.saved_at ? format(new Date(savedJob.saved_at), 'MMM d, yyyy') : "Recently"}
+                                <Clock className="h-3 w-3 mr-1" />
+                                {savedJob.saved_at ? format(new Date(savedJob.saved_at), 'MMM d, yyyy') : "Recently"}
                               </div>
                               <a
                                 href={`/view-job-detail/${job.job_post_id}`}
-                                className="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+                                className="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors group-hover:gap-1.5 gap-1"
                               >
-                                View details
-                                <ExternalLink className="ml-1 h-3.5 w-3.5" />
+                                View
+                                <ExternalLink className="h-3 w-3" />
                               </a>
                             </div>
                           </div>
