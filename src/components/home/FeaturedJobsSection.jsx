@@ -134,9 +134,8 @@ const FeaturedJobsSection = React.memo(({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.1 }}
-              whileHover={{ y: -5 }}
               onClick={() => navigate(`/view-job-detail/${job.job_post_id}`)}
-              className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all duration-300 cursor-pointer relative group"
+              className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md hover:border-blue-200 cursor-pointer relative group"
             >
               <div className="absolute top-4 right-4 z-10">
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
@@ -154,7 +153,7 @@ const FeaturedJobsSection = React.memo(({
               
               <div className="p-6">
                 <div className="flex items-start space-x-3 mb-4">
-                  <div className="h-12 w-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="h-12 w-12 bg-gray-50 border border-gray-100 rounded-lg flex items-center justify-center overflow-hidden group-hover:scale-110 transition-transform duration-300">
                     {job.company?.logo_url ? (
                       <img
                         src={job.company.logo_url}
@@ -175,7 +174,7 @@ const FeaturedJobsSection = React.memo(({
                   </div>
                 </div>
                 
-                <h2 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-blue-600 transition-colors">
+                <h2 className="text-base font-bold text-gray-900  mb-3 line-clamp-2 ">
                   {job.title}
                 </h2>
                 

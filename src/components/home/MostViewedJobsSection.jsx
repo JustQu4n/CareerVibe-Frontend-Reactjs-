@@ -40,7 +40,7 @@ const MostViewedJobsSection = React.memo(({
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
-              <span className="text-purple-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
+              <span className="text-blue-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
                 Popular Now
               </span>
               <h2 className="text-3xl font-bold mt-3 text-gray-900">Most Viewed Jobs</h2>
@@ -79,7 +79,7 @@ const MostViewedJobsSection = React.memo(({
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
           <div>
-            <span className="text-purple-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
+            <span className="text-blue-600 font-semibold text-sm bg-purple-50 px-4 py-1.5 rounded-full">
               Popular Now
             </span>
             <h2 className="text-3xl font-bold mt-3 text-gray-900">Most Viewed Jobs</h2>
@@ -133,12 +133,11 @@ const MostViewedJobsSection = React.memo(({
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3, delay: idx * 0.1 }}
-              whileHover={{ y: -5 }}
               onClick={() => navigate(`/view-job-detail/${job.job_post_id}`)}
               className="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 hover:shadow-md hover:border-purple-200 transition-all duration-300 cursor-pointer relative group"
             >
               <div className="absolute top-4 right-4 z-10">
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-600 text-white">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-600 text-white">
                   <Eye className="h-3 w-3 mr-1" />
                   {job.views_count }
                 </span>
@@ -178,7 +177,7 @@ const MostViewedJobsSection = React.memo(({
                   </div>
                 </div>
                 
-                <h2 className="text-lg font-bold text-gray-900 mb-3 line-clamp-2 group-hover:text-purple-600 transition-colors">
+                <h2 className="text-base font-bold text-gray-900 mb-3 line-clamp-2">
                   {job.title}
                 </h2>
                 
@@ -210,7 +209,7 @@ const MostViewedJobsSection = React.memo(({
                     <TrendingUp className="h-3.5 w-3.5 mr-1 text-purple-500" />
                     Trending
                   </div>
-                  <span className="inline-flex items-center text-sm font-medium text-purple-600 group-hover:translate-x-1 transition-transform">
+                  <span className="inline-flex items-center text-sm font-medium text-blue-600 group-hover:translate-x-1 transition-transform">
                     View Details
                     <ArrowRight className="ml-1 h-4 w-4" />
                   </span>

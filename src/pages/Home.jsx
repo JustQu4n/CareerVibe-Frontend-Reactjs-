@@ -15,6 +15,10 @@ import {
   AIRecommendedJobsSection,
   FeaturedJobsSection,
   MostViewedJobsSection,
+  PopularCategoriesSection,
+  TopCompaniesSection,
+  AIMatchingSection,
+  CTASection,
 } from '@/components/home';
 
 const Home = () => {
@@ -80,7 +84,7 @@ const Home = () => {
 
       <StatsSection />
 
-      <HowItWorksSection />
+      <PopularCategoriesSection />
 
       <RecommendedJobsSection
         jobs={recommendedJobs}
@@ -88,7 +92,6 @@ const Home = () => {
         error={recommendationError}
         user={user}
       />
-
       <AIRecommendedJobsSection
         recommendations={aiRecommendations}
         isLoading={isLoadingAI}
@@ -113,6 +116,20 @@ const Home = () => {
         onPrevPage={prevMostViewedPage}
         isLoading={isLoadingMostViewed}
       />
+
+      <AIMatchingSection />
+
+
+
+      <TopCompaniesSection />
+
+    
+
+     {/* <HowItWorksSection /> */}
+
+    
+
+      <CTASection />
     </MainLayout>
   );
 };
