@@ -6,11 +6,43 @@
 
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, MapPin, Edit, FileText } from 'lucide-react';
+import { Mail, Phone, MapPin, Edit, FileText, Share2, Download } from 'lucide-react';
+import { toast } from 'react-toastify';
 
 const ProfileInfo = React.memo(({ user, resume_url }) => {
   const navigate = useNavigate();
+  const currentUser = useSelector((state) => state.auth?.user);
+
+  const handleShareProfile = () => {
+    const publicUrl = `${window.location.origin}/public-profile/${currentUser?.user_id || user?.user_id}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `${user?.full_name || 'User'}'s Profile`,
+        url: publicUrl
+      }).catch(() => {});
+    } else {
+      navigator.clipboard.writeText(publicUrl);
+      toast.success('Public profile link copied to clipboard!');
+    }
+  };
+
+  const handleDownloadCV = () => {
+    const publicUrl = `${window.location.origin}/public-profile/${currentUser?.user_id || user?.user_id}`;
+    const printWindow = window.open(publicUrl, '_blank');
+    
+    if (printWindow) {
+      printWindow.onload = () => {
+        setTimeout(() => {
+          printWindow.print();
+        }, 1000);
+      };
+    } else {
+      toast.error('Please allow pop-ups to download CV');
+    }
+  };
 
   return (
     <div className="pt-20 pb-6 px-4 sm:px-8">
@@ -41,7 +73,7 @@ const ProfileInfo = React.memo(({ user, resume_url }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <Button
             variant="outline"
             className="border-blue-500 text-blue-600 hover:bg-blue-50 flex items-center gap-2"
@@ -49,6 +81,22 @@ const ProfileInfo = React.memo(({ user, resume_url }) => {
           >
             <Edit size={16} />
             Edit Profile
+          </Button>
+          <Button
+            variant="outline"
+            className="border-indigo-500 text-indigo-600 hover:bg-indigo-50 flex items-center gap-2"
+            onClick={handleShareProfile}
+          >
+            <Share2 size={16} />
+            Share Profile
+          </Button>
+          <Button
+            variant="outline"
+            className="border-green-500 text-green-600 hover:bg-green-50 flex items-center gap-2"
+            onClick={handleDownloadCV}
+          >
+            <Download size={16} />
+            Download CV
           </Button>
           {resume_url && (
             <Button

@@ -15,7 +15,8 @@ import {
   Browse,
   Companies,
   Profile,
-  EditProfile
+  EditProfile,
+  PublicProfile
 } from "./pages";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Creator from "./components/creator/Creator.jsx";
@@ -90,6 +91,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/profile",
     element: <Profile />,
+  },
+  {
+    path: "/public-profile/:userId",
+    element: <PublicProfile />,
   },
       {
         path: "/settings",

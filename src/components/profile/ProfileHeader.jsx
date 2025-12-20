@@ -13,7 +13,7 @@ const ProfileHeader = React.memo(({ avatar_url, full_name }) => {
   return (
     <div className="relative mb-8">
       {/* Cover Image */}
-      <div className="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-600 rounded-2xl shadow-lg"></div>
+      <div className="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-2xl shadow-lg"></div>
       
       {/* Avatar */}
       <div className="absolute -bottom-1 left-4 sm:left-8">

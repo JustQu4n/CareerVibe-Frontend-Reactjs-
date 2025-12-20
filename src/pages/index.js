@@ -12,4 +12,5 @@ export { default as Browse } from './Browse';
 export { default as Profile } from './Profile';
 export { default as EditProfile } from './EditProfile';
 export { default as Companies } from './Companies';
+export { default as PublicProfile } from './PublicProfile';
 // Add more page exports here
