@@ -69,6 +69,7 @@ export const getCompanyDetails = async (companyId) => {
       industry: companyData.industry,
       location: companyData.location,
       logo_url: companyData.logo_url,
+      cover_url: companyData.cover_url || companyData.cover || companyData.cover_image || null,
     };
     
     // Attach company info to each job post for JobCard compatibility
@@ -96,6 +97,7 @@ export const getCompanyDetails = async (companyId) => {
         founded_at: companyData.founded_at,
         // map to common keys used by UI
         logo_url: companyData.logo_url,
+        cover_url: companyData.cover_url || companyData.cover || companyData.cover_image || null,
         email: companyData.contact_email || companyData.contact_email_address || null,
         phone: companyData.contact_phone || null,
         address: companyData.contact_address || null,

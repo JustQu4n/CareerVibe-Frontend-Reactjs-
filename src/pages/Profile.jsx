@@ -260,6 +260,7 @@ const Profile = () => {
       <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
         {/* Profile Header */}
         <ProfileHeader
+          cover_url={user?.cover_url}
           avatar_url={avatar_url}
           full_name={user?.full_name}
         />

@@ -16,9 +16,18 @@ const JobHeroSection = ({ job }) => {
     views_count,
     created_at,
   } = job;
+  const coverUrl = company?.cover_url || company?.cover || company?.cover_image || null;
 
   return (
-    <div className="relative bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700 text-white py-8 md:py-12 overflow-hidden">
+    <div
+      className={`relative text-white py-8 md:py-12 overflow-hidden ${coverUrl ? '' : 'bg-gradient-to-br from-blue-600 via-indigo-600 to-purple-700'}`}
+      style={
+        coverUrl
+          ? { backgroundImage: `url(${coverUrl})`, backgroundSize: 'cover', backgroundPosition: 'center' }
+          : undefined
+      }
+    >
+      {coverUrl && <div className="absolute inset-0 bg-black/40" />}
       {/* Decorative background elements */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl transform translate-x-1/2 -translate-y-1/2"></div>

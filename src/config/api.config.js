@@ -28,6 +28,7 @@ export const API_ENDPOINTS = {
     UPDATE_PROFILE: `${API_BASE_URL}/api/auth/profile`,
     JOBSEEKER_PROFILE: (id) => `${API_BASE_URL}/api/jobseeker/profile/${id}`,
     AVATAR_UPDATE: `${API_BASE_URL}/api/jobseeker/profile/avatar`,
+    COVER_UPDATE: `${API_BASE_URL}/api/jobseeker/profile/cover`,
     // Experience endpoints - Try these alternatives if 404:
     // Option 1: Original (from requirements)
     EXPERIENCES: `${API_BASE_URL}/api/jobseeker/profile/experiences`,
@@ -137,7 +138,8 @@ export const API_ENDPOINTS = {
       AVATAR_UPDATE: `${API_BASE_URL}/api/employer/profile/avatar`,
       DELETE: `${API_BASE_URL}/api/employer/profile`,
       COMPANY_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}`,
-      COMPANY_AVATAR_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}/avatar`
+      COMPANY_AVATAR_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}/avatar`,
+      COMPANY_COVER_UPDATE: (companyId) => `${API_BASE_URL}/api/employer/companies/${companyId}/cover`
     },
     // Employer stats (dashboard)
     STATS: {

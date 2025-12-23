@@ -25,6 +25,7 @@ const EditProfile = () => {
   const [loading, setLoading] = useState(false);
   const [fetchingProfile, setFetchingProfile] = useState(true);
   const [previewUrl, setPreviewUrl] = useState(null);
+  const [coverPreviewUrl, setCoverPreviewUrl] = useState(null);
   
   const [formData, setFormData] = useState({
     bio: "",
@@ -33,8 +34,10 @@ const EditProfile = () => {
   });
   const [avatarFile, setAvatarFile] = useState(null);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [coverFile, setCoverFile] = useState(null);
+  const [uploadingCover, setUploadingCover] = useState(false);
 
-  // Fetch current profile data
+  // Fetch current profile data~
   useEffect(() => {
     const fetchProfile = async () => {
       if (!authUser?.id) {
@@ -55,6 +58,7 @@ const EditProfile = () => {
             address: userData.address || "",
           });
           setPreviewUrl(userData.avatar_url || profileData.avatar_url);
+          setCoverPreviewUrl(userData.cover_url || profileData.cover_url || null);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -93,6 +97,22 @@ const EditProfile = () => {
     }
   };
 
+  const handleCoverChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Please select an image file');
+        return;
+      }
+      if (file.size > 8 * 1024 * 1024) {
+        toast.error('Cover image should be less than 8MB');
+        return;
+      }
+      setCoverFile(file);
+      setCoverPreviewUrl(URL.createObjectURL(file));
+    }
+  };
+
   const handleAvatarUpload = async () => {
     if (!avatarFile) {
       toast.error('Please select an image first');
@@ -124,6 +144,37 @@ const EditProfile = () => {
       toast.error(error.response?.data?.message || 'Failed to upload avatar');
     } finally {
       setUploadingAvatar(false);
+    }
+  };
+
+  const handleCoverUpload = async () => {
+    if (!coverFile) {
+      toast.error('Please select a cover image first');
+      return;
+    }
+
+    try {
+      setUploadingCover(true);
+      const fd = new FormData();
+      fd.append('cover', coverFile);
+
+      const response = await apiClient.patch(
+        API_ENDPOINTS.USER.COVER_UPDATE,
+        fd,
+        {
+          headers: { 'Content-Type': 'multipart/form-data' },
+        }
+      );
+
+      if (response.status >= 200 && response.status < 300) {
+        toast.success('Cover updated successfully!');
+        setCoverFile(null);
+      }
+    } catch (error) {
+      console.error('Error uploading cover:', error);
+      toast.error(error.response?.data?.message || 'Failed to upload cover image');
+    } finally {
+      setUploadingCover(false);
     }
   };
 
@@ -268,6 +319,60 @@ const EditProfile = () => {
                   </Button>
                 )}
               </div>
+            </div>
+          </div>
+
+          {/* Cover Section */}
+          <div className="bg-white rounded-xl shadow-sm p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
+                <Upload className="w-5 h-5 text-yellow-600" />
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900">Profile Cover</h2>
+            </div>
+
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="cover" className="text-sm font-medium text-gray-700">Upload Cover Image</Label>
+                <input
+                  type="file"
+                  id="cover"
+                  accept="image/*"
+                  onChange={handleCoverChange}
+                  className="mt-2 w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-yellow-50 file:text-yellow-700 hover:file:bg-yellow-100"
+                />
+                <p className="text-sm text-gray-500 mt-2">Recommended: Landscape image (1200x300px), max 8MB</p>
+              </div>
+
+              {coverPreviewUrl && (
+                <div className="flex items-center gap-4">
+                  <div className="flex-1">
+                    <div className="w-full h-40 rounded-lg overflow-hidden bg-gray-50">
+                      <img src={coverPreviewUrl} alt="Cover preview" className="w-full h-full object-cover" />
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <Button
+                      type="button"
+                      onClick={handleCoverUpload}
+                      disabled={uploadingCover}
+                      className="bg-yellow-600 hover:bg-yellow-700 text-white"
+                    >
+                      {uploadingCover ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4 mr-2" />
+                          Upload Cover
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 

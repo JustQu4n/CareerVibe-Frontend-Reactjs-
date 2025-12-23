@@ -51,6 +51,15 @@ const employerService = {
     return res.data;
   }
   ,
+  // Update company cover image
+  updateCompanyCover: async (companyId, formData) => {
+    const url = BASE.PROFILE.COMPANY_COVER_UPDATE(companyId);
+    const res = await apiClient.patch(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return res.data;
+  }
+  ,
   // Get dashboard stats for employer
   getDashboardStats: async () => {
     // Endpoint requires Authorization header handled by apiClient

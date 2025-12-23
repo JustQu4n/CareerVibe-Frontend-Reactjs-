@@ -41,6 +41,11 @@ export default function CompanyUpdateModal({ profile, onClose, onSuccess }) {
   const [avatarPreview, setAvatarPreview] = useState(company.logo_url || '');
   const fileRef = useRef(null);
 
+  // Cover image upload
+  const [coverUploading, setCoverUploading] = useState(false);
+  const [coverPreview, setCoverPreview] = useState(company.cover_url || company.cover || company.cover_image || '');
+  const coverFileRef = useRef(null);
+
   const handleAvatarUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -80,6 +85,47 @@ export default function CompanyUpdateModal({ profile, onClose, onSuccess }) {
       setAvatarPreview(formData.logo_url || '');
     } finally {
       setUploading(false);
+      setTimeout(() => {
+        if (previewUrl) URL.revokeObjectURL(previewUrl);
+      }, 3000);
+    }
+  };
+
+  const handleCoverUpload = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!['image/jpeg', 'image/png', 'image/gif'].includes(file.type)) {
+      toast.error('Please upload JPG, PNG or GIF image');
+      return;
+    }
+
+    const companyId = formData.company_id;
+    if (!companyId) {
+      toast.error('Company ID is required to upload cover image');
+      return;
+    }
+
+    const previewUrl = URL.createObjectURL(file);
+    setCoverPreview(previewUrl);
+    setCoverUploading(true);
+
+    const fd = new FormData();
+    fd.append('cover', file);
+
+    try {
+      const res = await employerService.updateCompanyCover(companyId, fd);
+      const data = res.data || res;
+      const coverUrl = data?.cover_url || data?.cover || data?.cover_image;
+      setFormData(prev => ({ ...prev, cover_url: coverUrl }));
+      setCoverPreview(coverUrl || previewUrl);
+      toast.success(res.message || 'Company cover updated successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error(err?.response?.data?.message || 'Failed to upload cover image');
+      setCoverPreview(company.cover_url || company.cover || company.cover_image || '');
+    } finally {
+      setCoverUploading(false);
       setTimeout(() => {
         if (previewUrl) URL.revokeObjectURL(previewUrl);
       }, 3000);
@@ -227,6 +273,55 @@ export default function CompanyUpdateModal({ profile, onClose, onSuccess }) {
                 animate={{ opacity: 1, x: 0 }}
                 className="space-y-4"
               >
+                {/* Cover Upload Section */}
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-3">Cover Image</label>
+                  <div className="mb-3 w-full rounded-lg overflow-hidden border border-gray-200 bg-gray-50">
+                    {coverPreview ? (
+                      <div className="w-full h-40 lg:h-56 bg-gray-100 overflow-hidden">
+                        <img src={coverPreview} alt="Company cover" className="w-full h-full object-cover" />
+                        {coverUploading && (
+                          <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+                            <Loader2 className="w-6 h-6 text-white animate-spin" />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="w-full h-40 lg:h-56 flex items-center justify-center text-gray-400">
+                        <Image className="w-10 h-10" />
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <input
+                      ref={coverFileRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/gif"
+                      onChange={handleCoverUpload}
+                      className="hidden"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => coverFileRef.current?.click()}
+                      disabled={coverUploading || !formData.company_id}
+                      className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-lg hover:bg-indigo-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {coverUploading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <Upload className="w-4 h-4" />
+                          Upload Cover
+                        </>
+                      )}
+                    </button>
+                    <p className="text-xs text-gray-500">Recommended size: 1200x300px. JPG/PNG/GIF.</p>
+                  </div>
+                </div>
+
                 {/* Logo Upload Section */}
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-3">

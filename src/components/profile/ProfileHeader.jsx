@@ -7,13 +7,23 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Edit, User } from 'lucide-react';
 
-const ProfileHeader = React.memo(({ avatar_url, full_name }) => {
+const ProfileHeader = React.memo(({ avatar_url, full_name, cover_url }) => {
   const navigate = useNavigate();
 
   return (
     <div className="relative mb-8">
       {/* Cover Image */}
-      <div className="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-2xl shadow-lg"></div>
+      {cover_url ? (
+        <div className="h-48 sm:h-64 w-full rounded-2xl shadow-lg overflow-hidden">
+          <img
+            src={cover_url}
+            alt={full_name ? `${full_name} cover` : 'Profile cover'}
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+      ) : (
+        <div className="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-2xl shadow-lg"></div>
+      )}
       
       {/* Avatar */}
       <div className="absolute -bottom-1 left-4 sm:left-8">

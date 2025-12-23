@@ -11,23 +11,33 @@ import useCompanyFollow from '@/hooks/useCompanyFollow';
  * @param {Array} props.jobPosts - Job posts array
  * @param {Function} props.onViewPositions - Callback khi click view positions
  */
-const CompanyHeader = ({ company, jobPosts, onViewPositions }) => {
-  const { isFollowed, loading, toggleFollow } = useCompanyFollow(company.company_id);
+const CompanyHeader = ({ company = {}, jobPosts, onViewPositions }) => {
+  const companyId = company?.company_id || company?.id || null;
+  const { isFollowed, loading, toggleFollow } = useCompanyFollow(companyId);
+  const coverUrl = company?.cover_url || company?.cover || company?.cover_image || null;
+
   return (
-    <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+    <div>
+      {coverUrl && (
+        <div className="w-full h-40 md:h-56 rounded-xl overflow-hidden mb-4">
+          <img src={coverUrl} alt={`${company.name} cover`} className="w-full h-full object-cover" />
+        </div>
+      )}
+
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
       <div className="flex items-center">
         <div className="w-20 h-20 rounded-xl flex items-center justify-center overflow-hidden mr-4 shadow-lg">
           {company.logo_url ? (
-            <img src={company.logo_url} alt={company.name} className="w-full h-full object-cover" />
+            <img src={company.logo_url} alt={company.name || 'Company'} className="w-full h-full object-cover" />
           ) : (
             <span className="text-white text-2xl font-bold">
-              {company.name.charAt(0)}
+              {(company.name && company.name.charAt ? company.name.charAt(0) : '')}
             </span>
           )}
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">{company.name}</h2>
-          <p className="text-gray-600">{company.industry || "Technology"}</p>
+          <h2 className="text-2xl font-bold text-gray-900">{company.name || 'Company'}</h2>
+          <p className="text-gray-600">{company.industry || 'Technology'}</p>
         </div>
       </div>
       <div className="flex flex-col md:flex-row gap-3 mt-4 md:mt-0">
@@ -60,6 +70,7 @@ const CompanyHeader = ({ company, jobPosts, onViewPositions }) => {
           <ChevronRight className="w-5 h-5 ml-1" />
         </button>
       </div>
+    </div>
     </div>
   );
 };
