@@ -1,17 +1,10 @@
 import React from 'react';
-import { Briefcase, CheckCircle, Award, Heart, Star } from 'lucide-react';
+import { FileText, CheckCircle, Award, Heart, Star, Zap } from 'lucide-react';
 
 /**
- * JobTabs Component
- * Hiển thị các tabs chứa thông tin chi tiết về job
- * 
- * @param {Object} props
- * @param {string} props.activeTab - Tab hiện tại đang active
- * @param {Function} props.setActiveTab - Function để thay đổi active tab
- * @param {string} props.description - Mô tả công việc
+ * JobTabs Component - Modern tabbed interface with enhanced styling
  */
 const JobTabs = ({ activeTab, setActiveTab, description }) => {
-  // Hardcoded data - nên được truyền từ props hoặc API trong tương lai
   const responsibilities = [
     'Develop and maintain web applications using React.js and related technologies',
     'Write clean, maintainable, and efficient code',
@@ -33,46 +26,53 @@ const JobTabs = ({ activeTab, setActiveTab, description }) => {
   ];
 
   const benefits = [
-    'Competitive salary',
-    'Flexible working hours',
-    'Remote work options',
-    'Health insurance',
-    'Professional development budget',
-    'Regular team events',
-    'Modern office space',
-    'Gym membership',
+    'Competitive salary and performance bonuses',
+    'Flexible working hours and remote work options',
+    'Comprehensive health insurance coverage',
+    'Professional development budget for courses',
+    'Regular team building events and activities',
+    'Modern office space with ergonomic equipment',
+    'Gym membership and wellness programs',
+    'Free snacks and beverages',
   ];
 
   const tabs = [
-    { id: 'description', label: 'Description' },
-    { id: 'responsibilities', label: 'Responsibilities' },
-    { id: 'requirements', label: 'Requirements' },
-    { id: 'benefits', label: 'Benefits' },
+    { id: 'description', label: 'Description', icon: FileText },
+    { id: 'responsibilities', label: 'Responsibilities', icon: CheckCircle },
+    { id: 'requirements', label: 'Requirements', icon: Award },
+    { id: 'benefits', label: 'Benefits', icon: Heart },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+    <div className="bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
       {/* Tab Headers */}
-      <div className="border-b border-gray-100">
+      <div className="border-b border-gray-100 bg-gradient-to-r from-gray-50 to-white">
         <div className="flex overflow-x-auto hide-scrollbar">
-          {tabs.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-5 py-4 font-medium text-sm whitespace-nowrap border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+          {tabs.map((tab) => {
+            const Icon = tab.icon;
+            return (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`relative px-4 py-3 font-semibold text-xs whitespace-nowrap border-b-2 transition-all duration-300 flex items-center gap-1.5 ${
+                  activeTab === tab.id
+                    ? 'border-blue-600 text-blue-600 bg-blue-50/50'
+                    : 'border-transparent text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                {tab.label}
+                {activeTab === tab.id && (
+                  <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-t-full"></span>
+                )}
+              </button>
+            );
+          })}
         </div>
       </div>
 
       {/* Tab Content */}
-      <div className="p-6">
+      <div className="p-5">
         {activeTab === 'description' && (
           <TabDescription description={description} />
         )}
@@ -94,16 +94,18 @@ const JobTabs = ({ activeTab, setActiveTab, description }) => {
 };
 
 /**
- * TabDescription - Hiển thị mô tả công việc
+ * TabDescription - Enhanced job description display
  */
 const TabDescription = React.memo(({ description }) => (
-  <div>
-    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-      <Briefcase className="mr-2 h-5 w-5 text-blue-600" />
-      Job Description
-    </h2>
+  <div className="space-y-3">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="p-1.5 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg">
+        <FileText className="h-4 w-4 text-white" />
+      </div>
+      <h2 className="text-lg font-bold text-gray-900">Job Description</h2>
+    </div>
     <div
-      className="text-gray-600 space-y-4 prose max-w-none"
+      className="text-gray-700 text-sm leading-relaxed space-y-3 prose prose-sm prose-blue max-w-none"
       dangerouslySetInnerHTML={{ __html: description }}
     />
   </div>
@@ -112,21 +114,23 @@ const TabDescription = React.memo(({ description }) => (
 TabDescription.displayName = 'TabDescription';
 
 /**
- * TabResponsibilities - Hiển thị trách nhiệm công việc
+ * TabResponsibilities - Enhanced responsibilities display
  */
 const TabResponsibilities = React.memo(({ items }) => (
-  <div>
-    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-      <CheckCircle className="mr-2 h-5 w-5 text-blue-600" />
-      Responsibilities
-    </h2>
-    <ul className="text-gray-600 space-y-3">
+  <div className="space-y-3">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="p-1.5 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg">
+        <CheckCircle className="h-4 w-4 text-white" />
+      </div>
+      <h2 className="text-lg font-bold text-gray-900">Responsibilities</h2>
+    </div>
+    <ul className="space-y-2.5">
       {items.map((item, index) => (
-        <li key={index} className="flex items-start">
-          <div className="h-5 w-5 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5 mr-3">
-            <CheckCircle className="h-3 w-3 text-blue-600" />
+        <li key={index} className="flex items-start gap-2 p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-100 hover:border-green-200 transition-colors group">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+            <CheckCircle className="h-3.5 w-3.5 text-white" />
           </div>
-          <span>{item}</span>
+          <span className="text-gray-700 text-sm leading-relaxed flex-1">{item}</span>
         </li>
       ))}
     </ul>
@@ -136,21 +140,23 @@ const TabResponsibilities = React.memo(({ items }) => (
 TabResponsibilities.displayName = 'TabResponsibilities';
 
 /**
- * TabRequirements - Hiển thị yêu cầu công việc
+ * TabRequirements - Enhanced requirements display
  */
 const TabRequirements = React.memo(({ items }) => (
-  <div>
-    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-      <Award className="mr-2 h-5 w-5 text-blue-600" />
-      Requirements
-    </h2>
-    <ul className="text-gray-600 space-y-3">
+  <div className="space-y-3">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="p-1.5 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg">
+        <Award className="h-4 w-4 text-white" />
+      </div>
+      <h2 className="text-lg font-bold text-gray-900">Requirements</h2>
+    </div>
+    <ul className="space-y-2.5">
       {items.map((item, index) => (
-        <li key={index} className="flex items-start">
-          <div className="h-5 w-5 rounded-full bg-blue-100 flex-shrink-0 flex items-center justify-center mt-0.5 mr-3">
-            <Star className="h-3 w-3 text-blue-600" />
+        <li key={index} className="flex items-start gap-2 p-3 bg-gradient-to-r from-purple-50 to-pink-50 rounded-lg border border-purple-100 hover:border-purple-200 transition-colors group">
+          <div className="flex-shrink-0 w-6 h-6 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+            <Star className="h-3.5 w-3.5 text-white fill-white" />
           </div>
-          <span>{item}</span>
+          <span className="text-gray-700 text-sm leading-relaxed flex-1">{item}</span>
         </li>
       ))}
     </ul>
@@ -160,19 +166,26 @@ const TabRequirements = React.memo(({ items }) => (
 TabRequirements.displayName = 'TabRequirements';
 
 /**
- * TabBenefits - Hiển thị quyền lợi
+ * TabBenefits - Enhanced benefits display with modern grid
  */
 const TabBenefits = React.memo(({ items }) => (
-  <div>
-    <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center">
-      <Heart className="mr-2 h-5 w-5 text-blue-600" />
-      Benefits & Perks
-    </h2>
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+  <div className="space-y-3">
+    <div className="flex items-center gap-2 mb-4">
+      <div className="p-1.5 bg-gradient-to-br from-pink-500 to-rose-600 rounded-lg">
+        <Heart className="h-4 w-4 text-white" />
+      </div>
+      <h2 className="text-lg font-bold text-gray-900">Benefits & Perks</h2>
+    </div>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
       {items.map((benefit, index) => (
-        <div key={index} className="flex items-start bg-blue-50 rounded-lg p-3">
-          <CheckCircle className="h-5 w-5 text-blue-600 mr-2 mt-0.5" />
-          <span className="text-gray-800">{benefit}</span>
+        <div 
+          key={index} 
+          className="flex items-start gap-2 p-3 bg-gradient-to-br from-pink-50 to-rose-50 rounded-lg border border-pink-100 hover:border-pink-200 hover:shadow-sm transition-all duration-300 group"
+        >
+          <div className="flex-shrink-0 w-6 h-6 rounded-lg bg-gradient-to-br from-pink-500 to-rose-600 flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+            <Zap className="h-3.5 w-3.5 text-white" />
+          </div>
+          <span className="text-gray-700 text-sm font-medium leading-relaxed flex-1">{benefit}</span>
         </div>
       ))}
     </div>

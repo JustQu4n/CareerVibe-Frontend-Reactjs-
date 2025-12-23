@@ -3,19 +3,15 @@ import {
   Briefcase,
   Calendar,
   Clock,
-  GraduationCap,
   DollarSign,
   MapPin,
   Award,
+  TrendingUp,
 } from 'lucide-react';
 import { format } from 'date-fns';
 
 /**
- * JobOverview Component
- * Hiển thị thông tin tổng quan về job
- * 
- * @param {Object} props
- * @param {Object} props.job - Thông tin job
+ * JobOverview Component - Modern overview card with enhanced design
  */
 const JobOverview = ({ job }) => {
   const {
@@ -24,11 +20,9 @@ const JobOverview = ({ job }) => {
     salary_range,
     location,
     employment_type,
-    requirements,
     status,
   } = job;
 
-  // Format date helper
   const formatDate = (dateString) => {
     if (!dateString) return 'N/A';  
     return format(new Date(dateString), 'd MMMM, yyyy');
@@ -39,21 +33,33 @@ const JobOverview = ({ job }) => {
       icon: Calendar,
       label: 'Posted On',
       value: formatDate(created_at),
+      color: 'blue',
+      bgColor: 'bg-blue-50',
+      iconColor: 'text-blue-600',
     },
     {
       icon: Clock,
       label: 'Deadline',
       value: formatDate(deadline),
+      color: 'red',
+      bgColor: 'bg-red-50',
+      iconColor: 'text-red-600',
     },
     {
       icon: DollarSign,
       label: 'Salary',
       value: salary_range || 'Competitive',
+      color: 'green',
+      bgColor: 'bg-green-50',
+      iconColor: 'text-green-600',
     },
     {
       icon: MapPin,
       label: 'Location',
       value: location || 'Not specified',
+      color: 'purple',
+      bgColor: 'bg-purple-50',
+      iconColor: 'text-purple-600',
     },
     {
       icon: Briefcase,
@@ -62,24 +68,34 @@ const JobOverview = ({ job }) => {
              employment_type === 'part-time' ? 'Part Time' : 
              employment_type === 'contract' ? 'Contract' : 
              employment_type || 'Full Time',
+      color: 'indigo',
+      bgColor: 'bg-indigo-50',
+      iconColor: 'text-indigo-600',
     },
     {
-      icon: Award,
+      icon: TrendingUp,
       label: 'Status',
-      value: status === 'active' ? 'Active' : 
-             status === 'closed' ? 'Closed' : 
-             status || 'Active',
+      value: status === 'active' ? '🟢 Active' : 
+             status === 'closed' ? '🔴 Closed' : 
+             status || '🟢 Active',
+      color: 'emerald',
+      bgColor: 'bg-emerald-50',
+      iconColor: 'text-emerald-600',
     },
   ];
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <h3 className="text-lg font-bold text-gray-900 mb-5 flex items-center">
-        <Briefcase className="h-5 w-5 mr-2 text-blue-600" />
-        Job Overview
-      </h3>
+    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4">
+      <div className="flex items-center gap-2 mb-4 pb-3 border-b border-gray-100">
+        <div className="p-2 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg shadow-sm">
+          <Briefcase className="h-4 w-4 text-white" />
+        </div>
+        <h3 className="text-base font-bold text-gray-900">
+          Job Overview
+        </h3>
+      </div>
 
-      <div className="space-y-4">
+      <div className="space-y-2">
         {overviewItems.map((item, index) => (
           <OverviewItem key={index} {...item} />
         ))}
@@ -89,16 +105,18 @@ const JobOverview = ({ job }) => {
 };
 
 /**
- * OverviewItem - Item riêng lẻ trong job overview
+ * OverviewItem - Enhanced item with colorful icons
  */
-const OverviewItem = React.memo(({ icon: Icon, label, value }) => (
-  <div className="flex items-start">
-    <div className="flex-shrink-0 p-2 bg-blue-50 rounded-lg">
-      <Icon className="h-5 w-5 text-blue-600" />
-    </div>
-    <div className="ml-4">
-      <h4 className="text-xs text-gray-500 uppercase">{label}</h4>
-      <div className="text-sm font-medium mt-1 text-gray-900">{value}</div>
+const OverviewItem = React.memo(({ icon: Icon, label, value, bgColor, iconColor }) => (
+  <div className="group hover:bg-gray-50 p-2 rounded-lg transition-all duration-200">
+    <div className="flex items-center gap-2">
+      <div className={`flex-shrink-0 p-1.5 ${bgColor} rounded-md transition-transform duration-200 group-hover:scale-110`}>
+        <Icon className={`h-4 w-4 ${iconColor}`} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-xs font-medium text-gray-500 uppercase tracking-wide">{label}</h4>
+        <p className="text-sm font-semibold text-gray-900 truncate">{value}</p>
+      </div>
     </div>
   </div>
 ));
@@ -106,3 +124,4 @@ const OverviewItem = React.memo(({ icon: Icon, label, value }) => (
 OverviewItem.displayName = 'OverviewItem';
 
 export default React.memo(JobOverview);
+

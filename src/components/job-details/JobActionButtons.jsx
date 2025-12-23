@@ -1,15 +1,8 @@
-import React, { useCallback } from 'react';
-import { ArrowUpRight, Bookmark } from 'lucide-react';
+import React from 'react';
+import { Send, Bookmark, Clock, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 /**
- * JobActionButtons Component
- * Hiển thị các nút hành động (Apply, Save, thông tin hết hạn)
- * 
- * @param {Object} props
- * @param {Function} props.onApply - Callback khi click Apply
- * @param {Function} props.onToggleBookmark - Callback khi click Save/Bookmark
- * @param {boolean} props.isBookmarked - Trạng thái đã bookmark hay chưa
- * @param {number|null} props.daysRemaining - Số ngày còn lại trước khi hết hạn
+ * JobActionButtons Component - Modern action buttons with enhanced UI
  */
 const JobActionButtons = ({
   onApply,
@@ -17,61 +10,82 @@ const JobActionButtons = ({
   isBookmarked,
   daysRemaining,
 }) => {
-  const expirationColor = daysRemaining && daysRemaining < 7 ? 'text-red-600' : 'text-green-600';
+  const isExpiring = daysRemaining && daysRemaining < 7;
+  const isExpired = daysRemaining !== null && daysRemaining <= 0;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm p-6">
-      <div className="flex flex-col space-y-3">
+    <div className="bg-white rounded-xl shadow-md border border-gray-100 p-4 ">
+      <div className="space-y-3">
         {/* Apply Button */}
         <button
           onClick={onApply}
-          className="w-full py-3.5 px-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl flex items-center justify-center font-medium shadow-sm transition-all transform hover:scale-[1.02] active:scale-[0.98]"
+          disabled={isExpired}
+          className="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 text-white rounded-lg flex items-center justify-center font-semibold text-base shadow-md hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group relative overflow-hidden"
         >
-          Apply Now
-          <ArrowUpRight className="h-5 w-5 ml-1" />
+          <span className="absolute inset-0 w-0 bg-white/20 transition-all duration-500 ease-out group-hover:w-full"></span>
+          <span className="relative flex items-center gap-2">
+            <Send className="h-5 w-5" />
+            Apply Now
+          </span>
         </button>
 
         {/* Save Job Button */}
         <button
-          className={`w-full py-3 px-4 rounded-xl flex items-center justify-center font-medium transition-colors ${
-            isBookmarked
-              ? 'bg-blue-50 text-blue-700 border border-blue-200'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border border-transparent'
-          }`}
           onClick={onToggleBookmark}
+          className={`w-full py-2.5 px-4 rounded-lg flex items-center justify-center font-semibold text-sm transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98] ${
+            isBookmarked
+              ? 'bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border-2 border-blue-200 hover:border-blue-300 shadow-sm'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border-2 border-gray-200 hover:border-gray-300'
+          }`}
         >
-          {isBookmarked ? (
-            <>
-              <Bookmark className="h-5 w-5 mr-2 fill-blue-700 text-blue-700" />
-              Saved
-            </>
-          ) : (
-            <>
-              <Bookmark className="h-5 w-5 mr-2" />
-              Save Job
-            </>
-          )}
+          <Bookmark className={`h-4 w-4 mr-1.5 transition-all ${
+            isBookmarked ? 'fill-blue-600 text-blue-600' : ''
+          }`} />
+          {isBookmarked ? 'Saved' : 'Save Job'}
         </button>
 
         {/* Expiration Info */}
         {daysRemaining !== null && (
-          <div className="mt-3 bg-gray-50 p-3 rounded-lg border border-gray-100 text-center">
-            <p className="text-sm text-gray-500">
-              {daysRemaining > 0 ? (
+          <div className={`p-3 rounded-lg border ${
+            isExpired 
+              ? 'bg-red-50 border-red-200'
+              : isExpiring 
+              ? 'bg-amber-50 border-amber-200' 
+              : 'bg-emerald-50 border-emerald-200'
+          }`}>
+            <div className="flex items-center justify-center gap-1.5">
+              {isExpired ? (
                 <>
-                  Expires in:{' '}
-                  <span className={`${expirationColor} font-medium`}>
-                    {daysRemaining} days
+                  <AlertCircle className="h-4 w-4 text-red-600" />
+                  <span className="text-xs font-semibold text-red-700">
+                    Job Expired
+                  </span>
+                </>
+              ) : isExpiring ? (
+                <>
+                  <Clock className="h-4 w-4 text-amber-600 animate-pulse" />
+                  <span className="text-xs font-semibold text-amber-700">
+                    Expires in {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'}
                   </span>
                 </>
               ) : (
-                <span className="text-red-600 font-medium">
-                  This job has expired
-                </span>
+                <>
+                  <CheckCircle2 className="h-4 w-4 text-emerald-600" />
+                  <span className="text-xs font-semibold text-emerald-700">
+                    {daysRemaining} {daysRemaining === 1 ? 'day' : 'days'} remaining
+                  </span>
+                </>
               )}
-            </p>
+            </div>
           </div>
         )}
+
+        {/* Quick Stats */}
+        <div className="pt-3 border-t border-gray-100">
+          <div className="text-xs text-gray-500 text-center">
+            <p className="font-medium">✨ Quick & Easy Application</p>
+          </div>
+        </div>
       </div>
     </div>
   );

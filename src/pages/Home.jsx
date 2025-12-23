@@ -85,7 +85,7 @@ const Home = () => {
       <StatsSection />
 
       <PopularCategoriesSection />
-
+      {/*
       <RecommendedJobsSection
         jobs={recommendedJobs}
         isLoading={isLoadingRecommendations}
@@ -98,6 +98,7 @@ const Home = () => {
         error={aiError}
         user={user}
       />
+      */}
 
       <FeaturedJobsSection
         jobs={featuredJobs}

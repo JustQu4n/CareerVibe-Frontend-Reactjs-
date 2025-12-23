@@ -26,12 +26,12 @@ const useAIRecommendations = () => {
       setError(null);
 
       try {
-        const res = await apiClient.get(API_ENDPOINTS.RECOMMENDATIONS.BY_JOBSEEKER(jobSeekerId));
-        setRecommendations(res.data || []);
+       // const res = await apiClient.get(API_ENDPOINTS.RECOMMENDATIONS.BY_JOBSEEKER(jobSeekerId));
+       // setRecommendations(res.data || []);
       } catch (err) {
-        console.error('Error fetching AI recommendations:', err);
-        const message = err?.response?.data?.message || err.message || 'Failed to load recommendations';
-        setError(message);
+        //console.error('Error fetching AI recommendations:', err);
+       // const message = err?.response?.data?.message || err.message || 'Failed to load recommendations';
+        //setError(message);
       } finally {
         setIsLoading(false);
       }
