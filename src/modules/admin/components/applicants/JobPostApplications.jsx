@@ -564,7 +564,7 @@ export default function JobPostApplications() {
                           <button
                             onClick={() => {
                               // Navigate to candidate profile page using user id
-                              navigate(`/admin/jobs/applicants/candidate-profile/${app.jobSeeker.user_id || app.user.user_id}`);
+                              navigate(`/public-profile/${app.jobSeeker.user_id || app.user.user_id}`);
                             }}
                             className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-white border-2 border-gray-200 text-gray-700 rounded-xl hover:border-gray-300 hover:shadow-md transition-all text-sm font-semibold"
                           >
