@@ -24,11 +24,14 @@ import {
   GraduationCap,
   Code,
   MessageSquare,
-  BarChart3
+  BarChart3,
+  X,
+  Send
 } from 'lucide-react';
 import * as XLSX from "xlsx";
 import apiClient from "@/api/client";
 import { APPLICATION_STATUS } from '../../../../constants/application.constants';
+import API_CONFIG from "@/config/api.config";
 
 export default function JobPostApplications() {
   const { jobPostId } = useParams();
@@ -40,10 +43,66 @@ export default function JobPostApplications() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [selectedApp, setSelectedApp] = useState(null);
   const [showDetailModal, setShowDetailModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [selectedApplicant, setSelectedApplicant] = useState(null);
+  const [emailForm, setEmailForm] = useState({ subject: "", message: "" });
+  const [sendingEmail, setSendingEmail] = useState(false);
 
   useEffect(() => {
     fetchApplications();
   }, [jobPostId]);
+
+  // Handle opening email modal
+  const handleOpenEmailModal = (applicant) => {
+    setSelectedApplicant(applicant);
+    setEmailForm({
+      subject: `Regarding your job application`,
+      message: ""
+    });
+    setShowEmailModal(true);
+  };
+
+  // Handle closing email modal
+  const handleCloseEmailModal = () => {
+    setShowEmailModal(false);
+    setSelectedApplicant(null);
+    setEmailForm({ subject: "", message: "" });
+  };
+
+  // Send email to applicant
+  const handleSendEmail = async (e) => {
+    e.preventDefault();
+    
+    if (!emailForm.subject.trim() || !emailForm.message.trim()) {
+      alert("Please fill in both subject and message fields");
+      return;
+    }
+
+    setSendingEmail(true);
+    
+    try {
+      const userId = selectedApplicant?.jobSeeker?.user_id || selectedApplicant?.user?.user_id;
+      
+      console.log("Sending email to userId:", userId); // Debug log
+      
+      const response = await apiClient.post("/api/employer/messaging/send-email", {
+        userId: userId,
+        subject: emailForm.subject,
+        message: emailForm.message,
+      });
+
+      if (response.data) {
+        alert("Email sent successfully!");
+        handleCloseEmailModal();
+      }
+    } catch (error) {
+      console.error("Error sending email:", error);
+      const errorMessage = error.response?.data?.message || "Failed to send email. Please try again.";
+      alert(errorMessage);
+    } finally {
+      setSendingEmail(false);
+    }
+  };
 
   const fetchApplications = async () => {
     try {
@@ -572,13 +631,13 @@ export default function JobPostApplications() {
                             View Details
                           </button>
                           
-                          <a
-                            href={`mailto:${app.jobSeeker?.user?.email}`}
+                          <button
+                            onClick={() => handleOpenEmailModal(app)}
                             className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl hover:shadow-lg transition-all text-sm font-semibold"
                           >
                             <Mail className="w-4 h-4" />
                             Contact
-                          </a>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -623,6 +682,131 @@ export default function JobPostApplications() {
             </div>
           </motion.div>
         )}
+
+        {/* Email Modal */}
+        <AnimatePresence>
+          {showEmailModal && selectedApplicant && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden"
+              >
+                {/* Modal Header */}
+                <div className="flex items-center justify-between p-6 border-b border-gray-200">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-green-100 to-emerald-100 rounded-xl flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-gray-900">Send Email</h3>
+                      <p className="text-sm text-gray-500">
+                        To: {selectedApplicant.jobSeeker?.user?.full_name}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    onClick={handleCloseEmailModal}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-500" />
+                  </button>
+                </div>
+
+                {/* Modal Body */}
+                <form onSubmit={handleSendEmail} className="p-6">
+                  <div className="space-y-4">
+                    {/* Recipient Info */}
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 rounded-xl">
+                      <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center overflow-hidden">
+                        {selectedApplicant.jobSeeker?.avatar_url || selectedApplicant.jobSeeker?.user?.avatar_url ? (
+                          <img 
+                            src={selectedApplicant.jobSeeker?.avatar_url || selectedApplicant.jobSeeker?.user?.avatar_url} 
+                            alt="avatar" 
+                            className="w-full h-full object-cover" 
+                          />
+                        ) : (
+                          <Users className="w-6 h-6 text-blue-600" />
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="text-sm font-medium text-gray-900">
+                          {selectedApplicant.jobSeeker?.user?.full_name}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {selectedApplicant.jobSeeker?.user?.email}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Subject Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Subject <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        value={emailForm.subject}
+                        onChange={(e) => setEmailForm({ ...emailForm, subject: e.target.value })}
+                        placeholder="Enter email subject"
+                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm"
+                        required
+                      />
+                    </div>
+
+                    {/* Message Field */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Message <span className="text-red-500">*</span>
+                      </label>
+                      <textarea
+                        value={emailForm.message}
+                        onChange={(e) => setEmailForm({ ...emailForm, message: e.target.value })}
+                        placeholder="Write your message here..."
+                        rows={8}
+                        className="w-full px-4 py-2.5 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all text-sm resize-none"
+                        required
+                      />
+                      <p className="text-xs text-gray-500 mt-2">
+                        {emailForm.message.length} characters
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="flex items-center justify-end gap-3 mt-6 pt-6 border-t border-gray-200">
+                    <button
+                      type="button"
+                      onClick={handleCloseEmailModal}
+                      className="px-6 py-2.5 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl font-medium transition-colors text-sm"
+                      disabled={sendingEmail}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={sendingEmail}
+                      className="px-6 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-xl font-medium hover:from-green-700 hover:to-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 text-sm"
+                    >
+                      {sendingEmail ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                          Sending...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-4 h-4" />
+                          Send Email
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
