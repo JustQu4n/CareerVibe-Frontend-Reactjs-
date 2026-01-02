@@ -30,6 +30,21 @@ export const NotificationProvider = ({ children }) => {
            localStorage.getItem('access_token');
   };
 
+  /**
+   * Fetch unread count from API
+   */
+  const fetchUnreadCount = async () => {
+    const token = getToken();
+    if (!token) return;
+
+    try {
+      const count = await notificationService.fetchUnreadCount(token);
+      setUnreadCount(count);
+    } catch (err) {
+      console.error('Failed to fetch unread count:', err);
+    }
+  };
+
   // Initialize WebSocket connection and load notifications
   useEffect(() => {
     const token = getToken();
@@ -52,10 +67,8 @@ export const NotificationProvider = ({ children }) => {
       // Add new notification to the top of the list
       setNotifications((prev) => [notification, ...prev]);
 
-      // Update unread count
-      if (!notification.is_read) {
-        setUnreadCount((prev) => prev + 1);
-      }
+      // Fetch updated unread count from server
+      fetchUnreadCount();
 
       // Show toast notification
       setToastNotification(notification);
@@ -67,8 +80,9 @@ export const NotificationProvider = ({ children }) => {
       // showBrowserNotification(notification);
     });
 
-    // Fetch initial notifications
+    // Fetch initial notifications and unread count
     loadNotifications();
+    fetchUnreadCount();
 
     // Cleanup on unmount
     return () => {
@@ -98,14 +112,10 @@ export const NotificationProvider = ({ children }) => {
       
       if (page === 1) {
         setNotifications(response.data || []);
+        // Fetch unread count from dedicated endpoint
+        fetchUnreadCount();
       } else {
         setNotifications((prev) => [...prev, ...(response.data || [])]);
-      }
-
-      // Calculate unread count
-      const unread = (response.data || []).filter((n) => !n.is_read).length;
-      if (page === 1) {
-        setUnreadCount(unread);
       }
 
       // Check if there are more pages
@@ -144,8 +154,8 @@ export const NotificationProvider = ({ children }) => {
         prev.map((n) => (n.id === notificationId ? { ...n, is_read: true } : n))
       );
 
-      // Decrease unread count
-      setUnreadCount((prev) => Math.max(0, prev - 1));
+      // Fetch updated unread count from server
+      fetchUnreadCount();
     } catch (err) {
       console.error('Failed to mark as read:', err);
     }
@@ -155,11 +165,19 @@ export const NotificationProvider = ({ children }) => {
    * Mark all notifications as read
    */
   const markAllAsRead = async () => {
-    const unreadNotifications = notifications.filter((n) => !n.is_read);
+    const token = getToken();
+    if (!token) return;
 
     try {
-      // Mark all unread notifications as read
-      await Promise.all(unreadNotifications.map((n) => markAsRead(n.id)));
+      await notificationService.markAllAsRead(token);
+      
+      // Update local state - mark all as read
+      setNotifications((prev) =>
+        prev.map((n) => ({ ...n, is_read: true }))
+      );
+
+      // Reset unread count
+      setUnreadCount(0);
     } catch (err) {
       console.error('Failed to mark all as read:', err);
     }

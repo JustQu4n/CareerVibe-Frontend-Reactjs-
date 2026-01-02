@@ -3,6 +3,9 @@ import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchApplicationDetails } from "@/redux/applicationSlice";
 import { motion } from 'framer-motion';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 import { 
   Mail, 
   UserPlus, 
@@ -288,7 +291,7 @@ const CandidateProfile = () => {
                   </p>
                   <div className="flex gap-3">
                     <a
-                      href={`${cv_url?.replace(/\\/g, "/")}`}
+                      href={`${API_BASE_URL}/${cv_url}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors text-sm font-medium flex items-center gap-2"
@@ -297,7 +300,7 @@ const CandidateProfile = () => {
                       View Resume
                     </a>
                     <a
-                      href={`${cv_url?.replace(/\\/g, "/")}`}
+                      href={`${API_BASE_URL}/${cv_url}`}
                       download
                       className="bg-gray-100 hover:bg-gray-200 text-gray-800 px-4 py-2 rounded-xl transition-colors text-sm font-medium flex items-center gap-2"
                     >
@@ -397,7 +400,7 @@ const CandidateProfile = () => {
                     <p className="text-xs text-gray-500">PDF Document</p>
                   </div>
                   <a
-                    href={`${cv_url?.replace(/\\/g, "/")}`}
+                    href={`${API_BASE_URL}/${cv_url}`}
                     download
                     className="p-2 bg-blue-100 rounded-full text-blue-700 hover:bg-blue-200 transition-colors"
                   >
@@ -406,7 +409,7 @@ const CandidateProfile = () => {
                 </div>
                 
                 <a
-                  href={`${cv_url?.replace(/\\/g, "/")}`}
+                  href={`${API_BASE_URL}/${cv_url}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center justify-center w-full gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors text-sm font-medium"

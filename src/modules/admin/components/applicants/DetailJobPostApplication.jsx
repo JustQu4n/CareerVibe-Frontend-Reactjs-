@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { motion } from 'framer-motion';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 import {
   fetchEmployerApplications,
   updateApplicationStatus,
@@ -425,7 +428,7 @@ export default function DetailJobPostApplication() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <a
-                            href={`${app.cv_url.replace(/\\/g, "/")}`}
+                            href={`${API_BASE_URL}/${app.cv_url}`}
                             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors w-fit text-sm"
                             target="_blank"
                             rel="noopener noreferrer"

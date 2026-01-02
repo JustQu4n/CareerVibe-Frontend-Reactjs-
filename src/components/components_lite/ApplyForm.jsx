@@ -136,84 +136,32 @@ export default function ApplyForm() {
   // Render
   // ========================================
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen bg-gray-50">
       <Navbar />
       
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="max-w-3xl mx-auto px-4 py-12">
         {/* Back Button */}
         <button
           onClick={() => navigate(-1)}
-          className="mb-6 inline-flex items-center text-gray-600 hover:text-blue-600 transition-colors group"
+          className="mb-8 inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
         >
-          <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back
         </button>
 
         {/* Page Header */}
-        <motion.div
-          initial={{ opacity: 0, y: -20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8"
-        >
-          <h1 className="text-4xl font-bold text-gray-900 mb-2">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Apply for Position
           </h1>
           <p className="text-gray-600">
-            Complete the form below to submit your application
+            {jobData?.title || 'Job Position'} at {jobData?.company?.name || 'Company'}
           </p>
-        </motion.div>
-
-        {/* Job Info Card */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden mb-8 border border-gray-100"
-        >
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-6 py-4">
-            <h2 className="text-2xl font-bold text-white">
-              {jobData?.title || 'Job Position'}
-            </h2>
-            <p className="text-blue-100 flex items-center mt-1">
-              <Building2 className="h-4 w-4 mr-1" />
-              {jobData?.company?.name || 'Company Name'}
-            </p>
-          </div>
-          <div className="px-6 py-4 flex flex-wrap gap-4">
-            {jobData?.location && (
-              <div className="flex items-center text-gray-600">
-                <MapPinIcon className="h-4 w-4 mr-1.5 text-blue-600" />
-                {jobData.location}
-              </div>
-            )}
-            {jobData?.salary && (
-              <div className="flex items-center text-gray-600">
-                <DollarSign className="h-4 w-4 mr-1.5 text-green-600" />
-                {jobData.salary}
-              </div>
-            )}
-            {jobData?.jobType && (
-              <div className="flex items-center text-gray-600">
-                <Clock className="h-4 w-4 mr-1.5 text-amber-600" />
-                {jobData.jobType}
-              </div>
-            )}
-            {jobData?.experienceLevel !== undefined && (
-              <div className="flex items-center text-gray-600">
-                <Briefcase className="h-4 w-4 mr-1.5 text-purple-600" />
-                {jobData.experienceLevel} years exp
-              </div>
-            )}
-          </div>
-        </motion.div>
+        </div>
 
         {/* Application Form */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100"
-        >
-          <form onSubmit={handleSubmit} className="px-8 py-8">
+        <div className="bg-white rounded-lg border border-gray-200">
+          <form onSubmit={handleSubmit} className="p-8">
             {/* Success/Error Messages */}
             <FormMessages success={success} error={error} />
 
@@ -228,15 +176,6 @@ export default function ApplyForm() {
               formatFileSize={formatFileSize}
             />
 
-            {/* Personal Information - Removed as per new backend DTO */}
-            {/* Backend now gets user info from authentication, no need for manual input */}
-            {/*
-            <PersonalInfoSection 
-              input={input}
-              onChange={handleInputChange}
-            />
-            */}
-
             {/* Cover Letter */}
             <CoverLetterSection 
               value={coverLetter}
@@ -247,52 +186,6 @@ export default function ApplyForm() {
             {/* Submit Section */}
             <SubmitSection loading={loading} />
           </form>
-        </motion.div>
-
-        {/* Additional Information */}
-        <div className="mt-8 bg-blue-50 rounded-xl p-6 border border-blue-100">
-          <h4 className="text-lg font-semibold text-gray-800 mb-2">
-            What happens next?
-          </h4>
-          <ol className="space-y-3 mt-3">
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-200 flex items-center justify-center mr-3 mt-0.5 text-sm font-bold text-blue-800">
-                1
-              </div>
-              <div className="text-gray-700">
-                <strong>Application Review</strong>
-                <p className="text-sm text-gray-600">
-                  Our team will review your application and CV
-                </p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-200 flex items-center justify-center mr-3 mt-0.5 text-sm font-bold text-blue-800">
-                2
-              </div>
-              <div className="text-gray-700">
-                <strong>Initial Screening</strong>
-                <p className="text-sm text-gray-600">
-                  Qualified candidates will be contacted for a screening call
-                </p>
-              </div>
-            </li>
-            <li className="flex items-start">
-              <div className="flex-shrink-0 h-6 w-6 rounded-full bg-blue-200 flex items-center justify-center mr-3 mt-0.5 text-sm font-bold text-blue-800">
-                3
-              </div>
-              <div className="text-gray-700">
-                <strong>Interview Process</strong>
-                <p className="text-sm text-gray-600">
-                  Selected candidates will proceed to the interview stage
-                </p>
-              </div>
-            </li>
-          </ol>
-          <p className="text-sm text-gray-600 mt-4">
-            The hiring process typically takes 2-3 weeks. You can check your application status
-            in your <Link to="/jobseeker-applications" className="text-blue-600 hover:text-blue-800 font-medium">Applications Dashboard</Link>.
-          </p>
         </div>
       </div>
 

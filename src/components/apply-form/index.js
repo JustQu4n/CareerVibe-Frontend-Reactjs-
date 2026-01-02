@@ -9,3 +9,4 @@ export { default as CVUploadSection } from './CVUploadSection';
 export { default as PersonalInfoSection } from './PersonalInfoSection';
 export { default as CoverLetterSection } from './CoverLetterSection';
 export { default as SubmitSection } from './SubmitSection';
+export { default as ApplyModal } from './ApplyModal';

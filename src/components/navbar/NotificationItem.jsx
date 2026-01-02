@@ -42,9 +42,13 @@ const NotificationItem = ({ notification, onDismiss, onClick }) => {
       <div className="flex-1 min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="flex-1">
-            <p className="text-sm  text-gray-900 whitespace-normal break-words leading-snug">{notification.title}</p>
+            <p className={`text-sm text-gray-900 whitespace-normal break-words leading-snug ${notification.isNew ? 'font-bold' : ''}`}>
+              {notification.title}
+            </p>
             {notification.description ? (
-              <p className="text-xs text-gray-500 mt-1 whitespace-normal break-words">{notification.description}</p>
+              <p className={`text-xs text-gray-500 mt-1 whitespace-normal break-words ${notification.isNew ? 'font-semibold' : ''}`}>
+                {notification.description}
+              </p>
             ) : null}
           </div>
 

@@ -3,6 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchEmployerApplications } from "@/redux/applicationSlice";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from 'framer-motion';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 import {
   Users,
   Clock,
@@ -548,7 +551,7 @@ const Applicants = () => {
                               className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusStyle.bgColor} ${statusStyle.textColor} border ${statusStyle.borderColor}`}
                             >
                               {statusStyle.icon}
-                              {app.status.charAt(0).toUpperCase() + app.status.slice(1)}
+                              {app.status ? app.status.charAt(0).toUpperCase() + app.status.slice(1) : 'N/A'}
                             </span>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
@@ -561,17 +564,19 @@ const Applicants = () => {
                               >
                                 <Eye className="w-4 h-4" />
                               </motion.button>
-                              <motion.a
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                href={app.cv_url || app.resume_url || app.jobSeeker?.resume_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="p-2 bg-gray-50 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="View CV"
-                              >
-                                <Download className="w-4 h-4" />
-                              </motion.a>
+                              {app.resume_url && (
+                                <motion.a
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  href={`${API_BASE_URL}/${app.resume_url}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-2 bg-gray-50 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                                  title="View CV"
+                                >
+                                  <Download className="w-4 h-4" />
+                                </motion.a>
+                              )}
                               <motion.button
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}

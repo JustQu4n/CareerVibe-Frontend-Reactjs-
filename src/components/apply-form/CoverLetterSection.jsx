@@ -12,33 +12,24 @@ import { FileText } from 'lucide-react';
  */
 const CoverLetterSection = ({ value, remainingChars, onChange }) => {
   return (
-    <div className="mb-8">
-      <div className="flex justify-between items-center mb-1">
-        <h4 className="text-lg font-semibold text-gray-800 flex items-center">
-          <FileText className="mr-2 h-5 w-5 text-blue-600" />
-          Cover Letter
-        </h4>
-        <span className="text-sm text-gray-500">Optional</span>
+    <div className="mb-6">
+      <div className="flex justify-between items-center mb-2">
+        <label className="block text-sm font-medium text-gray-700">
+          Cover Letter <span className="text-gray-500 text-xs font-normal">(Optional)</span>
+        </label>
+        <span className="text-xs text-gray-500">
+          {remainingChars}/500
+        </span>
       </div>
-      
-      <p className="text-sm text-gray-600 mb-3">
-        Explain why you're a good fit for this position
-      </p>
       
       <textarea
         value={value}
         onChange={onChange}
         maxLength={500}
-        rows={6}
-        placeholder="Include specific examples of your relevant skills and experience that make you a strong candidate for this role..."
-        className="block w-full border border-gray-300 rounded-lg shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors"
+        rows={4}
+        placeholder="Why are you a good fit for this position?"
+        className="block w-full border border-gray-300 rounded text-sm py-2 px-3 focus:outline-none focus:ring-1 focus:ring-gray-400 focus:border-gray-400 transition-colors"
       ></textarea>
-      
-      <div className="flex justify-end mt-2">
-        <span className={`text-sm ${remainingChars < 50 ? 'text-amber-600' : 'text-gray-500'}`}>
-          {remainingChars} characters remaining
-        </span>
-      </div>
     </div>
   );
 };

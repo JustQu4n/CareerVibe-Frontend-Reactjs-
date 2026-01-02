@@ -1,6 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from 'framer-motion';
+
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+
 import {
   Users,
   Clock,
@@ -608,9 +611,9 @@ export default function JobPostApplications() {
                         
                         {/* Action Buttons */}
                         <div className="space-y-2">
-                          {(app.resume_url || app.jobSeeker?.resume_url) && (
+                          {app.resume_url && (
                             <a
-                              href={app.resume_url || app.jobSeeker.resume_url}
+                              href={`${API_BASE_URL}/${app.resume_url}`}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="flex items-center justify-center gap-2 w-full px-4 py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl hover:shadow-lg transition-all text-sm font-semibold"

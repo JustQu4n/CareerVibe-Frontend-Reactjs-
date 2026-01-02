@@ -34,26 +34,23 @@ const CVUploadSection = ({
     onRemove();
   };
   return (
-    <div className="mb-8">
-      <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
-        <FileText className="mr-2 h-5 w-5 text-blue-600" />
-        Resume/CV
-      </h4>
+    <div className="mb-6">
+      <label className="block text-sm font-medium text-gray-700 mb-2">
+        Resume/CV <span className="text-red-500">*</span>
+      </label>
       
-      <div className={`border-2 border-dashed rounded-lg p-6 transition-colors ${
-        cvFile ? 'border-green-300 bg-green-50' : 'border-blue-200 bg-blue-50'
+      <div className={`border-2 border-dashed rounded-lg p-4 transition-colors ${
+        cvFile ? 'border-gray-300 bg-gray-50' : 'border-gray-300 bg-white'
       }`}>
         {!cvFile ? (
           <div className="text-center">
-            <div className="mx-auto w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-3">
-              <Upload className="h-8 w-8 text-blue-600" />
-            </div>
-            <p className="text-gray-700 font-medium mb-2">
-              Drag and drop your CV here, or
+            <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+            <p className="text-sm text-gray-600 mb-2">
+              Drop your CV here or click to browse
             </p>
             <div className="relative inline-block">
-              <button type="button" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors font-medium">
-                Browse Files
+              <button type="button" className="bg-gray-900 text-white px-4 py-2 rounded text-sm hover:bg-gray-800 transition-colors">
+                Choose File
               </button>
               <input
                 ref={fileInputRef}
@@ -64,40 +61,37 @@ const CVUploadSection = ({
                 required
               />
             </div>
-            <p className="text-sm text-gray-500 mt-3">
-              Supported formats: PDF, DOC, DOCX (max 3MB)
+            <p className="text-xs text-gray-500 mt-2">
+              PDF, DOC, DOCX (max 3MB)
             </p>
           </div>
         ) : (
-          <div>
-            <div className="flex items-center">
-              <div className="h-12 w-12 rounded-lg bg-white flex items-center justify-center mr-3 border border-gray-200">
-                <FileText className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-start mb-1">
-                  <div>
-                    <h5 className="font-medium text-gray-900">{cvName}</h5>
-                    <p className="text-sm text-gray-500">{formatFileSize(cvSize)}</p>
-                  </div>
-                  <button 
-                    type="button"
-                    onClick={handleRemove}
-                    className="text-gray-500 hover:text-red-600 transition-colors text-sm font-medium"
-                  >
-                    Remove
-                  </button>
+          <div className="flex items-center">
+            <div className="h-10 w-10 rounded bg-gray-100 flex items-center justify-center mr-3 flex-shrink-0">
+              <FileText className="h-5 w-5 text-gray-600" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex justify-between items-center mb-1">
+                <div className="flex-1 min-w-0 mr-2">
+                  <p className="text-sm font-medium text-gray-900 truncate">{cvName}</p>
+                  <p className="text-xs text-gray-500">{formatFileSize(cvSize)}</p>
                 </div>
-                <div className="w-full bg-gray-200 rounded-full h-1.5 mb-1">
+                <button 
+                  type="button"
+                  onClick={handleRemove}
+                  className="text-gray-500 hover:text-red-600 transition-colors text-xs font-medium flex-shrink-0"
+                >
+                  Remove
+                </button>
+              </div>
+              {cvProgress < 100 && (
+                <div className="w-full bg-gray-200 rounded-full h-1">
                   <div 
-                    className="bg-green-600 h-1.5 rounded-full transition-all duration-300" 
+                    className="bg-gray-900 h-1 rounded-full transition-all duration-300" 
                     style={{ width: `${cvProgress}%` }}
                   ></div>
                 </div>
-                <p className="text-xs text-gray-500">
-                  {cvProgress < 100 ? 'Uploading...' : 'Upload complete'}
-                </p>
-              </div>
+              )}
             </div>
           </div>
         )}

@@ -5,6 +5,7 @@ import apiClient from '@/api/client';
 import { Navbar } from '@/components/navbar';
 import Footer from '@/components/components_lite/Footer';
 import JDSummaryModal from '@/components/components_lite/JDSummaryModal';
+import { ApplyModal } from '@/components/apply-form';
 
 // Import UI Components đã được tách riêng
 import {
@@ -48,6 +49,7 @@ export default function JobPostViewDetails() {
   // Local state
   const [activeTab, setActiveTab] = useState('description');
   const [showSummaryModal, setShowSummaryModal] = useState(false);
+  const [showApplyModal, setShowApplyModal] = useState(false);
 
   // Custom hooks - Logic đã được tách ra để dễ maintain và test
   const { loading, error } = useJobDetails(jobId);
@@ -89,19 +91,10 @@ export default function JobPostViewDetails() {
     return () => { mounted = false; };
   }, [jobId]);
 
-  // Handler: Navigate to apply page - sử dụng useCallback để tránh re-create function
+  // Handler: Open apply modal
   const handleApplyClick = useCallback(() => {
-    navigate(`/apply/${jobId}`, {
-      state: {
-        jobData: {
-          title: singleJob?.title || '',
-          company: {
-            name: singleJob?.company?.name || '',
-          },
-        },
-      },
-    });
-  }, [navigate, jobId, singleJob]);
+    setShowApplyModal(true);
+  }, []);
 
   // Handler: Open JD Summary Modal
   const handleOpenSummary = useCallback(() => {
@@ -186,6 +179,15 @@ export default function JobPostViewDetails() {
 
       {/* Footer */}
       <Footer />
+
+      {/* Apply Modal */}
+      <ApplyModal
+        open={showApplyModal}
+        onClose={() => setShowApplyModal(false)}
+        jobId={jobId}
+        jobTitle={singleJob?.title || ''}
+        companyName={singleJob?.company?.name || ''}
+      />
     </div>
   );
 }

@@ -101,6 +101,21 @@ class NotificationService {
   }
 
   /**
+   * Fetch unread notification count
+   * @param {string} token - JWT token
+   * @returns {Promise<number>} Unread count
+   */
+  async fetchUnreadCount(_token) {
+    try {
+      const res = await apiClient.get('/api/notifications/unread-count');
+      return res.data.unread_count || 0;
+    } catch (error) {
+      console.error('❌ Error fetching unread count:', error);
+      return 0;
+    }
+  }
+
+  /**
    * Mark notification as read
    * @param {string} notificationId - Notification ID
    * @param {string} token - JWT token
@@ -112,6 +127,21 @@ class NotificationService {
       return res.data;
     } catch (error) {
       console.error('❌ Error marking notification as read:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Mark all notifications as read
+   * @param {string} token - JWT token
+   * @returns {Promise<Object>} Response message
+   */
+  async markAllAsRead(_token) {
+    try {
+      const res = await apiClient.patch('/api/notifications/mark-all-read');
+      return res.data;
+    } catch (error) {
+      console.error('❌ Error marking all as read:', error);
       throw error;
     }
   }

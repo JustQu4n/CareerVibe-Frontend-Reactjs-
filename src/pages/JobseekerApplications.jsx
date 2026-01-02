@@ -17,17 +17,14 @@ import { fetchJobseekerApplications } from '@/redux/jobseekerApplicationsSlice';
 import ApplicationDetailModal from '@/components/components_lite/ApplicationDetailModal';
 import { Navbar } from '@/components/navbar';
 import Footer from '@/components/components_lite/Footer';
-import { BarChart4 } from 'lucide-react';
 
 // Import UI Components
 import {
-  ApplicationsHero,
   LoadingState,
   ErrorState,
   EmptyState,
   ApplicationStats,
   ApplicationFilters,
-  ApplicationCard,
   ApplicationsTable,
 } from '@/components/applications';
 
@@ -76,16 +73,18 @@ const JobseekerApplications = () => {
   }, [dispatch, jobseekerId]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen flex flex-col bg-gray-50">
       {/* Navbar */}
       <Navbar />
       
-      {/* Hero Section - Component đã được tách riêng */}
-      <ApplicationsHero />
-      
-      <main className="flex-grow container mx-auto px-4 py-8">
+      <main className="flex-grow container mx-auto px-4 py-6">
+        {/* Page Header */}
+        <div className="mb-6">
+          <h1 className="text-xl font-semibold text-gray-900">My Applications</h1>
+        </div>
+
         {/* Dashboard Content */}
-        <div className="-mt-16 relative z-10">
+        <div>
           {/* Loading State */}
           {loading ? (
             <LoadingState />
@@ -97,10 +96,10 @@ const JobseekerApplications = () => {
             <EmptyState />
           ) : (
             <>
-              {/* Application Stats - Component đã được tách riêng */}
+              {/* Application Stats */}
               <ApplicationStats applications={applications} />
               
-              {/* Filters and Search - Component đã được tách riêng */}
+              {/* Filters and Search */}
               <ApplicationFilters
                 filterStatus={filterStatus}
                 onFilterChange={handleFilterChange}
@@ -108,25 +107,7 @@ const JobseekerApplications = () => {
                 onSearchChange={handleSearchChange}
               />
 
-              {/* Recent Applications - Hiển thị 6 applications gần nhất */}
-              <h2 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
-                <BarChart4 className="mr-2 h-5 w-5 text-blue-500" />
-                Recent Applications
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-                {filteredApplications?.slice(0, 6).map((app, idx) => {
-                  const appKey = app?._id || app?.id || app?.application_id || app?.applicationId || app?.uuid || idx;
-                  return (
-                    <ApplicationCard
-                      key={appKey}
-                      application={app}
-                      onClick={() => handleOpenModal(app)}
-                    />
-                  );
-                })}
-              </div>
-
-              {/* All Applications Table - Component đã được tách riêng */}
+              {/* All Applications Table */}
               <ApplicationsTable
                 applications={filteredApplications}
                 onViewDetails={handleOpenModal}
@@ -136,7 +117,7 @@ const JobseekerApplications = () => {
           )}
         </div>
 
-        {/* Modal chi tiết - Hiển thị khi có application được chọn */}
+        {/* Modal chi tiết */}
         {selectedApplication && (
           <ApplicationDetailModal 
             application={selectedApplication} 

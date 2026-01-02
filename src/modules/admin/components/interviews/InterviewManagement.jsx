@@ -338,6 +338,7 @@ export default function InterviewManagement() {
 // Interview Card Component
 // ========================================
 function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJobPost, onDetachJobPost, getStatusBadge }) {
+  console.log('Rendering InterviewCard for:', interview);
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -375,9 +376,20 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
             </div>
           )}
           {interview.job_post_id && (
-            <div className="flex items-center gap-2 text-sm text-green-600">
-              <LinkIcon className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">Linked to Job Post</span>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-2">
+              <div className="flex items-start gap-2 text-sm">
+                <LinkIcon className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="flex-1 min-w-0">
+                  <p className="text-green-800 font-medium truncate">
+                    {interview.jobPost?.title || 'Linked to Job Post'}
+                  </p>
+                  {interview.jobPost?.location && (
+                    <p className="text-green-600 text-xs truncate mt-0.5">
+                      {interview.jobPost.location}
+                    </p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
