@@ -12,11 +12,19 @@ import { formatDistanceToNow } from 'date-fns';
 import { formatNotification } from '@/lib/notificationUtils';
 
 const NotificationBell = () => {
-  const { notifications: apiNotifications = [], unreadCount, markAsRead, refresh } = useNotifications();
+  const { 
+    notifications: apiNotifications = [], 
+    unreadCount, 
+    markAsRead, 
+    markAllAsRead, 
+    refresh 
+  } = useNotifications();
 
   // Map API notification shape to the UI notification shape expected by NotificationItem
   const notifications = apiNotifications.map((n) => {
     const { title, description } = formatNotification(n);
+    // Parse is_read to boolean (API might return string "false"/"true")
+    const isRead = n.is_read === true || n.is_read === 'true';
     return {
       id: n.id,
       type: n.type || 'info',
@@ -26,7 +34,7 @@ const NotificationBell = () => {
       title: title || n.message || (n.metadata && n.metadata.title) || 'Notification',
       description: description || (n.metadata && n.metadata.description) || '',
       time: formatDistanceToNow(new Date(n.created_at || Date.now()), { addSuffix: true }),
-      isNew: !n.is_read,
+      isNew: !isRead,
       original: n,
     };
   });
@@ -43,12 +51,9 @@ const NotificationBell = () => {
    * Mark all as read
    */
   const handleMarkAllAsRead = useCallback(() => {
-    if (!markAsRead) return;
-    // mark each unread as read
-    notifications.forEach((n) => {
-      if (n.isNew) markAsRead(n.id);
-    });
-  }, [markAsRead, notifications]);
+    if (!markAllAsRead) return;
+    markAllAsRead();
+  }, [markAllAsRead]);
 
   return (
     <Popover>
