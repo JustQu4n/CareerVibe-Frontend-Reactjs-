@@ -141,11 +141,38 @@ const InterviewSession = () => {
   // Loading state
   if (loading && !interviewData) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
-        <Card className="w-96">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <Card className="w-96 shadow-lg">
           <CardContent className="p-8 text-center space-y-4">
-            <Loader2 className="w-12 h-12 mx-auto animate-spin text-blue-600" />
-            <p className="text-slate-600">Đang tải thông tin bài interview...</p>
+            <Loader2 className="w-12 h-12 mx-auto animate-spin text-purple-600" />
+            <p className="text-gray-600 font-medium">Loading interview information...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Check if already submitted
+  if (interviewData?.candidateInterview?.status === 'SUBMITTED') {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md shadow-lg">
+          <CardContent className="p-8 text-center space-y-4">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+              <ShieldAlert className="w-8 h-8 text-green-600" />
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900">
+              Interview Completed
+            </h2>
+            <p className="text-gray-600">
+              You have already submitted this interview. You cannot retake it.
+            </p>
+            <Button
+              onClick={() => navigate(-1)}
+              className="w-full bg-gray-900 hover:bg-gray-800 text-white"
+            >
+              Go Back
+            </Button>
           </CardContent>
         </Card>
       </div>
@@ -160,82 +187,74 @@ const InterviewSession = () => {
   // Start screen
   if (showStartScreen && !sessionStarted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-2xl"
         >
-          <Card className="border-2 shadow-xl">
+          <Card className="shadow-xl border border-gray-200">
             {/* Header */}
-            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: 'spring', duration: 0.5 }}
-                className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center mb-4 mx-auto"
-              >
-                <Play className="w-10 h-10" />
-              </motion.div>
-              <h1 className="text-3xl font-bold text-center mb-2">
-                {interviewData?.candidateInterview?.interview_id || 'Bài Interview'}
+            <div className="bg-black p-8 text-white rounded-t-lg">
+              <h1 className="text-sm font-bold text-center mb-2">
+                {interviewData?.candidateInterview?.interview_id || 'Interview'}
               </h1>
-              <p className="text-blue-50 text-center">
-                Sẵn sàng để bắt đầu làm bài?
-              </p>
+              <h1 className="text-purple-100 text-center text-xl">
+                Ready to start?
+              </h1>
             </div>
 
             <CardContent className="p-8 space-y-6">
               {/* Interview Info */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="p-4 bg-blue-50 rounded-lg text-center">
-                  <Clock className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm text-slate-600">Tổng thời gian</p>
-                  <p className="text-2xl font-bold text-slate-900">
+                <div className="p-5 bg-purple-50 rounded-xl text-center border border-purple-100">
+                  <Clock className="w-8 h-8 mx-auto mb-2 text-purple-600" />
+                  <p className="text-sm text-gray-600 font-medium mb-1">Total Time</p>
+                  <p className="text-2xl font-bold text-gray-900">
                     {Math.floor(
                       (interviewData?.questions?.reduce(
                         (sum, q) => sum + q.time_limit_seconds,
                         0
                       ) || 0) / 60
                     )}{' '}
-                    phút
+                    min
                   </p>
                 </div>
-                <div className="p-4 bg-purple-50 rounded-lg text-center">
-                  <AlertCircle className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-                  <p className="text-sm text-slate-600">Số câu hỏi</p>
-                  <p className="text-2xl font-bold text-slate-900">
-                    {totalQuestions} câu
+                <div className="p-5 bg-blue-50 rounded-xl text-center border border-blue-100">
+                  <AlertCircle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
+                  <p className="text-sm text-gray-600 font-medium mb-1">Questions</p>
+                  <p className="text-2xl font-bold text-gray-900">
+                    {totalQuestions}
                   </p>
                 </div>
               </div>
 
               {/* Important Rules */}
-              <Alert className="border-2 border-amber-200 bg-amber-50">
+              <Alert className="border border-amber-200 bg-amber-50">
                 <ShieldAlert className="h-5 w-5 text-amber-600" />
                 <AlertDescription className="ml-2">
                   <p className="font-semibold text-amber-900 mb-2">
-                    📋 Quy tắc quan trọng:
+                    📋 Important Rules:
                   </p>
-                  <ul className="text-sm text-amber-800 space-y-1 list-disc ml-4">
-                    <li>Mỗi câu hỏi có thời gian giới hạn riêng</li>
-                    <li>Không thể quay lại câu trước đó</li>
-                    <li>Tự động nộp khi hết thời gian</li>
-                    <li>Không được refresh hoặc đóng trang</li>
+                  <ul className="text-sm text-amber-800 space-y-1.5 list-disc ml-4">
+                    <li>Each question has its own time limit</li>
+                    <li>Cannot go back to previous questions</li>
+                    <li>Auto-submit when time runs out</li>
+                    <li>Do not refresh or close the page</li>
                   </ul>
                 </AlertDescription>
               </Alert>
 
               {/* Deadline */}
               {interviewData?.candidateInterview?.deadline_at && (
-                <div className="bg-slate-100 p-4 rounded-lg">
-                  <p className="text-sm font-semibold text-slate-900 mb-1">
-                    ⏰ Hạn nộp bài:
+                <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
+                  <p className="text-sm font-semibold text-gray-900 mb-1">
+                    ⏰ Deadline:
                   </p>
-                  <p className="text-sm text-slate-700">
+                  <p className="text-sm text-gray-700">
                     {new Date(
                       interviewData.candidateInterview.deadline_at
-                    ).toLocaleString('vi-VN')}
+                    ).toLocaleString('en-US')}
                   </p>
                 </div>
               )}
@@ -244,17 +263,17 @@ const InterviewSession = () => {
               <Button
                 onClick={handleStartInterview}
                 disabled={loading}
-                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                className="w-full h-14 text-lg font-semibold bg-black hover:bg-white text-black transition-colors"
               >
                 {loading ? (
                   <span className="flex items-center">
                     <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Đang khởi động...
+                    Starting...
                   </span>
                 ) : (
                   <span className="flex items-center">
                     <Play className="w-5 h-5 mr-2" />
-                    Bắt đầu làm bài
+                    Start Interview
                   </span>
                 )}
               </Button>
@@ -263,9 +282,9 @@ const InterviewSession = () => {
                 variant="ghost"
                 onClick={() => navigate(-1)}
                 disabled={loading}
-                className="w-full"
+                className="w-full hover:bg-gray-100"
               >
-                Quay lại
+                Go Back
               </Button>
             </CardContent>
           </Card>
@@ -276,24 +295,24 @@ const InterviewSession = () => {
 
   // Interview in progress
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
+    <div className="min-h-screen bg-gray-50 py-8 px-4">
       {/* Header */}
       <div className="max-w-4xl mx-auto mb-6">
-        <Card className="border-2">
-          <CardContent className="p-4 flex items-center justify-between">
+        <Card className="shadow-md border border-gray-200">
+          <CardContent className="p-5 flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-slate-900">
-                Đang làm bài Interview
+              <h2 className="text-lg font-bold text-gray-900">
+                Interview in Progress
               </h2>
-              <p className="text-sm text-slate-600">
-                Câu {currentQuestionIndex + 1} / {totalQuestions}
+              <p className="text-sm text-gray-600 mt-0.5">
+                Question {currentQuestionIndex + 1} / {totalQuestions}
               </p>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold text-blue-600">
+              <div className="text-3xl font-bold text-purple-600">
                 {Math.round(progress)}%
               </div>
-              <p className="text-xs text-slate-600">Tiến độ</p>
+              <p className="text-xs text-gray-600 mt-0.5">Progress</p>
             </div>
           </CardContent>
         </Card>
