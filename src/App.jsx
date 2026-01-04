@@ -57,6 +57,16 @@ import UserSettings from "./pages/Settings";
 import ProtectedRoute from "./modules/admin/components/ProtectedRoute";
 import { InterviewSession } from "./components/interviews";
 
+// SuperAdmin Module Imports
+import SuperAdminLogin from "./modules/superadmin/pages/SuperAdminLogin";
+import SuperAdminRegister from "./modules/superadmin/pages/SuperAdminRegister";
+import SuperAdminVerifyEmail from "./modules/superadmin/pages/SuperAdminVerifyEmail";
+import SuperAdminLayout from "./modules/superadmin/components/SuperAdminLayout";
+import SuperAdminDashboard from "./modules/superadmin/pages/SuperAdminDashboard";
+import UserManagement from "./modules/superadmin/pages/UserManagement";
+import CompanyManagement from "./modules/superadmin/pages/CompanyManagement";
+import CategoryManagement from "./modules/superadmin/pages/CategoryManagement";
+
 const appRouter = createBrowserRouter([
   { path: "/", element: <Home /> },
   {
@@ -70,6 +80,18 @@ const appRouter = createBrowserRouter([
   {
     path: "/register-recruiter",
     element: <RegisterRecruiter/>,
+  },
+  {
+    path: "/superadmin/login",
+    element: <SuperAdminLogin />,
+  },
+  {
+    path: "/superadmin/register",
+    element: <SuperAdminRegister />,
+  },
+  {
+    path: "/superadmin/verify-email",
+    element: <SuperAdminVerifyEmail />,
   },
   {
     path: "/verify-email",
@@ -245,6 +267,46 @@ const appRouter = createBrowserRouter([
       {
         path: "profile",
         element: <EmployerProfilePage />
+      }
+    ]
+  },
+
+  // SuperAdmin Routes
+  {
+    path: "/superadmin",
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <SuperAdminLayout />
+      </ProtectedRoute>
+    ),
+    children: [
+      {
+        index: true,
+        element: <SuperAdminDashboard />
+      },
+      {
+        path: "dashboard",
+        element: <SuperAdminDashboard />
+      },
+      {
+        path: "users",
+        element: <UserManagement />
+      },
+      {
+        path: "companies",
+        element: <CompanyManagement />
+      },
+      {
+        path: "categories",
+        element: <CategoryManagement />
+      },
+      {
+        path: "analytics",
+        element: <div className="p-6"><h1 className="text-2xl font-bold">Analytics (Coming Soon)</h1></div>
+      },
+      {
+        path: "settings",
+        element: <div className="p-6"><h1 className="text-2xl font-bold">Settings (Coming Soon)</h1></div>
       }
     ]
   }

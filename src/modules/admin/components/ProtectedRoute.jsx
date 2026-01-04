@@ -1,32 +1,31 @@
- 
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = ({ children, requiredRole = "employer" }) => {
   const { user } = useSelector((store) => store.auth);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if user exists and has employer role (can be in roles array or role string)
-    const isEmployer = user && (
-      user.roles?.includes("employer") || 
-      user.role === "employer"
+    // Check if user exists and has required role
+    const hasRole = user && (
+      user.roles?.includes(requiredRole) || 
+      user.role === requiredRole
     );
     
-    if (!isEmployer) {
-      console.log('ProtectedRoute: Access denied, redirecting to home');
+    if (!hasRole) {
+      console.log(`ProtectedRoute: Access denied, redirecting to home. Required: ${requiredRole}, User roles:`, user?.roles);
       navigate("/");  
     }
-  }, [user, navigate]);   
+  }, [user, navigate, requiredRole]);   
  
-  // Check if user exists and has employer role
-  const isEmployer = user && (
-    user.roles?.includes("employer") || 
-    user.role === "employer"
+  // Check if user exists and has required role
+  const hasRole = user && (
+    user.roles?.includes(requiredRole) || 
+    user.role === requiredRole
   );
   
-  if (!isEmployer) {
+  if (!hasRole) {
     return null;   
   }
 
