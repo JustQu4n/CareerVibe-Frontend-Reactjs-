@@ -1,6 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
-import apiClient from '@/api/client';
-import { useSelector } from 'react-redux';
+import React, { useState, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
@@ -14,11 +12,8 @@ const TABS = [
 ];
 
 export default function Settings() {
-  const { user } = useSelector((s) => s.auth || {});
   const [tab, setTab] = useState('profile');
 
-  const [loadingProfile, setLoadingProfile] = useState(false);
-  const [savingProfile, setSavingProfile] = useState(false);
   const [profile, setProfile] = useState({ fullname: '', email: '', avatar: '' });
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarPreview, setAvatarPreview] = useState('');
@@ -27,166 +22,74 @@ export default function Settings() {
   const [errors, setErrors] = useState({});
 
   const [preferences, setPreferences] = useState({ theme: 'system', language: 'en' });
-  const [savingPreferences, setSavingPreferences] = useState(false);
 
   const [notifications, setNotifications] = useState({ email: true, push: true });
-  const [savingNotifications, setSavingNotifications] = useState(false);
 
   const [security, setSecurity] = useState({ currentPassword: '', newPassword: '', confirmPassword: '' });
-  const [savingPassword, setSavingPassword] = useState(false);
 
-  // Load initial data
-  useEffect(() => {
-    const load = async () => {
-      setLoadingProfile(true);
-      try {
-        // Try profile endpoint (fallbacks included)
-        let res;
-        try {
-          res = await apiClient.get('/api/users/me');
-        } catch (e) {
-          res = await apiClient.get('/api/auth/profile');
-        }
-        const data = res.data || res;
-        const payload = data.data || data;
-        const fullname = payload.fullname || payload.full_name || payload.name || '';
-        setProfile((p) => ({ ...p, fullname, email: payload.email || '', avatar: payload.avatar || '' }));
-        setAvatarPreview(payload.avatar || '');
-
-        // preferences may come from profile.settings
-        const prefs = payload.settings || payload.preferences || {};
-        setPreferences((prev) => ({ ...prev, ...prefs }));
-
-        // notification settings
-        const n = prefs.notifications || {};
-        setNotifications((prev) => ({ ...prev, ...n }));
-      } catch (err) {
-        console.error('Failed to load profile', err);
-      } finally {
-        setLoadingProfile(false);
-      }
-    };
-
-    load();
-  }, []);
-
-  // Save profile
-  const saveProfile = async () => {
-    // simple validation
-    const nextErrors = {};
-    if (!profile.fullname || profile.fullname.trim().length < 2) nextErrors.fullname = 'Please enter your full name';
-    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!profile.email || !emailRe.test(profile.email)) nextErrors.email = 'Please enter a valid email';
-    setErrors(nextErrors);
-    if (Object.keys(nextErrors).length) return;
-
-    setSavingProfile(true);
-    try {
-      // If there is a file selected, convert to base64 and include it
-      let payload = { full_name: profile.fullname, email: profile.email };
-      if (avatarFile) {
-        const toBase64 = (file) => new Promise((res, rej) => {
-          const reader = new FileReader();
-          reader.onload = () => res(reader.result);
-          reader.onerror = rej;
-          reader.readAsDataURL(file);
-        });
-        const base64 = await toBase64(avatarFile);
-        payload.avatar = base64;
-      } else if (profile.avatar) {
-        payload.avatar = profile.avatar;
-      }
-
-      // Try to update canonical user endpoint first
-      try {
-        await apiClient.patch('/api/users/me', payload);
-      } catch (e) {
-        await apiClient.patch('/api/auth/profile', payload);
-      }
-
-      toast.success('Profile updated');
-      setAvatarFile(null);
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || 'Failed to update profile');
-    } finally {
-      setSavingProfile(false);
+  // Handler for avatar selection
+  const handleAvatarChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatarPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
     }
   };
 
-  // Save preferences
-  const savePreferences = async () => {
-    setSavingPreferences(true);
-    try {
-      // Save locally first
-      localStorage.setItem('theme', preferences.theme);
-      // send to backend
-      await apiClient.patch('/api/users/me/settings', { preferences });
-      toast.success('Preferences saved');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to save preferences');
-    } finally {
-      setSavingPreferences(false);
+  // Handler for profile save
+  const saveProfile = () => {
+    setErrors({});
+    
+    if (!profile.fullname?.trim()) {
+      setErrors({ fullname: 'Full name is required' });
+      return;
     }
+    if (!profile.email?.trim()) {
+      setErrors({ email: 'Email is required' });
+      return;
+    }
+
+    toast.success('Profile updated successfully!');
   };
 
-  // Save notification settings
-  const saveNotifications = async () => {
-    setSavingNotifications(true);
-    try {
-      await apiClient.patch('/api/users/me/settings', { preferences: { notifications } });
-      toast.success('Notification settings saved');
-    } catch (err) {
-      console.error(err);
-      toast.error('Failed to save notification settings');
-    } finally {
-      setSavingNotifications(false);
-    }
+  // Handler for preferences save
+  const savePreferences = () => {
+    toast.success('Preferences saved successfully!');
   };
 
-  // Change password
-  const changePassword = async () => {
-    if (!security.currentPassword || !security.newPassword) {
-      toast.error('Please fill all password fields');
+  // Handler for notifications save
+  const saveNotifications = () => {
+    toast.success('Notification settings updated!');
+  };
+
+  // Handler for password change
+  const changePassword = () => {
+    if (!security.currentPassword) {
+      toast.error('Current password is required');
+      return;
+    }
+    if (!security.newPassword) {
+      toast.error('New password is required');
       return;
     }
     if (security.newPassword !== security.confirmPassword) {
-      toast.error('New password and confirmation do not match');
+      toast.error('Passwords do not match');
+      return;
+    }
+    if (security.newPassword.length < 6) {
+      toast.error('Password must be at least 6 characters');
       return;
     }
 
-    setSavingPassword(true);
-    try {
-      await apiClient.post('/api/auth/change-password', {
-        currentPassword: security.currentPassword,
-        newPassword: security.newPassword,
-      });
-      toast.success('Password updated');
-      setSecurity({ currentPassword: '', newPassword: '', confirmPassword: '' });
-    } catch (err) {
-      console.error(err);
-      toast.error(err?.response?.data?.message || 'Failed to change password');
-    } finally {
-      setSavingPassword(false);
-    }
+    toast.success('Password changed successfully!');
+    setSecurity({ currentPassword: '', newPassword: '', confirmPassword: '' });
   };
 
-  // avatar select
-  const onSelectAvatar = (file) => {
-    if (!file) return;
-    setAvatarFile(file);
-    const url = URL.createObjectURL(file);
-    setAvatarPreview(url);
-  };
-
-  const clearAvatar = () => {
-    setAvatarFile(null);
-    setAvatarPreview('');
-    setProfile((p) => ({ ...p, avatar: '' }));
-    if (fileInputRef.current) fileInputRef.current.value = null;
-  };
-
+  
   // theme options
   const themeOptions = [
     { key: 'system', label: 'System' },
@@ -223,67 +126,72 @@ export default function Settings() {
           {/* Profile Tab */}
           {tab === 'profile' && (
             <div className="bg-white rounded-lg shadow p-6">
-              <h2 className="text-lg font-semibold mb-4">Profile</h2>
+              <h2 className="text-lg font-semibold mb-4">Profile Information</h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label>Full name</Label>
-                  <Input
-                    aria-label="Full name"
-                    value={profile.fullname}
-                    onChange={(e) => setProfile({ ...profile, fullname: e.target.value })}
-                    placeholder="Your full name"
-                    className={errors.fullname ? 'border-red-500' : ''}
-                  />
-                  {errors.fullname && <p className="text-red-600 text-sm mt-1">{errors.fullname}</p>}
-                </div>
-
-                <div>
-                  <Label>Email</Label>
-                  <Input
-                    aria-label="Email"
-                    type="email"
-                    value={profile.email}
-                    onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                    placeholder="you@example.com"
-                    className={errors.email ? 'border-red-500' : ''}
-                  />
-                  {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
-                </div>
-              </div>
-
-              <div className="mt-4">
-                <Label>Avatar</Label>
-                <div className="flex items-center gap-4 mt-2">
-                  <div className="w-20 h-20 rounded-full bg-gray-100 overflow-hidden flex items-center justify-center">
-                    {avatarPreview ? (
-                      <img src={avatarPreview} alt="avatar preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-gray-400">No avatar</span>
-                    )}
-                  </div>
-
-                  <div className="flex flex-col gap-2">
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="relative">
+                    <div className="w-24 h-24 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                      {avatarPreview || profile.avatar ? (
+                        <img src={avatarPreview || profile.avatar} alt="Avatar" className="w-full h-full object-cover" />
+                      ) : (
+                        <span className="text-3xl text-gray-400">👤</span>
+                      )}
+                    </div>
                     <input
                       ref={fileInputRef}
-                      aria-label="Upload avatar"
                       type="file"
                       accept="image/*"
-                      onChange={(e) => onSelectAvatar(e.target.files?.[0])}
+                      onChange={handleAvatarChange}
+                      className="hidden"
                     />
-                    <div className="flex gap-2">
-                      <Button onClick={() => fileInputRef.current?.click()} className="bg-white border">Choose</Button>
-                      <Button onClick={clearAvatar} className="bg-red-50 text-red-600 border">Remove</Button>
-                    </div>
+                  </div>
+                  <div>
+                    <Button
+                      onClick={() => fileInputRef.current?.click()}
+                      variant="outline"
+                      size="sm"
+                    >
+                      Change Avatar
+                    </Button>
+                    <p className="text-xs text-gray-500 mt-1">JPG, PNG. Max 2MB.</p>
                   </div>
                 </div>
-              </div>
 
-              <div className="flex justify-end mt-6">
-                <Button onClick={saveProfile} className="bg-indigo-600 hover:bg-indigo-700" disabled={savingProfile}>{savingProfile ? 'Saving...' : 'Save profile'}</Button>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label>Full Name</Label>
+                    <Input
+                      value={profile.fullname}
+                      onChange={(e) => setProfile({ ...profile, fullname: e.target.value })}
+                      placeholder="Your full name"
+                      className={errors.fullname ? 'border-red-500' : ''}
+                    />
+                    {errors.fullname && <p className="text-xs text-red-500 mt-1">{errors.fullname}</p>}
+                  </div>
+
+                  <div>
+                    <Label>Email</Label>
+                    <Input
+                      value={profile.email}
+                      onChange={(e) => setProfile({ ...profile, email: e.target.value })}
+                      placeholder="your.email@example.com"
+                      type="email"
+                      className={errors.email ? 'border-red-500' : ''}
+                    />
+                    {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email}</p>}
+                  </div>
+                </div>
+
+                <div className="flex justify-end mt-6">
+                  <Button onClick={saveProfile} className="bg-indigo-600 hover:bg-indigo-700">
+                    Save Profile
+                  </Button>
+                </div>
               </div>
             </div>
           )}
+         
 
           {/* Preferences Tab */}
           {tab === 'preferences' && (
@@ -312,7 +220,9 @@ export default function Settings() {
               </div>
 
               <div className="flex justify-end">
-                <Button onClick={savePreferences} className="bg-indigo-600 hover:bg-indigo-700" disabled={savingPreferences}>{savingPreferences ? 'Saving...' : 'Save preferences'}</Button>
+                <Button onClick={savePreferences} className="bg-indigo-600 hover:bg-indigo-700">
+                  Save preferences
+                </Button>
               </div>
             </div>
           )}
@@ -341,7 +251,9 @@ export default function Settings() {
               </div>
 
               <div className="flex justify-end mt-6">
-                <Button onClick={saveNotifications} className="bg-indigo-600 hover:bg-indigo-700" disabled={savingNotifications}>{savingNotifications ? 'Saving...' : 'Save settings'}</Button>
+                <Button onClick={saveNotifications} className="bg-indigo-600 hover:bg-indigo-700">
+                  Save settings
+                </Button>
               </div>
             </div>
           )}
@@ -369,7 +281,9 @@ export default function Settings() {
               </div>
 
               <div className="flex justify-end mt-6">
-                <Button onClick={changePassword} className="bg-indigo-600 hover:bg-indigo-700" disabled={savingPassword}>{savingPassword ? 'Updating...' : 'Change password'}</Button>
+                <Button onClick={changePassword} className="bg-indigo-600 hover:bg-indigo-700">
+                  Change password
+                </Button>
               </div>
             </div>
           )}

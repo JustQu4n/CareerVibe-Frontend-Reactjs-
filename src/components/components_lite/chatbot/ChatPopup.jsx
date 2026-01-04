@@ -1,8 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { MessageCircleMore, SendHorizontal } from 'lucide-react';
+import { MessageCircle, Send, Minimize2, Maximize2, X, Sparkles, Bot } from 'lucide-react';
 import apiClient from '@/api/client';
 import { useSelector } from 'react-redux';
+
+const WELCOME_MESSAGE = `Hello! 👋 Welcome to CareerVibe AI Assistant!
+
+I'm here to help you with:
+• Job search and recommendations
+• Career advice and guidance  
+• Interview preparation tips
+• Resume and cover letter assistance
+
+How can I assist you today?`;
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
 const CHAT_BASE = `${API_BASE}/api/ai-assistant`;
@@ -32,6 +42,15 @@ export default function ChatPopup() {
       fetchSuggestions();
     }
   }, [open, token]);
+
+  // Add welcome message when opening chat for first time
+  useEffect(() => {
+    if (open && messages.length === 0 && !loading) {
+      setTimeout(() => {
+        setMessages([{ role: 'assistant', text: WELCOME_MESSAGE }]);
+      }, 300);
+    }
+  }, [open]);
 
   const fetchStatus = async () => {
     try {
@@ -120,120 +139,135 @@ export default function ChatPopup() {
 
   // Lớp CSS điều chỉnh kích thước
   const containerClasses = fullscreen
-    ? "fixed inset-0 z-50 bg-white flex flex-col rounded-none shadow-none"
-    : "fixed bottom-24 right-6 w-96 max-w-full bg-white rounded-lg shadow-xl flex flex-col z-50 ";
+    ? "fixed inset-0 z-50 bg-white flex flex-col"
+    : "fixed bottom-6 right-6 w-[380px] h-[500px] max-h-[calc(100vh-100px)] bg-white rounded-2xl shadow-2xl flex flex-col z-50 border border-gray-200";
 
   return (
     <>
       <button
         onClick={toggleOpen}
-        className="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg"
+        className="fixed bottom-6 right-6 z-50 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-full w-16 h-16 flex items-center justify-center shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl"
         aria-label="Open chat"
       >
-       <MessageCircleMore />
+        <MessageCircle className="w-7 h-7" />
       </button>
 
       {open && (
         <div className={containerClasses}>
-          <div className="px-4 py-3 bg-blue-600 text-white font-semibold flex justify-between items-center rounded-t-lg">
-            <span>Chatbot Gemini</span>
-            <div className="flex items-center space-x-3">
+          <div className="px-4 py-2 bg-blue-500 text-white flex justify-between items-center rounded-t-2xl shadow-md">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                <Bot className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-bold text-lg">AI CareerVibe</h3>
+                <p className="text-xs text-blue-100">Always here to help</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
               <button
                 onClick={toggleFullscreen}
-                className="hover:text-gray-300"
-                title={fullscreen ? "Thu nhỏ" : "Phóng to"}
+                className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
+                title={fullscreen ? "Exit fullscreen" : "Fullscreen"}
                 aria-label="Toggle fullscreen"
               >
-                {fullscreen ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round"
-                      d="M18 12h3m0 0v3m0-3v-3m0 3h-3m-9 6h-3m0 0v-3m0 3v3m0-3h3" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none"
-                    viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round"
-                      d="M8 3H5a2 2 0 00-2 2v3m0 8v3a2 2 0 002 2h3m8-16h3a2 2 0 012 2v3m0 8v3a2 2 0 01-2 2h-3" />
-                  </svg>
-                )}
+                {fullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
               </button>
               <button
                 onClick={toggleOpen}
-                className="hover:text-gray-300"
+                className="p-2 hover:bg-white/20 rounded-lg transition-all duration-200"
                 aria-label="Close chat"
               >
-                ✕
+                <X className="w-5 h-5" />
               </button>
             </div>
           </div>
 
           <div
-            className="p-4 flex-grow overflow-y-auto flex flex-col space-y-4 bg-gray-50"
-            style={{ minHeight: 0, maxHeight: fullscreen ? 'calc(100vh - 140px)' : '300px' }}
+            className="flex-1 overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50 to-white"
+            style={{ minHeight: 0 }}
           >
-            {messages.length === 0 && (
-              <p className="text-gray-400 italic text-sm text-center">Start the conversation!</p>
-            )}
             {messages.map((msg, idx) => (
               <div
                 key={idx}
-                className={`flex max-w-[90%] ${
-                  msg.role === 'user' ? 'self-end flex-row-reverse' : 'self-start'
-                } items-start space-x-2`}
+                className={`flex items-start gap-3 animate-fadeIn ${
+                  msg.role === 'user' ? 'flex-row-reverse' : ''
+                }`}
               >
-                <div className="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold select-none">
-                  {msg.role === 'user' ? 'U' : 'G'}
+                <div
+                  className={`w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md ${
+                    msg.role === 'user'
+                      ? 'bg-gradient-to-br from-blue-500 to-blue-600'
+                      : 'bg-gradient-to-br from-indigo-500 to-purple-600'
+                  }`}
+                >
+                  {msg.role === 'user' ? 'You' : 'AI'}
                 </div>
 
                 <div
-                  className={`px-4 py-3 rounded-lg whitespace-pre-wrap break-words text-sm ${
+                  className={`px-4 py-3 rounded-2xl max-w-[75%] shadow-sm ${
                     msg.role === 'user'
-                      ? 'bg-blue-100 text-blue-800'
-                      : 'bg-white border border-gray-300'
+                      ? 'bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-tr-sm'
+                      : 'bg-white border border-gray-200 text-gray-800 rounded-tl-sm'
                   }`}
-                  style={{ maxWidth: '70%' }}
                 >
-                  <ReactMarkdown>{msg.text}</ReactMarkdown>
+                  <div
+                    className={`text-sm leading-relaxed ${
+                      msg.role === 'assistant' ? 'prose prose-sm max-w-none' : ''
+                    }`}
+                  >
+                    <ReactMarkdown>
+                      {msg.text}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             ))}
             {loading && (
-              <div className="flex self-start items-center space-x-2">
-                <div className="w-8 h-8 rounded-full bg-gray-400 animate-pulse" />
-                <div className="bg-white border border-gray-300 rounded-lg px-4 py-3 text-sm text-gray-500">
-                  Typing...
+              <div className="flex items-start gap-3 animate-fadeIn">
+                <div className="w-9 h-9 rounded-full bg-black flex items-center justify-center text-white text-xs font-bold flex-shrink-0 shadow-md">
+                  AI
+                </div>
+                <div className="bg-white border border-gray-200 rounded-2xl rounded-tl-sm px-5 py-3 shadow-sm">
+                  <div className="flex gap-1.5">
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                    <div className="w-2 h-2 bg-indigo-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                  </div>
                 </div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
-          <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              if(!loading) sendMessage();
-            }}
-            className="flex items-end border-t border-gray-300 rounded-b-lg p-3 space-x-3"
-          >
-            <textarea
-              rows={2}
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Type a message..."
-              className={`flex-grow p-2 resize-none border-none focus:outline-none ${fullscreen ? 'h-10' : 'h-8'}`}
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              className='bg-blue-600 hover:bg-blue-700 text-white rounded-full w-10 h-10 flex items-center justify-center disabled:opacity-50 transition-colors'
-              aria-label="Send message"
-              disabled={!input.trim() || loading}
+          <div className="p-4 bg-white border-t border-gray-200 rounded-b-2xl">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if(!loading) sendMessage();
+              }}
+              className="flex items-end gap-3"
             >
-            <SendHorizontal  />
-            </button>
-          </form>
+              <textarea
+                rows={1}
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="Type your message..."
+                className="flex-1 resize-none border border-gray-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm transition-all"
+                disabled={loading}
+                style={{ maxHeight: '120px' }}
+              />
+              <button
+                type="submit"
+                className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white rounded-xl p-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200 flex-shrink-0 hover:shadow-lg transform hover:scale-105"
+                aria-label="Send message"
+                disabled={!input.trim() || loading}
+              >
+                <Send className="w-5 h-5" />
+              </button>
+            </form>
+          </div>
         </div>
       )}
     </>

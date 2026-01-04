@@ -17,7 +17,8 @@ import {
   ArrowUpDown,
   ChevronDown,
   Filter,
-  ExternalLink
+  ExternalLink,
+  Loader2
 } from 'lucide-react';
 import { Navbar } from '../navbar';
 import Footer from '../components_lite/Footer';
@@ -199,7 +200,7 @@ const SaveJobs = () => {
         <Navbar />
       </div>
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-10">
           <h1 className="text-3xl font-bold text-gray-900 mb-3 flex items-center">
@@ -214,18 +215,18 @@ const SaveJobs = () => {
         </div>
         
         {/* Search and filter bar */}
-        <div className="bg-white rounded-2xl shadow-lg p-4 mb-6 border border-gray-100">
+        <div className="bg-white rounded-lg shadow-sm p-4 mb-6 border border-gray-200">
           <div className="flex flex-col md:flex-row md:items-center gap-3">
             <div className="relative flex-grow">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Search className="h-5 w-5 text-gray-400" />
+                <Search className="h-4 w-4 text-gray-400" />
               </div>
               <input
                 type="text"
                 placeholder="Search job titles or companies..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10 w-full py-2.5 px-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all text-sm"
+                className="pl-10 w-full py-2 px-4 bg-gray-50 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all text-sm"
               />
             </div>
             
@@ -241,35 +242,35 @@ const SaveJobs = () => {
                 </button>
                 
                 {showSortMenu && (
-                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-xl shadow-xl p-2 z-10 border border-gray-200">
+                  <div className="absolute right-0 mt-2 w-52 bg-white rounded-lg shadow-xl p-2 z-10 border border-gray-200">
                     <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Sort By</div>
                     <button 
                       onClick={() => {setSortBy('dateDesc'); setShowSortMenu(false);}}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'dateDesc' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'dateDesc' ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}`}
                     >
                       Newest saved first
                     </button>
                     <button 
                       onClick={() => {setSortBy('dateAsc'); setShowSortMenu(false);}}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'dateAsc' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'dateAsc' ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}`}
                     >
                       Oldest saved first
                     </button>
                     <button 
                       onClick={() => {setSortBy('salaryDesc'); setShowSortMenu(false);}}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'salaryDesc' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'salaryDesc' ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}`}
                     >
                       Salary: high to low
                     </button>
                     <button 
                       onClick={() => {setSortBy('salaryAsc'); setShowSortMenu(false);}}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'salaryAsc' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'salaryAsc' ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}`}
                     >
                       Salary: low to high
                     </button>
                     <button 
                       onClick={() => {setSortBy('alphabetical'); setShowSortMenu(false);}}
-                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'alphabetical' ? 'bg-indigo-50 text-indigo-700' : 'hover:bg-gray-50'}`}
+                      className={`w-full text-left px-3 py-2 text-sm rounded-md ${sortBy === 'alphabetical' ? 'bg-blue-50 text-blue-700' : 'hover:bg-gray-50'}`}
                     >
                       Alphabetical (A-Z)
                     </button>
@@ -279,12 +280,12 @@ const SaveJobs = () => {
               
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className="flex items-center px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700 relative"
+                className="flex items-center px-4 py-2 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors text-sm font-medium text-gray-700 relative"
               >
                 <Filter className="h-4 w-4 mr-1.5" />
                 Filters
                 {getAppliedFiltersCount() > 0 && (
-                  <span className="ml-1.5 h-5 w-5 bg-indigo-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                  <span className="ml-1.5 h-5 w-5 bg-blue-600 text-white text-xs font-bold rounded-full flex items-center justify-center">
                     {getAppliedFiltersCount()}
                   </span>
                 )}
@@ -309,7 +310,7 @@ const SaveJobs = () => {
                       <select
                         value={filters.jobType}
                         onChange={(e) => setFilters({...filters, jobType: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       >
                         <option value="all">All types</option>
                         <option value="full_time">Full Time</option>
@@ -330,7 +331,7 @@ const SaveJobs = () => {
                           step="10000"
                           value={filters.salary[1]}
                           onChange={(e) => setFilters({...filters, salary: [0, parseInt(e.target.value)]})}
-                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-indigo-600"
+                          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
                         />
                         <div className="flex justify-between text-xs text-gray-500 mt-1">
                           <span>$0</span>
@@ -346,7 +347,7 @@ const SaveJobs = () => {
                         placeholder="Any location"
                         value={filters.location}
                         onChange={(e) => setFilters({...filters, location: e.target.value})}
-                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                        className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                       />
                     </div>
                     
@@ -380,143 +381,136 @@ const SaveJobs = () => {
           </AnimatePresence>
         </div>
         
-        {/* Content */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="relative w-20 h-20">
-              <div className="absolute top-0 left-0 w-full h-full border-4 border-indigo-100 rounded-full"></div>
-              <div className="absolute top-0 left-0 w-full h-full border-4 border-indigo-600 rounded-full border-t-transparent animate-spin"></div>
+          {loading ? (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
+              <p className="text-gray-500 font-medium mt-4">Loading your saved jobs...</p>
             </div>
-            <p className="text-gray-500 font-medium mt-4">Loading your saved jobs...</p>
-          </div>
-        ) : (
-          <>
-            {filteredJobs.length === 0 ? (
-              <div className="bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 rounded-2xl shadow-sm p-12 text-center border border-indigo-100">
-                <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 text-white mb-6 shadow-lg">
-                  <Bookmark className="h-10 w-10" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">No saved jobs found</h3>
-                <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                  {searchQuery || getAppliedFiltersCount() > 0 
-                    ? "We couldn't find any saved jobs matching your current filters. Try adjusting your search criteria."
-                    : "You haven't saved any jobs yet. Save jobs that interest you to view them here later."}
-                </p>
-                {(searchQuery || getAppliedFiltersCount() > 0) && (
-                  <button
-                    onClick={resetFilters}
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold"
-                  >
-                    Clear Filters
-                  </button>
-                )}
-                {!searchQuery && getAppliedFiltersCount() === 0 && (
-                  <a
-                    href="/browse"
-                    className="px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-lg hover:shadow-xl font-semibold inline-block"
-                  >
-                    Browse Jobs
-                  </a>
-                )}
-              </div>
-            ) : (
-              <div>
-                <div className="mb-5 flex justify-between items-center">
-                  <p className="text-sm text-gray-600">
-                    Showing <span className="font-bold text-indigo-600">{filteredJobs.length}</span> of <span className="font-semibold">{savedJobs.length}</span> saved jobs
+          ) : (
+            <>
+              {filteredJobs.length === 0 ? (
+                <div className="border border-gray-200 shadow-sm rounded-lg p-12 text-center bg-white">
+                  <Bookmark className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                    No saved jobs found
+                  </h3>
+                  <p className="text-sm text-gray-600 mb-4">
+                    {searchQuery || getAppliedFiltersCount() > 0 
+                      ? "We couldn't find any saved jobs matching your current filters. Try adjusting your search criteria."
+                      : "You haven't saved any jobs yet. Save jobs that interest you to view them here later."}
                   </p>
+                  {(searchQuery || getAppliedFiltersCount() > 0) && (
+                    <button
+                      onClick={resetFilters}
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm"
+                    >
+                      Clear Filters
+                    </button>
+                  )}
+                  {!searchQuery && getAppliedFiltersCount() === 0 && (
+                    <a
+                      href="/browse"
+                      className="px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all font-medium text-sm inline-block"
+                    >
+                      Browse Jobs
+                    </a>
+                  )}
                 </div>
-                
-                {/* Modern Job Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                  <AnimatePresence>
-                    {filteredJobs.map((savedJob) => {
-                      const job = savedJob.jobPost;
-                      const company = job?.company;
-                      
-                      return (
-                        <motion.div
-                          key={savedJob.saved_job_id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -20 }}
-                          transition={{ duration: 0.3 }}
-                          className="group bg-white rounded-2xl overflow-hidden border border-gray-200 hover:border-indigo-300 transition-all shadow-sm hover:shadow-xl relative"
-                        >
-                          {/* Job Card Header */}
-                          <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
-                          
-                          <div className="p-5">
-                            <div className="flex justify-between items-start mb-4">
-                              <div className="flex items-start space-x-3 flex-1 min-w-0">
-                                <div className="h-12 w-12 bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl flex items-center justify-center overflow-hidden border border-gray-200 group-hover:scale-110 transition-transform flex-shrink-0">
-                                  {company?.logo_url ? (
-                                    <img src={company.logo_url} alt={company.name} className="h-full w-full object-cover" />
-                                  ) : (
-                                    <Building2 className="h-7 w-7 text-gray-400" />
-                                  )}
-                                </div>
-                                <div className="min-w-0">
-                                  <h3 className="font-bold text-base text-gray-900 group-hover:text-indigo-600 transition-colors line-clamp-2 mb-1">
-                                    <a href={`/view-job-detail/${job.job_post_id}`}>{job.title}</a>
+              ) : (
+                <div className="space-y-4">
+                  {filteredJobs.map((savedJob) => {
+                    const job = savedJob.jobPost;
+                    const company = job?.company;
+                    
+                    return (
+                      <motion.div
+                        key={savedJob.saved_job_id}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -20 }}
+                        transition={{ duration: 0.3 }}
+                        className="border border-gray-200 shadow-sm hover:shadow-md hover:border-gray-300 transition-all rounded-lg bg-white"
+                      >
+                        <div className="p-4">
+                          <div className="flex flex-col lg:flex-row gap-4">
+                            {/* Company Logo */}
+                            <div className="flex-shrink-0">
+                              <div className="w-12 h-12 rounded-lg border border-gray-200 flex items-center justify-center bg-gray-50">
+                                {company?.logo_url ? (
+                                  <img
+                                    src={company.logo_url}
+                                    alt={company.name}
+                                    className="w-full h-full object-cover rounded-lg"
+                                  />
+                                ) : (
+                                  <Building2 className="w-6 h-6 text-gray-400" />
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Job Details */}
+                            <div className="flex-1 min-w-0">
+                              <div className="flex items-start justify-between gap-4 mb-2">
+                                <div className="flex-1">
+                                  <h3 className="text-lg font-semibold text-gray-900 mb-0.5">
+                                    {job.title}
                                   </h3>
-                                  <p className="text-sm text-gray-600 truncate">{company?.name}</p>
+                                  <p className="text-sm text-gray-600">
+                                    {company?.name}
+                                  </p>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="text-xs text-gray-500 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {savedJob.saved_at ? format(new Date(savedJob.saved_at), 'MMM d, yyyy') : "Recently"}
+                                  </div>
                                 </div>
                               </div>
-                              <button 
-                                onClick={() => handleRemoveJob(savedJob.saved_job_id, job.job_post_id)}
-                                className="text-gray-400 hover:text-red-500 transition-colors p-1.5 hover:bg-red-50 rounded-lg flex-shrink-0"
-                                aria-label="Remove from saved"
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </button>
-                            </div>
-                            
-                            <div className="space-y-2">
-                              <div className="flex items-center text-sm text-gray-500">
-                                <div className="bg-gray-100 p-1 rounded-full mr-2">
-                                  <MapPin className="h-3.5 w-3.5 text-gray-600" />
+
+                              {/* Job Info */}
+                              <div className="flex flex-wrap gap-3 mb-3 text-xs text-gray-600">
+                                <div className="flex items-center gap-1">
+                                  <MapPin className="w-3.5 h-3.5 text-gray-500" />
+                                  {job.location || "Location not specified"}
                                 </div>
-                                {job.location || "Location not specified"}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <div className="bg-gray-100 p-1 rounded-full mr-2">
-                                  <Briefcase className="h-3.5 w-3.5 text-gray-600" />
+                                <div className="flex items-center gap-1">
+                                  <DollarSign className="w-3.5 h-3.5 text-gray-500" />
+                                  {job.salary_range || "Salary not specified"}
                                 </div>
-                                {job.employment_type ? job.employment_type.replace("-", " ") : "Full Time"}
-                              </div>
-                              <div className="flex items-center text-sm text-gray-500">
-                                <div className="bg-gray-100 p-1 rounded-full mr-2">
-                                  <DollarSign className="h-3.5 w-3.5 text-gray-600" />
+                                <div className="flex items-center gap-1">
+                                  <Briefcase className="w-3.5 h-3.5 text-gray-500" />
+                                  {job.employment_type ? job.employment_type.replace("-", " ") : "Full Time"}
                                 </div>
-                                {job.salary_range || "Salary not specified"}
                               </div>
-                            </div>
-                            
-                            <div className="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
-                              <div className="flex items-center text-xs text-gray-500">
-                                <Clock className="h-3 w-3 mr-1" />
-                                {savedJob.saved_at ? format(new Date(savedJob.saved_at), 'MMM d, yyyy') : "Recently"}
+
+                              {/* Actions */}
+                              <div className="flex gap-2">
+                                <a
+                                  href={`/view-job-detail/${job.job_post_id}`}
+                                  className="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white h-9 px-4 text-sm rounded-lg font-medium transition-colors"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5 mr-1.5" />
+                                  View Details
+                                </a>
+                                <button
+                                  onClick={() => handleRemoveJob(savedJob.saved_job_id, job.job_post_id)}
+                                  className="inline-flex items-center justify-center border border-gray-300 text-gray-700 hover:border-red-300 hover:bg-red-50 hover:text-red-600 h-9 px-4 text-sm rounded-lg font-medium transition-colors"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                                  Remove
+                                </button>
                               </div>
-                              <a
-                                href={`/view-job-detail/${job.job_post_id}`}
-                                className="inline-flex items-center text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors group-hover:gap-1.5 gap-1"
-                              >
-                                View
-                                <ExternalLink className="h-3 w-3" />
-                              </a>
                             </div>
                           </div>
-                        </motion.div>
-                      );
-                    })}
-                  </AnimatePresence>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
                 </div>
-              </div>
-            )}
-          </>
-        )}
-      </div>
+              )}
+            </>
+          )}
+        </div>
       
       <Footer />
     </div>
