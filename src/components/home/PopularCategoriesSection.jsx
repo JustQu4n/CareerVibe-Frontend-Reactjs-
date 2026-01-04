@@ -35,7 +35,7 @@ const PopularCategoriesSection = () => {
   const navigate = useNavigate();
 
   const handleCategoryClick = (categoryName) => {
-    navigate(`/jobs?category=${encodeURIComponent(categoryName)}`);
+   
   };
 
   return (

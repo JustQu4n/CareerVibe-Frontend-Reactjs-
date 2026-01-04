@@ -19,6 +19,7 @@ import {
   PublicProfile
 } from "./pages";
 import RecommendationJobs from "./pages/RecommendationJobs";
+import CareerTools from "./pages/CareerTools";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Creator from "./components/creator/Creator.jsx";
 import { ToastContainer } from 'react-toastify';
@@ -177,6 +178,10 @@ const appRouter = createBrowserRouter([
   {
     path: "/recommendations",
     element: <RecommendationJobs />,
+  },
+  {
+    path: "/career-tools",
+    element: <CareerTools />,
   },
   {
     path: "/save-items",

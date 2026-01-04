@@ -72,7 +72,7 @@ const ExperienceSection = React.memo(({
               </div>
 
               {/* Experience Card */}
-              <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow group">
+              <div className="bg-white  rounded-xl p-5 border border-gray-400 hover:shadow-md transition-shadow group">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
                     <h3 className="text-lg font-bold text-black">

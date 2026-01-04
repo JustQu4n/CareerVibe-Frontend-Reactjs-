@@ -36,6 +36,7 @@ export const NAVIGATION_LINKS = {
       ]
     },
     { to: '/companies', label: 'Companies' },
+    { to: '/career-tools', label: 'Career Tools' },
     { to: '/recruiter-login', label: 'Recruiter site' },
     { to: '/Creator', label: 'About' },
   ],
