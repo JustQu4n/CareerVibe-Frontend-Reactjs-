@@ -80,12 +80,7 @@ const JobActionButtons = ({
           </div>
         )}
 
-        {/* Quick Stats */}
-        <div className="pt-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500 text-center">
-            <p className="font-medium">✨ Quick & Easy Application</p>
-          </div>
-        </div>
+
       </div>
     </div>
   );

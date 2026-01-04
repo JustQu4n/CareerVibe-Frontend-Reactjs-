@@ -18,6 +18,7 @@ import {
   EditProfile,
   PublicProfile
 } from "./pages";
+import RecommendationJobs from "./pages/RecommendationJobs";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Creator from "./components/creator/Creator.jsx";
 import { ToastContainer } from 'react-toastify';
@@ -174,8 +175,8 @@ const appRouter = createBrowserRouter([
     element: <SearchResults />,
   },
   {
-    path: "/cv-tools",
-    element: <CvMatcher />,
+    path: "/recommendations",
+    element: <RecommendationJobs />,
   },
   {
     path: "/save-items",

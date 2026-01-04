@@ -28,9 +28,14 @@ export const NAVIGATION_LINKS = {
   ],
   JOBSEEKER: [
     { to: '/Home', label: 'Home' },
-    { to: '/Browse', label: 'Browse' },
+    { 
+      label: 'Jobs',
+      submenu: [
+        { to: '/Browse', label: 'Browse' },
+        { to: '/recommendations', label: 'Recommendations' },
+      ]
+    },
     { to: '/companies', label: 'Companies' },
-    { to: '/cv-tools', label: 'Career Tools' },
     { to: '/recruiter-login', label: 'Recruiter site' },
     { to: '/Creator', label: 'About' },
   ],
