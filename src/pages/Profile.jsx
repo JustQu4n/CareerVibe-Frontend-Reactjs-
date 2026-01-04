@@ -218,12 +218,12 @@ const Profile = () => {
   // Loading state
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <div className="flex items-center justify-center min-h-[70vh]">
           <div className="text-center">
-            <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-            <p className="text-gray-600">Loading profile...</p>
+            <Loader2 className="w-12 h-12 text-black animate-spin mx-auto mb-4" />
+            <p className="text-black">Loading profile...</p>
           </div>
         </div>
       </div>
@@ -233,14 +233,14 @@ const Profile = () => {
   // No profile data
   if (!profileSections) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="min-h-screen bg-white">
         <Navbar />
         <div className="flex items-center justify-center min-h-[70vh]">
-          <div className="text-center bg-white rounded-2xl shadow-lg p-8 max-w-md">
-            <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <div className="text-center bg-white rounded-2xl shadow-lg p-8 max-w-md border-2 border-black">
+            <h2 className="text-xl font-bold text-black mb-2">
               Profile Not Found
             </h2>
-            <p className="text-gray-600">
+            <p className="text-black">
               Unable to load profile data. Please try logging in again.
             </p>
           </div>
@@ -254,10 +254,10 @@ const Profile = () => {
   // ==================== Main Render ====================
   
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+    <div className="min-h-screen bg-white">
       <Navbar />
 
-      <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8 max-w-7xl">
+      <div className="container mx-auto py-12 px-4 sm:px-6 lg:px-8 max-w-6xl">
         {/* Profile Header */}
         <ProfileHeader
           cover_url={user?.cover_url}
@@ -272,9 +272,9 @@ const Profile = () => {
         />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
           {/* Left Sidebar */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="lg:col-span-1 space-y-8">
             {/* About Section */}
             <AboutSection bio={bio} />
 
@@ -287,7 +287,7 @@ const Profile = () => {
           </div>
 
           {/* Right Content */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Experience Section */}
             <ExperienceSection
               experiences={experiences}

@@ -11,10 +11,10 @@ const ProfileHeader = React.memo(({ avatar_url, full_name, cover_url }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="relative mb-8">
+    <div className="relative mb-12">
       {/* Cover Image */}
       {cover_url ? (
-        <div className="h-48 sm:h-64 w-full rounded-2xl shadow-lg overflow-hidden">
+        <div className="h-56 sm:h-72 w-full rounded-xl overflow-hidden border-2 border-gray-200">
           <img
             src={cover_url}
             alt={full_name ? `${full_name} cover` : 'Profile cover'}
@@ -22,13 +22,13 @@ const ProfileHeader = React.memo(({ avatar_url, full_name, cover_url }) => {
           />
         </div>
       ) : (
-        <div className="h-48 sm:h-64 w-full bg-gradient-to-r from-blue-100 via-indigo-100 to-purple-100 rounded-2xl shadow-lg"></div>
+        <div className="h-56 sm:h-72 w-full bg-gray-100 rounded-xl border-2 border-gray-200"></div>
       )}
       
       {/* Avatar */}
-      <div className="absolute -bottom-1 left-4 sm:left-8">
+      <div className="absolute -bottom-16 left-6 sm:left-10">
         <div className="relative">
-          <div className="w-30 h-32 sm:w-36 sm:h-36 rounded-full border-4 border-white shadow-2xl overflow-hidden bg-white ring-2 ring-gray-100">
+          <div className="w-32 h-32 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
             {avatar_url ? (
               <img
                 src={avatar_url}
@@ -36,8 +36,8 @@ const ProfileHeader = React.memo(({ avatar_url, full_name, cover_url }) => {
                 className="w-full h-full object-cover object-center"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-blue-100 to-indigo-100">
-                <User className="w-14 h-14 sm:w-16 sm:h-16 text-blue-500" />
+              <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                <User className="w-16 h-16 sm:w-20 sm:h-20 text-gray-400" />
               </div>
             )}
           </div>
@@ -45,10 +45,10 @@ const ProfileHeader = React.memo(({ avatar_url, full_name, cover_url }) => {
           {/* Edit Button */}
           <button
             onClick={() => navigate('/profile/edit')}
-            className="absolute bottom-0 right-0 bg-blue-600 hover:bg-blue-700 text-white p-2.5 rounded-full shadow-lg transition-all hover:scale-110 border-2 border-white"
+            className="absolute bottom-2 right-2 bg-black hover:bg-gray-800 text-white p-3 rounded-full shadow-lg transition-all hover:scale-105 border-2 border-white"
             aria-label="Edit profile"
           >
-            <Edit size={16} />
+            <Edit size={18} />
           </button>
         </div>
       </div>

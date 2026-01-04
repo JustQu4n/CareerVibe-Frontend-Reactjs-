@@ -35,7 +35,7 @@ const ExperienceSection = React.memo(({
   return (
     <div className="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
+        <h2 className="text-xl font-bold text-black flex items-center gap-2">
           <Briefcase className="w-6 h-6 text-blue-600" />
           Work Experience
         </h2>
@@ -75,7 +75,7 @@ const ExperienceSection = React.memo(({
               <div className="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-100 hover:shadow-md transition-shadow group">
                 <div className="flex justify-between items-start mb-2">
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-gray-900">
+                    <h3 className="text-lg font-bold text-black">
                       {exp.title}
                     </h3>
                     <div className="flex items-center gap-2 text-blue-600 font-medium mt-1">
@@ -113,7 +113,7 @@ const ExperienceSection = React.memo(({
                 </div>
 
                 {/* Date and Location */}
-                <div className="flex items-center gap-4 text-sm text-gray-600 mt-3">
+                <div className="flex items-center gap-4 text-sm text-black mt-3">
                   <div className="flex items-center gap-1">
                     <Calendar size={14} />
                     <span>
@@ -133,7 +133,7 @@ const ExperienceSection = React.memo(({
 
                 {/* Description */}
                 {exp.description && (
-                  <p className="text-gray-600 text-sm mt-3 leading-relaxed">
+                  <p className="text-black text-sm mt-3 leading-relaxed">
                     {exp.description}
                   </p>
                 )}

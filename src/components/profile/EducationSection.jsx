@@ -111,7 +111,7 @@ const EducationSection = React.memo(({
                 </div>
 
                 {/* Details */}
-                <div className="flex flex-wrap items-center gap-4 text-sm text-gray-600 mt-3">
+                <div className="flex flex-wrap items-center gap-4 text-sm text-black mt-3">
                   {edu.field && (
                     <div className="flex items-center gap-1">
                       <Award size={14} />
@@ -136,7 +136,7 @@ const EducationSection = React.memo(({
 
                 {/* Description */}
                 {edu.description && (
-                  <p className="text-gray-600 text-sm mt-3 leading-relaxed">
+                  <p className="text-black text-sm mt-3 leading-relaxed">
                     {edu.description}
                   </p>
                 )}
