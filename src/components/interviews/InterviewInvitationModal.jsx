@@ -47,10 +47,10 @@ const InterviewInvitationModal = ({
           </motion.div>
           <DialogHeader>
             <DialogTitle className="text-2xl font-bold text-center text-white">
-              {title || 'Mời làm bài Interview'}
+              {title || 'Interview Invitation'}
             </DialogTitle>
             <DialogDescription className="text-blue-50 text-center mt-2">
-              Nhà tuyển dụng yêu cầu bạn hoàn thành bài đánh giá
+              The recruiter requests you to complete the assessment
             </DialogDescription>
           </DialogHeader>
         </div>
@@ -73,10 +73,10 @@ const InterviewInvitationModal = ({
               </div>
               <div>
                 <p className="text-xs text-slate-600 font-medium">
-                  Thời gian
+                  Duration
                 </p>
                 <p className="text-lg font-bold text-slate-900">
-                  {total_time_minutes} phút
+                  {total_time_minutes} minutes
                 </p>
               </div>
             </div>
@@ -87,9 +87,9 @@ const InterviewInvitationModal = ({
                 <FileText className="w-5 h-5 text-purple-600" />
               </div>
               <div>
-                <p className="text-xs text-slate-600 font-medium">Số câu hỏi</p>
+                <p className="text-xs text-slate-600 font-medium">Number of questions</p>
                 <p className="text-lg font-bold text-slate-900">
-                  {question_count} câu
+                  {question_count} questions
                 </p>
               </div>
             </div>
@@ -101,7 +101,7 @@ const InterviewInvitationModal = ({
               <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="text-sm font-medium text-amber-900">
-                  Hạn nộp bài
+                  Deadline
                 </p>
                 <p className="text-sm text-amber-700">
                   {new Date(deadline).toLocaleString('vi-VN')}
@@ -113,13 +113,13 @@ const InterviewInvitationModal = ({
           {/* Important Note */}
           <div className="bg-slate-100 p-4 rounded-lg space-y-2">
             <p className="text-sm font-semibold text-slate-900">
-              📌 Lưu ý quan trọng:
+              📌 Important Note:
             </p>
             <ul className="text-xs text-slate-700 space-y-1 ml-4 list-disc">
-              <li>Mỗi câu hỏi có thời gian giới hạn riêng</li>
-              <li>Không thể quay lại câu trước đó</li>
-              <li>Đảm bảo kết nối mạng ổn định</li>
-              <li>Chuẩn bị sẵn môi trường làm việc yên tĩnh</li>
+              <li>Each question has its own time limit</li>
+              <li>You cannot go back to previous questions</li>
+              <li>Ensure a stable internet connection</li>
+              <li>Prepare a quiet workspace</li>
             </ul>
           </div>
 
@@ -131,14 +131,14 @@ const InterviewInvitationModal = ({
               disabled={loading}
               className="flex-1 h-11"
             >
-              Làm sau
+              Do Later
             </Button>
             <Button
               onClick={onStartNow}
               disabled={loading}
               className="flex-1 h-11 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
             >
-              {loading ? (
+                  {loading ? (
                 <span className="flex items-center">
                   <svg
                     className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
@@ -160,10 +160,10 @@ const InterviewInvitationModal = ({
                       d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                     ></path>
                   </svg>
-                  Đang tải...
+                  Loading...
                 </span>
-              ) : (
-                'Bắt đầu ngay'
+                ) : (
+                'Start Now'
               )}
             </Button>
           </div>

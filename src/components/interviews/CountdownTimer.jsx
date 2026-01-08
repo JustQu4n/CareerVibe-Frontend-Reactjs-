@@ -108,7 +108,9 @@ const CountdownTimer = ({
             {formatTime(timeRemaining)}
           </p>
           <p className="text-xs font-medium mt-1 opacity-75">
-            {percentage <= 25 ? 'Sắp hết giờ!' : 'Thời gian còn lại'}
+          <p className="text-xs font-medium mt-1 opacity-75">
+            {percentage <= 25 ? 'Time is running out!' : 'Time remaining'}
+          </p>
           </p>
         </div>
       </motion.div>

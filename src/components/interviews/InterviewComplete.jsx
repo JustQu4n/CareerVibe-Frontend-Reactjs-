@@ -73,14 +73,14 @@ const InterviewComplete = ({ interviewData }) => {
               transition={{ type: 'spring', delay: 0.2, duration: 0.6 }}
               className="relative"
             >
-              <div className="w-24 h-24 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-14 h-14 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 className="w-14 h-14 text-green-500" />
               </div>
               <h1 className="text-4xl font-bold mb-3">
-                Hoàn thành xuất sắc! 🎉
+                Outstanding Performance! 🎉
               </h1>
               <p className="text-green-50 text-lg">
-                Bạn đã nộp bài interview thành công
+                You have successfully submitted your interview
               </p>
             </motion.div>
           </div>
@@ -94,10 +94,10 @@ const InterviewComplete = ({ interviewData }) => {
               className="bg-green-50 border-2 border-green-200 rounded-xl p-6 text-center"
             >
               <p className="text-lg font-semibold text-green-900 mb-2">
-                ✅ Bài làm của bạn đã được ghi nhận
+                ✅ Your submission has been recorded
               </p>
               <p className="text-sm text-green-700">
-                Nhà tuyển dụng sẽ xem xét và phản hồi trong thời gian sớm nhất
+                The recruiter will review and respond as soon as possible
               </p>
             </motion.div>
 
@@ -113,7 +113,7 @@ const InterviewComplete = ({ interviewData }) => {
                 <p className="text-2xl font-bold text-slate-900">
                   {interviewData?.questions?.length || 0}
                 </p>
-                <p className="text-xs text-slate-600">Câu hoàn thành</p>
+                <p className="text-xs text-slate-600">Questions Completed</p>
               </div>
               <div className="bg-purple-50 rounded-lg p-4 text-center">
                 <Clock className="w-8 h-8 mx-auto mb-2 text-purple-600" />
@@ -125,12 +125,12 @@ const InterviewComplete = ({ interviewData }) => {
                     ) || 0) / 60
                   )}
                 </p>
-                <p className="text-xs text-slate-600">Phút đã sử dụng</p>
+                <p className="text-xs text-slate-600">Minutes Used</p>
               </div>
               <div className="bg-green-50 rounded-lg p-4 text-center">
                 <Briefcase className="w-8 h-8 mx-auto mb-2 text-green-600" />
                 <p className="text-2xl font-bold text-slate-900">100%</p>
-                <p className="text-xs text-slate-600">Hoàn thành</p>
+                <p className="text-xs text-slate-600">Completed</p>
               </div>
             </motion.div>
 
@@ -143,20 +143,20 @@ const InterviewComplete = ({ interviewData }) => {
             >
               <h3 className="font-semibold text-slate-900 flex items-center">
                 <span className="text-xl mr-2">🚀</span>
-                Các bước tiếp theo
+                Next Steps
               </h3>
               <ul className="space-y-2 text-sm text-slate-700">
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
-                  <span>Nhà tuyển dụng sẽ xem xét câu trả lời của bạn</span>
+                  <span>The recruiter will review your answers</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
-                  <span>Bạn sẽ nhận được thông báo qua email</span>
+                  <span>You will receive email notifications</span>
                 </li>
                 <li className="flex items-start">
                   <span className="text-green-500 mr-2">✓</span>
-                  <span>Theo dõi trạng thái ứng tuyển trong Dashboard</span>
+                  <span>Track your application status in Dashboard</span>
                 </li>
               </ul>
             </motion.div>
@@ -173,7 +173,7 @@ const InterviewComplete = ({ interviewData }) => {
                 className="flex-1 h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
               >
                 <Briefcase className="w-5 h-5 mr-2" />
-                Xem đơn ứng tuyển
+                View Applications
               </Button>
               <Button
                 onClick={() => navigate('/')}
@@ -181,13 +181,13 @@ const InterviewComplete = ({ interviewData }) => {
                 className="flex-1 h-12"
               >
                 <Home className="w-5 h-5 mr-2" />
-                Về trang chủ
+                Back to Home
               </Button>
             </motion.div>
 
             {/* Note */}
             <p className="text-xs text-center text-slate-500 pt-2">
-              💡 Bạn có thể tiếp tục tìm kiếm và ứng tuyển các công việc khác
+              💡 You can continue searching and applying for other jobs
             </p>
           </CardContent>
         </Card>

@@ -47,14 +47,8 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
   // Helper để lấy màu recommendation
   const getRecommendationColor = (rec) => {
     switch (rec) {
-      case 'STRONG_PASS':
-        return 'text-green-700 bg-green-50 border-green-200';
       case 'PASS':
-        return 'text-blue-700 bg-blue-50 border-blue-200';
-      case 'POTENTIAL':
-        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
-      case 'WEAK':
-        return 'text-orange-700 bg-orange-50 border-orange-200';
+        return 'text-green-700 bg-green-50 border-green-200';
       case 'FAIL':
         return 'text-red-700 bg-red-50 border-red-200';
       default:
@@ -65,12 +59,8 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
   // Helper để lấy icon recommendation
   const getRecommendationIcon = (rec) => {
     switch (rec) {
-      case 'STRONG_PASS':
       case 'PASS':
         return <CheckCircle className="h-6 w-6" />;
-      case 'POTENTIAL':
-        return <Star className="h-6 w-6" />;
-      case 'WEAK':
       case 'FAIL':
         return <AlertCircle className="h-6 w-6" />;
       default:
@@ -81,10 +71,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
   // Helper để format recommendation text
   const getRecommendationText = (rec) => {
     const map = {
-      'STRONG_PASS': 'Strong Pass',
       'PASS': 'Pass',
-      'POTENTIAL': 'Potential',
-      'WEAK': 'Weak',
       'FAIL': 'Fail'
     };
     return map[rec] || rec;
@@ -118,20 +105,20 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
       </div>
 
       {/* Score Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {/* Total Score Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
-              <Award className="h-6 w-6 text-blue-600" />
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
+              <Award className="h-5 w-5 text-blue-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900">Total Score</h4>
+            <h4 className="text-base font-semibold text-gray-900">Total Score</h4>
           </div>
           <div className="flex items-end gap-2">
-            <span className="text-5xl font-bold text-blue-600">{totalScore}</span>
-            <span className="text-2xl text-gray-400 mb-2">/ 50</span>
+            <span className="text-3xl font-bold text-blue-600">{totalScore}</span>
+            <span className="text-xl text-gray-400 mb-1">/ 50</span>
           </div>
-          <div className="mt-4 bg-gray-100 rounded-full h-3 overflow-hidden">
+          <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full transition-all duration-500"
               style={{ width: `${(totalScore / 50) * 100}%` }}
@@ -140,16 +127,16 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
         </div>
 
         {/* Recommendation Card */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
-              <TrendingUp className="h-6 w-6 text-purple-600" />
+        <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
+              <TrendingUp className="h-5 w-5 text-purple-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900">Recommendation</h4>
+            <h4 className="text-base font-semibold text-gray-900">Recommendation</h4>
           </div>
-          <div className={`inline-flex items-center gap-2 px-6 py-3 rounded-lg border-2 ${getRecommendationColor(recommendation)}`}>
+          <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 ${getRecommendationColor(recommendation)}`}>
             {getRecommendationIcon(recommendation)}
-            <span className="text-2xl font-bold">
+            <span className="text-xl font-bold">
               {getRecommendationText(recommendation)}
             </span>
           </div>

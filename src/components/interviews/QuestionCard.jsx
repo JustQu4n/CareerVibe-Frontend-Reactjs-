@@ -205,12 +205,12 @@ const QuestionCard = ({
               <Textarea
                 value={answer}
                 onChange={(e) => setAnswer(e.target.value)}
-                onPaste={(e) => {
-                  e.preventDefault();
-                  alert('⚠️ Copy-paste is disabled. Please type your answer manually.');
-                }}
-                onCopy={(e) => e.preventDefault()}
-                onCut={(e) => e.preventDefault()}
+                //onPaste={(e) => {
+                 // e.preventDefault();
+                 // alert('⚠️ Copy-paste is disabled. Please type your answer manually.');
+                //
+                //onCopy={(e) => e.preventDefault()}
+                //onCut={(e) => e.preventDefault()}
                 placeholder="Enter your answer here..."
                 className="min-h-[300px] text-base resize-none focus:ring-2 focus:ring-blue-500 border-2"
                 autoFocus

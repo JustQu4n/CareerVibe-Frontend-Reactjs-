@@ -195,22 +195,22 @@ const InterviewSession = () => {
         >
           <Card className="shadow-xl border border-gray-200">
             {/* Header */}
-            <div className="bg-black p-8 text-white rounded-t-lg">
-              <h1 className="text-sm font-bold text-center mb-2">
-                {interviewData?.candidateInterview?.interview_id || 'Interview'}
+            <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-8 text-white rounded-t-lg">
+              <h1 className="text-lg font-bold text-center mb-2 text-blue-50/90">
+                {interviewData?.title || interviewData?.candidateInterview?.title || 'Interview'}
               </h1>
-              <h1 className="text-purple-100 text-center text-xl">
+              <h1 className="text-white text-center text-xl font-semibold">
                 Ready to start?
               </h1>
             </div>
 
             <CardContent className="p-8 space-y-6">
               {/* Interview Info */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="p-5 bg-purple-50 rounded-xl text-center border border-purple-100">
-                  <Clock className="w-8 h-8 mx-auto mb-2 text-purple-600" />
-                  <p className="text-sm text-gray-600 font-medium mb-1">Total Time</p>
-                  <p className="text-2xl font-bold text-gray-900">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="p-3 bg-blue-50 rounded-lg text-center border border-blue-100">
+                  <Clock className="w-6 h-6 mx-auto mb-1.5 text-blue-600" />
+                  <p className="text-xs text-gray-600 font-medium mb-1">Total Time</p>
+                  <p className="text-xl font-bold text-gray-900">
                     {Math.floor(
                       (interviewData?.questions?.reduce(
                         (sum, q) => sum + q.time_limit_seconds,
@@ -220,10 +220,10 @@ const InterviewSession = () => {
                     min
                   </p>
                 </div>
-                <div className="p-5 bg-blue-50 rounded-xl text-center border border-blue-100">
-                  <AlertCircle className="w-8 h-8 mx-auto mb-2 text-blue-600" />
-                  <p className="text-sm text-gray-600 font-medium mb-1">Questions</p>
-                  <p className="text-2xl font-bold text-gray-900">
+                <div className="p-3 bg-blue-50 rounded-lg text-center border border-blue-100">
+                  <AlertCircle className="w-6 h-6 mx-auto mb-1.5 text-blue-600" />
+                  <p className="text-xs text-gray-600 font-medium mb-1">Questions</p>
+                  <p className="text-xl font-bold text-gray-900">
                     {totalQuestions}
                   </p>
                 </div>
@@ -263,7 +263,7 @@ const InterviewSession = () => {
               <Button
                 onClick={handleStartInterview}
                 disabled={loading}
-                className="w-full h-14 text-lg font-semibold bg-black hover:bg-white text-black transition-colors"
+                className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
               >
                 {loading ? (
                   <span className="flex items-center">
@@ -282,7 +282,7 @@ const InterviewSession = () => {
                 variant="ghost"
                 onClick={() => navigate(-1)}
                 disabled={loading}
-                className="w-full hover:bg-gray-100"
+                className="w-full hover:bg-gray-100 border-black border"
               >
                 Go Back
               </Button>
