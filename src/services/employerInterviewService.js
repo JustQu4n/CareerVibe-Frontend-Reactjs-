@@ -168,6 +168,20 @@ export const deleteQuestion = async (interviewId, questionId) => {
   }
 };
 
+/**
+ * Classify question criteria using AI
+ * POST /employer/interviews/:interviewId/questions/:questionId/classify-criteria
+ */
+export const classifyQuestionCriteria = async (interviewId, questionId) => {
+  try {
+    const url = `/api/employer/interviews/${interviewId}/questions/${questionId}/classify-criteria`;
+    const response = await apiClient.post(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to classify question criteria');
+  }
+};
+
 // ========================================
 // Assignments & Candidates
 // ========================================
@@ -299,4 +313,5 @@ export default {
   // AI Scoring
   scoreInterviewWithAI,
   getAIEvaluation,
+  classifyQuestionCriteria,
 };

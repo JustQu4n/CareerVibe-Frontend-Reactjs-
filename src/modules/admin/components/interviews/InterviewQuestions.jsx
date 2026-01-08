@@ -22,6 +22,7 @@ import employerInterviewService from '@/services/employerInterviewService';
 export default function InterviewQuestions({ interview }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [classifyingAll, setClassifyingAll] = useState(false);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
   const [showImportModal, setShowImportModal] = useState(false);
@@ -89,6 +90,38 @@ export default function InterviewQuestions({ interview }) {
           </button>
 
           <button
+            onClick={async () => {
+              if (!questions || questions.length === 0) {
+                toast.info('No questions to classify');
+                return;
+              }
+              if (!window.confirm('Classify criteria for all questions using AI?')) return;
+              try {
+                setClassifyingAll(true);
+                for (let i = 0; i < questions.length; i++) {
+                  const q = questions[i];
+                  toast.info(`Classifying question ${i + 1} / ${questions.length}...`);
+                  try {
+                    await employerInterviewService.classifyQuestionCriteria(interview.interview_id, q.question_id);
+                  } catch (err) {
+                    console.error('classify failed', q.question_id, err);
+                  }
+                }
+                toast.success('Classification completed for all questions');
+                await loadQuestions();
+              } catch (err) {
+                toast.error('Failed to classify all questions');
+              } finally {
+                setClassifyingAll(false);
+              }
+            }}
+            disabled={classifyingAll}
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all"
+          >
+            {classifyingAll ? 'Classifying...' : 'Classify All (AI)'}
+          </button>
+
+          <button
             onClick={() => setShowCreateModal(true)}
             className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
           >
@@ -118,8 +151,10 @@ export default function InterviewQuestions({ interview }) {
               key={question.question_id}
               question={question}
               index={index}
+              interview={interview}
               onEdit={handleEdit}
               onDelete={handleDelete}
+              onClassified={loadQuestions}
             />
           ))}
         </div>
@@ -167,7 +202,32 @@ export default function InterviewQuestions({ interview }) {
 // ========================================
 // Question Card Component
 // ========================================
-function QuestionCard({ question, index, onEdit, onDelete }) {
+function QuestionCard({ question, index, interview, onEdit, onDelete, onClassified }) {
+  const [classifying, setClassifying] = useState(false);
+  // Try multiple sources for criteria
+  const [criteria, setCriteria] = useState(
+    question.classified_criteria || question.criteria || []
+  );
+
+  const handleClassify = async () => {
+    if (!interview || !question) return;
+    try {
+      setClassifying(true);
+      const res = await employerInterviewService.classifyQuestionCriteria(
+        interview.interview_id,
+        question.question_id
+      );
+      // Expecting { question_id, question_text, criteria: [...], message }
+      if (res?.criteria) setCriteria(res.criteria);
+      toast.success(res?.message || 'Classification completed');
+      if (onClassified) onClassified();
+    } catch (err) {
+      toast.error(err.message || 'Failed to classify criteria');
+    } finally {
+      setClassifying(false);
+    }
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -184,9 +244,30 @@ function QuestionCard({ question, index, onEdit, onDelete }) {
 
           {/* Content */}
           <div className="flex-1">
-            <p className="text-gray-900 text-base leading-relaxed mb-4">
+            <p className="text-gray-900 text-base font-bold leading-relaxed mb-4">
               {question.question_text}
             </p>
+
+            {/* Criteria Section - Always visible */}
+            <div className="mb-4 bg-slate-50 border border-slate-200 rounded-lg p-3">
+
+              {criteria && criteria.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {criteria.map((c, i) => (
+                    <span 
+                      key={i} 
+                      className="text-xs bg-white border border-slate-300 px-3 py-1.5 rounded-full text-slate-700 font-medium shadow-sm"
+                    >
+                      {c}
+                    </span>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 italic">
+                  No criteria classified yet. Click the classify button to analyze this question.
+                </p>
+              )}
+            </div>
 
             <div className="flex flex-wrap items-center gap-4">
               {question.time_limit_seconds && (
@@ -217,6 +298,13 @@ function QuestionCard({ question, index, onEdit, onDelete }) {
               className="p-2 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg transition-colors"
             >
               <Edit className="h-4 w-4" />
+            </button>
+            <button
+              onClick={handleClassify}
+              disabled={classifying}
+              className="p-2 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-lg transition-colors flex items-center"
+            >
+              {classifying ? '...' : <FileQuestion className="h-4 w-4" />}
             </button>
             <button
               onClick={() => onDelete(question.question_id)}
