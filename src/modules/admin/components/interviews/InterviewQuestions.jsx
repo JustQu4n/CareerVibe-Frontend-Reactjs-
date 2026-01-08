@@ -19,6 +19,15 @@ import parseExcel from '@/utils/parseExcel';
 import * as XLSX from 'xlsx';
 import employerInterviewService from '@/services/employerInterviewService';
 
+// Available evaluation criteria
+const AVAILABLE_CRITERIA = [
+  'Clarity of Expression',
+  'Logical Thinking',
+  'Learning Attitude & Growth Mindset',
+  'Basic IT Awareness',
+  'Professional Attitude & Honesty'
+];
+
 export default function InterviewQuestions({ interview }) {
   const [questions, setQuestions] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -328,6 +337,7 @@ function CreateQuestionModal({ isOpen, interview, onClose, onSuccess }) {
     time_limit_seconds: '',
     max_score: '',
     order_index: '',
+    criteria: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -340,6 +350,7 @@ function CreateQuestionModal({ isOpen, interview, onClose, onSuccess }) {
         time_limit_seconds: formData.time_limit_seconds ? parseInt(formData.time_limit_seconds) : null,
         max_score: formData.max_score ? parseFloat(formData.max_score) : null,
         order_index: formData.order_index ? parseInt(formData.order_index) : null,
+        criteria: formData.criteria || [],
       });
       toast.success('Question created successfully');
       onSuccess();
@@ -376,6 +387,31 @@ function CreateQuestionModal({ isOpen, interview, onClose, onSuccess }) {
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
               placeholder="Enter your question..."
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Evaluation Criteria
+            </label>
+            <div className="border border-gray-300 rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto bg-gray-50">
+              {AVAILABLE_CRITERIA.map((criterion) => (
+                <label key={criterion} className="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.criteria.includes(criterion)}
+                    onChange={(e) => {
+                      const newCriteria = e.target.checked
+                        ? [...formData.criteria, criterion]
+                        : formData.criteria.filter(c => c !== criterion);
+                      setFormData({ ...formData, criteria: newCriteria });
+                    }}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{criterion}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Select criteria for AI evaluation</p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">
@@ -602,6 +638,7 @@ function EditQuestionModal({ isOpen, interview, question, onClose, onSuccess }) 
     time_limit_seconds: '',
     max_score: '',
     order_index: '',
+    criteria: [],
   });
   const [loading, setLoading] = useState(false);
 
@@ -612,6 +649,7 @@ function EditQuestionModal({ isOpen, interview, question, onClose, onSuccess }) 
         time_limit_seconds: question.time_limit_seconds || '',
         max_score: question.max_score || '',
         order_index: question.order_index || '',
+        criteria: question.criteria || question.classified_criteria || [],
       });
     }
   }, [question]);
@@ -628,6 +666,7 @@ function EditQuestionModal({ isOpen, interview, question, onClose, onSuccess }) 
           time_limit_seconds: formData.time_limit_seconds ? parseInt(formData.time_limit_seconds) : null,
           max_score: formData.max_score ? parseFloat(formData.max_score) : null,
           order_index: formData.order_index ? parseInt(formData.order_index) : null,
+          criteria: formData.criteria || [],
         }
       );
       toast.success('Question updated successfully');
@@ -664,6 +703,31 @@ function EditQuestionModal({ isOpen, interview, question, onClose, onSuccess }) 
               rows={4}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
             />
+          </div>
+
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Evaluation Criteria
+            </label>
+            <div className="border border-gray-300 rounded-lg p-3 space-y-2 max-h-40 overflow-y-auto bg-gray-50">
+              {AVAILABLE_CRITERIA.map((criterion) => (
+                <label key={criterion} className="flex items-center gap-2 cursor-pointer hover:bg-white p-2 rounded transition-colors">
+                  <input
+                    type="checkbox"
+                    checked={formData.criteria.includes(criterion)}
+                    onChange={(e) => {
+                      const newCriteria = e.target.checked
+                        ? [...formData.criteria, criterion]
+                        : formData.criteria.filter(c => c !== criterion);
+                      setFormData({ ...formData, criteria: newCriteria });
+                    }}
+                    className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-gray-700">{criterion}</span>
+                </label>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500 mt-1">Select criteria for AI evaluation</p>
           </div>
 
           <div className="grid grid-cols-3 gap-4">

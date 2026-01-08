@@ -81,6 +81,24 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
   const criteriaEntries = criteria ? Object.entries(criteria) : [];
   const maxScore = 10; // Mỗi criteria có max 10 điểm
 
+  // Convert detailedFeedback object to array, excluding group2Analysis
+  let feedbackArray = [];
+  let group2Analysis = null;
+  
+  if (detailedFeedback && typeof detailedFeedback === 'object') {
+    if (Array.isArray(detailedFeedback)) {
+      // If it's already an array, use it directly
+      feedbackArray = detailedFeedback;
+    } else {
+      // If it's an object, extract numeric keys and group2Analysis
+      group2Analysis = detailedFeedback.group2Analysis;
+      feedbackArray = Object.keys(detailedFeedback)
+        .filter(key => key !== 'group2Analysis' && !isNaN(key))
+        .sort((a, b) => Number(a) - Number(b))
+        .map(key => detailedFeedback[key]);
+    }
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -194,7 +212,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
       )}
 
       {/* Detailed Feedback */}
-      {detailedFeedback && detailedFeedback.length > 0 && (
+      {feedbackArray && feedbackArray.length > 0 && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
           <div className="flex items-center gap-3 mb-6">
             <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
@@ -203,72 +221,206 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <h4 className="text-lg font-semibold text-gray-900">Detailed Feedback by Question</h4>
           </div>
           <div className="space-y-6">
-            {detailedFeedback.map((feedback, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: index * 0.1 }}
-                className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
-              >
-                {/* Question Header */}
-                <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-                  <div className="flex items-center gap-2">
-                    <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
-                      Q{feedback.questionIndex}
+            {feedbackArray.map((feedback, index) => {
+              // Calculate average score from scores object if available
+              const scores = feedback.scores || {};
+              const scoreValues = Object.values(scores).filter(v => v !== null && v !== undefined);
+              const avgScore = scoreValues.length > 0 
+                ? (scoreValues.reduce((a, b) => a + b, 0) / scoreValues.length).toFixed(1)
+                : feedback.score || 0;
+
+              return (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"
+                >
+                  {/* Question Header */}
+                  <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
+                    <div className="flex items-center gap-2">
+                      <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                        Q{feedback.questionIndex + 1}
+                      </div>
+                      <span className="font-semibold text-gray-900">Question {feedback.questionIndex + 1}</span>
                     </div>
-                    <span className="font-semibold text-gray-900">Question {feedback.questionIndex}</span>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm text-gray-600">Avg Score:</span>
+                      <span className={`text-2xl font-bold ${
+                        avgScore >= 8 ? 'text-green-600' :
+                        avgScore >= 6 ? 'text-yellow-600' :
+                        avgScore >= 4 ? 'text-orange-600' :
+                        'text-red-600'
+                      }`}>
+                        {avgScore}/10
+                      </span>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm text-gray-600">Score:</span>
+
+                  {/* Question Criteria */}
+                  {feedback.questionCriteria && feedback.questionCriteria.length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <Target className="h-4 w-4" />
+                        Evaluation Criteria
+                      </h5>
+                      <div className="flex flex-wrap gap-2">
+                        {feedback.questionCriteria.map((criterion, idx) => (
+                          <span key={idx} className="text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-full text-slate-700">
+                            {criterion}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Individual Scores */}
+                  {scores && Object.keys(scores).length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                        <BarChart3 className="h-4 w-4" />
+                        Score Breakdown
+                      </h5>
+                      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        {Object.entries(scores).map(([key, value]) => (
+                          <div key={key} className="bg-slate-50 rounded-lg p-3">
+                            <div className="text-xs text-gray-600 mb-1 capitalize">
+                              {key === 'itAwareness' ? 'IT Awareness' : 
+                               key === 'clarity' ? 'Clarity' : 
+                               key === 'logic' ? 'Logical Thinking' : key}
+                            </div>
+                            <div className="flex items-center gap-2">
+                              <span className={`text-xl font-bold ${
+                                value === null ? 'text-gray-400' :
+                                value >= 8 ? 'text-green-600' :
+                                value >= 6 ? 'text-yellow-600' :
+                                'text-orange-600'
+                              }`}>
+                                {value !== null ? value : 'N/A'}
+                              </span>
+                              {value !== null && <span className="text-sm text-gray-500">/10</span>}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Strengths */}
+                  {feedback.strengths && feedback.strengths.length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-green-700 mb-2 flex items-center gap-2">
+                        <CheckCircle className="h-4 w-4" />
+                        Strengths
+                      </h5>
+                      <ul className="space-y-1">
+                        {feedback.strengths.map((strength, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="text-green-500 mt-0.5">✓</span>
+                            <span>{strength}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {/* Weaknesses */}
+                  {feedback.weaknesses && feedback.weaknesses.length > 0 && (
+                    <div className="mb-4">
+                      <h5 className="text-sm font-semibold text-orange-700 mb-2 flex items-center gap-2">
+                        <AlertCircle className="h-4 w-4" />
+                        Areas for Improvement
+                      </h5>
+                      <ul className="space-y-1">
+                        {feedback.weaknesses.map((weakness, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="text-orange-500 mt-0.5">!</span>
+                            <span>{weakness}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Group 2 Analysis - Displayed once at the end */}
+      {group2Analysis && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
+              <Star className="h-6 w-6 text-purple-600" />
+            </div>
+            <h4 className="text-lg font-semibold text-gray-900">Attitude & Professional Skills Analysis</h4>
+          </div>
+          
+          <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-5 border border-purple-200">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Learning Attitude */}
+              {group2Analysis.learningAttitude && (
+                <div className="bg-white rounded-lg p-4 border border-purple-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-gray-800">Learning Attitude & Growth Mindset</span>
                     <span className={`text-2xl font-bold ${
-                      feedback.score >= 8 ? 'text-green-600' :
-                      feedback.score >= 6 ? 'text-yellow-600' :
-                      feedback.score >= 4 ? 'text-orange-600' :
-                      'text-red-600'
+                      group2Analysis.learningAttitude.score >= 8 ? 'text-green-600' :
+                      group2Analysis.learningAttitude.score >= 6 ? 'text-yellow-600' :
+                      'text-orange-600'
                     }`}>
-                      {feedback.score}/10
+                      {group2Analysis.learningAttitude.score}/10
                     </span>
                   </div>
+                  {group2Analysis.learningAttitude.evidence && 
+                   group2Analysis.learningAttitude.evidence.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 mb-2">Evidence:</p>
+                      <ul className="space-y-1.5">
+                        {group2Analysis.learningAttitude.evidence.map((item, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="text-purple-500 mt-0.5">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                 </div>
+              )}
 
-                {/* Strengths */}
-                {feedback.strengths && feedback.strengths.length > 0 && (
-                  <div className="mb-4">
-                    <h5 className="text-sm font-semibold text-green-700 mb-2 flex items-center gap-2">
-                      <CheckCircle className="h-4 w-4" />
-                      Strengths
-                    </h5>
-                    <ul className="space-y-1">
-                      {feedback.strengths.map((strength, idx) => (
-                        <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                          <span className="text-green-500 mt-0.5">✓</span>
-                          <span>{strength}</span>
-                        </li>
-                      ))}
-                    </ul>
+              {/* Professional Attitude */}
+              {group2Analysis.professionalAttitude && (
+                <div className="bg-white rounded-lg p-4 border border-purple-100">
+                  <div className="flex items-center justify-between mb-3">
+                    <span className="text-sm font-semibold text-gray-800">Professional Attitude & Honesty</span>
+                    <span className={`text-2xl font-bold ${
+                      group2Analysis.professionalAttitude.score >= 8 ? 'text-green-600' :
+                      group2Analysis.professionalAttitude.score >= 6 ? 'text-yellow-600' :
+                      'text-orange-600'
+                    }`}>
+                      {group2Analysis.professionalAttitude.score}/10
+                    </span>
                   </div>
-                )}
-
-                {/* Weaknesses */}
-                {feedback.weaknesses && feedback.weaknesses.length > 0 && (
-                  <div>
-                    <h5 className="text-sm font-semibold text-orange-700 mb-2 flex items-center gap-2">
-                      <AlertCircle className="h-4 w-4" />
-                      Areas for Improvement
-                    </h5>
-                    <ul className="space-y-1">
-                      {feedback.weaknesses.map((weakness, idx) => (
-                        <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
-                          <span className="text-orange-500 mt-0.5">!</span>
-                          <span>{weakness}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </motion.div>
-            ))}
+                  {group2Analysis.professionalAttitude.evidence && 
+                   group2Analysis.professionalAttitude.evidence.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-gray-600 mb-2">Evidence:</p>
+                      <ul className="space-y-1.5">
+                        {group2Analysis.professionalAttitude.evidence.map((item, idx) => (
+                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                            <span className="text-purple-500 mt-0.5">•</span>
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
