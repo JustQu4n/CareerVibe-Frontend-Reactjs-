@@ -239,7 +239,7 @@ const InterviewSession = () => {
                 <ShieldAlert className="h-5 w-5 text-amber-600" />
                 <AlertDescription className="ml-2">
                   <p className="font-semibold text-amber-900 mb-2">
-                    📋 Important Rules:
+                     Important Rules:
                   </p>
                   <ul className="text-sm text-amber-800 space-y-1.5 list-disc ml-4">
                     <li>Each question has its own time limit</li>
@@ -254,7 +254,7 @@ const InterviewSession = () => {
               {interviewData?.candidateInterview?.deadline_at && (
                 <div className="bg-gray-100 p-4 rounded-lg border border-gray-200">
                   <p className="text-sm font-semibold text-gray-900 mb-1">
-                    ⏰ Deadline:
+                     Deadline:
                   </p>
                   <p className="text-sm text-gray-700">
                     {new Date(
