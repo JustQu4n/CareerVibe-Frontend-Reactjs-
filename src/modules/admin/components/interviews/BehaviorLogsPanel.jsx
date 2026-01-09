@@ -133,49 +133,6 @@ const BehaviorLogsPanel = ({ behaviorLogs = [], candidateName = 'Candidate', loa
                   No suspicious behavior detected during this interview session.
                 </p>
               </div>
-              <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                <p className="text-xs text-amber-800 font-medium mb-1">
-                  ⚠️ Scenario 2: Backend Not Configured
-                </p>
-                <p className="text-xs text-amber-700 mb-3">
-                  Behavior tracking is enabled on frontend, but backend may need configuration.
-                </p>
-                <details className="text-xs text-amber-800">
-                  <summary className="font-semibold cursor-pointer hover:text-amber-900">
-                    Backend Implementation Required
-                  </summary>
-                  <div className="mt-3 space-y-2 pl-4 border-l-2 border-amber-300">
-                    <p><strong>1. Modify API Response:</strong></p>
-                    <code className="block bg-amber-100 p-2 rounded text-xs font-mono">
-                      GET /api/employer/interviews/:id/candidates/:candidateId/answers
-                    </code>
-                    <p>Should include <code className="bg-amber-100 px-1">behavior_logs</code> array in each answer object</p>
-                    
-                    <p className="mt-2"><strong>2. Or Create New Endpoint:</strong></p>
-                    <code className="block bg-amber-100 p-2 rounded text-xs font-mono">
-                      GET /api/employer/interviews/:id/candidates/:candidateId/behavior-logs
-                    </code>
-                    
-                    <p className="mt-2"><strong>3. Data Structure:</strong></p>
-                    <pre className="bg-amber-100 p-2 rounded text-xs font-mono overflow-x-auto">
-{`{
-  "logs": [
-    {
-      "type": "PASTE|COPY|...",
-      "timestamp": "ISO date",
-      "description": "...",
-      "data": {...}
-    }
-  ]
-}`}
-                    </pre>
-                    
-                    <p className="mt-2">
-                      See <code className="bg-amber-100 px-1">BACKEND_BEHAVIOR_TRACKING_REQUIREMENTS.md</code> for details
-                    </p>
-                  </div>
-                </details>
-              </div>
             </div>
           </div>
         </div>

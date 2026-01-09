@@ -309,13 +309,13 @@ const QuestionCard = ({
                   className="min-h-[300px] text-base resize-none focus:ring-2 focus:ring-blue-500 border-2"
                   autoFocus
                 />
-                {/* Behavior tracking indicator */}
+                {/* Behavior tracking indicator 
                 {behaviorLogs.length > 0 && (
                   <div className="absolute top-2 right-2 flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
                     <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
                     <span>Activity monitored</span>
                   </div>
-                )}
+                )}*/}
               </div>
             )}
 
