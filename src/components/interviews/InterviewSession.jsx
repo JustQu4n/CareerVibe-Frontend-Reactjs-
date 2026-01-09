@@ -78,9 +78,9 @@ const InterviewSession = () => {
   };
 
   // Handle answer submission (next question)
-  const handleSubmitAnswer = async (answerText, elapsedSeconds) => {
-    // Update answer in state
-    updateAnswer(answerText, elapsedSeconds);
+  const handleSubmitAnswer = async (answerText, elapsedSeconds, behaviorLogs = []) => {
+    // Update answer in state with behavior logs
+    updateAnswer(answerText, elapsedSeconds, behaviorLogs);
     
     // If last question, submit entire interview with updated answer
     if (currentQuestionIndex === totalQuestions - 1) {
@@ -91,6 +91,7 @@ const InterviewSession = () => {
             question_id: q.question_id,
             answer_text: answerText,
             elapsed_seconds: elapsedSeconds,
+            behavior_logs: behaviorLogs, // Include behavior logs
           };
         }
         // Get from existing answers array
@@ -98,20 +99,21 @@ const InterviewSession = () => {
           question_id: q.question_id,
           answer_text: answers[index]?.answer_text || '',
           elapsed_seconds: answers[index]?.elapsed_seconds || 0,
+          behavior_logs: answers[index]?.behavior_logs || [],
         };
       })];
       
       await submitInterview(updatedAnswers);
     } else {
-      // Move to next question
+      // Move to next question (answer already updated via updateAnswer call above)
       nextQuestion();
     }
   };
 
   // Handle auto-submit when time's up
-  const handleAutoSubmit = async (answerText, elapsedSeconds) => {
-    // Update answer in state
-    updateAnswer(answerText, elapsedSeconds);
+  const handleAutoSubmit = async (answerText, elapsedSeconds, behaviorLogs = []) => {
+    // Update answer in state with behavior logs
+    updateAnswer(answerText, elapsedSeconds, behaviorLogs);
     
     // Auto move to next or submit
     if (currentQuestionIndex === totalQuestions - 1) {
@@ -122,6 +124,7 @@ const InterviewSession = () => {
             question_id: q.question_id,
             answer_text: answerText,
             elapsed_seconds: elapsedSeconds,
+            behavior_logs: behaviorLogs, // Include behavior logs
           };
         }
         // Get from existing answers array
@@ -129,11 +132,13 @@ const InterviewSession = () => {
           question_id: q.question_id,
           answer_text: answers[index]?.answer_text || '',
           elapsed_seconds: answers[index]?.elapsed_seconds || 0,
+          behavior_logs: answers[index]?.behavior_logs || [],
         };
       })];
       
       await submitInterview(updatedAnswers);
     } else {
+      // Move to next question (answer already updated via updateAnswer call above)
       nextQuestion();
     }
   };

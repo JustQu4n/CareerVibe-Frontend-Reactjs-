@@ -92,7 +92,7 @@ export default function InterviewQuestions({ interview }) {
         <div className="flex items-center gap-3">
           <button
             onClick={() => setShowImportModal(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold rounded-xl transition-all"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-white border border-gray-200 hover:bg-gray-50 text-gray-700 font-semibold transition-all"
           >
             <FileQuestion className="h-4 w-4" />
             Import Excel
@@ -125,16 +125,16 @@ export default function InterviewQuestions({ interview }) {
               }
             }}
             disabled={classifyingAll}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white font-semibold transition-all"
           >
             {classifyingAll ? 'Classifying...' : 'Classify All (AI)'}
           </button>
 
           <button
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 transition-all"
+            className="flex items-center gap-2 px-4 py-2 text-sm rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-semibold shadow-sm shadow-blue-500/20 transition-all"
           >
-            <Plus className="h-5 w-5" />
+            <Plus className="h-4 w-4" />
             Add Question
           </button>
         </div>
@@ -148,7 +148,7 @@ export default function InterviewQuestions({ interview }) {
           <p className="text-gray-600 mb-6">Get started by adding your first question</p>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
+            className="gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-colors"
           >
             Add Question
           </button>

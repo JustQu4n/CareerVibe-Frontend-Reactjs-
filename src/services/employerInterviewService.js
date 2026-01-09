@@ -243,6 +243,50 @@ export const getCandidateAnswers = async (interviewId, candidateInterviewId) => 
 };
 
 /**
+ * Send congratulations email to candidate
+ * POST /api/employer/interviews/{interviewId}/candidates/{candidateInterviewId}/send-congratulations
+ */
+export const sendCongratulations = async (interviewId, candidateInterviewId) => {
+  try {
+    const url = `/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/send-congratulations`;
+    const response = await apiClient.post(url);
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to send congratulations email');
+  }
+};
+
+/**
+ * Get candidate behavior logs
+ * GET /api/employer/interviews/{interviewId}/candidates/{candidateInterviewId}/behavior-logs
+ */
+export const getBehaviorLogs = async (interviewId, candidateInterviewId) => {
+  try {
+    const response = await apiClient.get(
+      `/api/employer/interviews/${interviewId}/candidates/${candidateInterviewId}/behavior-logs`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch behavior logs');
+  }
+};
+
+/**
+ * Get behavior summary for all candidates in an interview
+ * GET /api/employer/interviews/{interviewId}/behavior-summary
+ */
+export const getBehaviorSummary = async (interviewId) => {
+  try {
+    const response = await apiClient.get(
+      `/api/employer/interviews/${interviewId}/behavior-summary`
+    );
+    return response.data;
+  } catch (error) {
+    throw new Error(error.response?.data?.message || 'Failed to fetch behavior summary');
+  }
+};
+
+/**
  * Chấm điểm câu trả lời
  */
 export const gradeAnswer = async (interviewId, candidateInterviewId, answerId, data) => {
@@ -313,5 +357,8 @@ export default {
   // AI Scoring
   scoreInterviewWithAI,
   getAIEvaluation,
+  sendCongratulations,
+  getBehaviorLogs,
+  getBehaviorSummary,
   classifyQuestionCriteria,
 };

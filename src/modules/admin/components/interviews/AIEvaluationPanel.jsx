@@ -22,9 +22,9 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
   if (loading) {
     return (
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-        <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center justify-center gap-3">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-600"></div>
-          <p className="text-gray-600">AI is analyzing the interview...</p>
+          <p className="text-black">AI is analyzing the interview...</p>
         </div>
       </div>
     );
@@ -130,11 +130,11 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center">
               <Award className="h-5 w-5 text-blue-600" />
             </div>
-            <h4 className="text-base font-semibold text-gray-900">Total Score</h4>
+            <h4 className="text-base font-semibold text-black">Total Score</h4>
           </div>
           <div className="flex items-end gap-2">
             <span className="text-3xl font-bold text-blue-600">{totalScore}</span>
-            <span className="text-xl text-gray-400 mb-1">/ 50</span>
+            <span className="text-xl text-black mb-1">/ 50</span>
           </div>
           <div className="mt-3 bg-gray-100 rounded-full h-2 overflow-hidden">
             <div
@@ -150,7 +150,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <div className="h-8 w-8 rounded-lg bg-purple-100 flex items-center justify-center">
               <TrendingUp className="h-5 w-5 text-purple-600" />
             </div>
-            <h4 className="text-base font-semibold text-gray-900">Recommendation</h4>
+            <h4 className="text-base font-semibold text-black">Recommendation</h4>
           </div>
           <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border-2 ${getRecommendationColor(recommendation)}`}>
             {getRecommendationIcon(recommendation)}
@@ -168,16 +168,16 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
               <BarChart3 className="h-6 w-6 text-green-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900">Evaluation Criteria</h4>
+            <h4 className="text-lg font-semibold text-black">Evaluation Criteria</h4>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {criteriaEntries.map(([key, value]) => (
               <div key={key} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-700 capitalize">
+                  <span className="text-sm font-medium text-black capitalize">
                     {key.replace(/_/g, ' ')}
                   </span>
-                  <span className="text-lg font-bold text-gray-900">
+                  <span className="text-lg font-bold text-black">
                     {value} / {maxScore}
                   </span>
                 </div>
@@ -205,9 +205,9 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <div className="h-10 w-10 rounded-lg bg-indigo-100 flex items-center justify-center">
               <MessageSquare className="h-6 w-6 text-indigo-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900">Overall Summary</h4>
+            <h4 className="text-lg font-semibold text-black">Overall Summary</h4>
           </div>
-          <p className="text-gray-700 leading-relaxed">{summary}</p>
+          <p className="text-black leading-relaxed">{summary}</p>
         </div>
       )}
 
@@ -239,14 +239,14 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                 >
                   {/* Question Header */}
                   <div className="flex items-center justify-between mb-4 pb-3 border-b border-gray-200">
-                    <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-2">
                       <div className="h-8 w-8 rounded-lg bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
                         Q{feedback.questionIndex + 1}
                       </div>
-                      <span className="font-semibold text-gray-900">Question {feedback.questionIndex + 1}</span>
+                      <span className="font-semibold text-black">Question {feedback.questionIndex + 1}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-sm text-gray-600">Avg Score:</span>
+                      <span className="text-sm text-black">Avg Score:</span>
                       <span className={`text-2xl font-bold ${
                         avgScore >= 8 ? 'text-green-600' :
                         avgScore >= 6 ? 'text-yellow-600' :
@@ -261,13 +261,13 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                   {/* Question Criteria */}
                   {feedback.questionCriteria && feedback.questionCriteria.length > 0 && (
                     <div className="mb-4">
-                      <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <h5 className="text-sm font-semibold text-black mb-2 flex items-center gap-2">
                         <Target className="h-4 w-4" />
                         Evaluation Criteria
                       </h5>
                       <div className="flex flex-wrap gap-2">
                         {feedback.questionCriteria.map((criterion, idx) => (
-                          <span key={idx} className="text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-full text-slate-700">
+                          <span key={idx} className="text-xs bg-slate-100 border border-slate-200 px-2 py-1 rounded-full text-black">
                             {criterion}
                           </span>
                         ))}
@@ -278,14 +278,14 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                   {/* Individual Scores */}
                   {scores && Object.keys(scores).length > 0 && (
                     <div className="mb-4">
-                      <h5 className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+                      <h5 className="text-sm font-semibold text-black mb-2 flex items-center gap-2">
                         <BarChart3 className="h-4 w-4" />
                         Score Breakdown
                       </h5>
                       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                         {Object.entries(scores).map(([key, value]) => (
                           <div key={key} className="bg-slate-50 rounded-lg p-3">
-                            <div className="text-xs text-gray-600 mb-1 capitalize">
+                            <div className="text-xs text-black mb-1 capitalize">
                               {key === 'itAwareness' ? 'IT Awareness' : 
                                key === 'clarity' ? 'Clarity' : 
                                key === 'logic' ? 'Logical Thinking' : key}
@@ -299,7 +299,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                               }`}>
                                 {value !== null ? value : 'N/A'}
                               </span>
-                              {value !== null && <span className="text-sm text-gray-500">/10</span>}
+                              {value !== null && <span className="text-sm text-black">/10</span>}
                             </div>
                           </div>
                         ))}
@@ -316,7 +316,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                       </h5>
                       <ul className="space-y-1">
                         {feedback.strengths.map((strength, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                          <li key={idx} className="text-sm text-black flex items-start gap-2">
                             <span className="text-green-500 mt-0.5">✓</span>
                             <span>{strength}</span>
                           </li>
@@ -334,7 +334,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                       </h5>
                       <ul className="space-y-1">
                         {feedback.weaknesses.map((weakness, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                          <li key={idx} className="text-sm text-black flex items-start gap-2">
                             <span className="text-orange-500 mt-0.5">!</span>
                             <span>{weakness}</span>
                           </li>
@@ -356,7 +356,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
             <div className="h-10 w-10 rounded-lg bg-purple-100 flex items-center justify-center">
               <Star className="h-6 w-6 text-purple-600" />
             </div>
-            <h4 className="text-lg font-semibold text-gray-900">Attitude & Professional Skills Analysis</h4>
+            <h4 className="text-lg font-semibold text-black">Attitude & Professional Skills Analysis</h4>
           </div>
           
           <div className="bg-gradient-to-br from-purple-50 to-blue-50 rounded-lg p-5 border border-purple-200">
@@ -365,7 +365,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
               {group2Analysis.learningAttitude && (
                 <div className="bg-white rounded-lg p-4 border border-purple-100">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-gray-800">Learning Attitude & Growth Mindset</span>
+                    <span className="text-sm font-semibold text-black">Learning Attitude & Growth Mindset</span>
                     <span className={`text-2xl font-bold ${
                       group2Analysis.learningAttitude.score >= 8 ? 'text-green-600' :
                       group2Analysis.learningAttitude.score >= 6 ? 'text-yellow-600' :
@@ -377,10 +377,10 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                   {group2Analysis.learningAttitude.evidence && 
                    group2Analysis.learningAttitude.evidence.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold text-gray-600 mb-2">Evidence:</p>
+                      <p className="text-xs font-semibold text-black mb-2">Evidence:</p>
                       <ul className="space-y-1.5">
                         {group2Analysis.learningAttitude.evidence.map((item, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                          <li key={idx} className="text-sm text-black flex items-start gap-2">
                             <span className="text-purple-500 mt-0.5">•</span>
                             <span>{item}</span>
                           </li>
@@ -395,7 +395,7 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
               {group2Analysis.professionalAttitude && (
                 <div className="bg-white rounded-lg p-4 border border-purple-100">
                   <div className="flex items-center justify-between mb-3">
-                    <span className="text-sm font-semibold text-gray-800">Professional Attitude & Honesty</span>
+                    <span className="text-sm font-semibold text-black">Professional Attitude & Honesty</span>
                     <span className={`text-2xl font-bold ${
                       group2Analysis.professionalAttitude.score >= 8 ? 'text-green-600' :
                       group2Analysis.professionalAttitude.score >= 6 ? 'text-yellow-600' :
@@ -407,10 +407,10 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
                   {group2Analysis.professionalAttitude.evidence && 
                    group2Analysis.professionalAttitude.evidence.length > 0 && (
                     <div>
-                      <p className="text-xs font-semibold text-gray-600 mb-2">Evidence:</p>
+                      <p className="text-xs font-semibold text-black mb-2">Evidence:</p>
                       <ul className="space-y-1.5">
                         {group2Analysis.professionalAttitude.evidence.map((item, idx) => (
-                          <li key={idx} className="text-sm text-gray-700 flex items-start gap-2">
+                          <li key={idx} className="text-sm text-black flex items-start gap-2">
                             <span className="text-purple-500 mt-0.5">•</span>
                             <span>{item}</span>
                           </li>

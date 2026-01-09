@@ -26,6 +26,11 @@ const QuestionCard = ({
   const [isListening, setIsListening] = useState(false);
   const [recognition, setRecognition] = useState(null);
   const [voiceLang, setVoiceLang] = useState('en-US'); // 'en-US' or 'vi-VN'
+  
+  // Behavior tracking state
+  const [behaviorLogs, setBehaviorLogs] = useState([]);
+  const [previousAnswerLength, setPreviousAnswerLength] = useState(0);
+  const [tabSwitchCount, setTabSwitchCount] = useState(0);
 
   // Initialize speech recognition
   useEffect(() => {
@@ -95,15 +100,107 @@ const QuestionCard = ({
     };
   }, [recognition, isListening]);
 
+  // Behavior tracking: Tab switch detection
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        const log = {
+          type: 'TAB_SWITCH',
+          timestamp: new Date().toISOString(),
+          question_id: question?.question_id,
+          description: 'Candidate switched to another tab/window',
+        };
+        setBehaviorLogs(prev => [...prev, log]);
+        setTabSwitchCount(prev => prev + 1);
+      }
+    };
+
+    const handleBlur = () => {
+      const log = {
+        type: 'FOCUS_LOSS',
+        timestamp: new Date().toISOString(),
+        question_id: question?.question_id,
+        description: 'Interview window lost focus',
+      };
+      setBehaviorLogs(prev => [...prev, log]);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('blur', handleBlur);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('blur', handleBlur);
+    };
+  }, [question]);
+
+  // Behavior tracking: Copy-paste detection
+  const handlePaste = (e) => {
+    const pastedText = e.clipboardData.getData('text');
+    const log = {
+      type: 'PASTE',
+      timestamp: new Date().toISOString(),
+      question_id: question?.question_id,
+      description: `Pasted ${pastedText.length} characters`,
+      data: {
+        length: pastedText.length,
+        preview: pastedText.substring(0, 50) + (pastedText.length > 50 ? '...' : ''),
+      },
+    };
+    setBehaviorLogs(prev => [...prev, log]);
+  };
+
+  // Behavior tracking: Copy detection
+  const handleCopy = (e) => {
+    const copiedText = window.getSelection().toString();
+    const log = {
+      type: 'COPY',
+      timestamp: new Date().toISOString(),
+      question_id: question?.question_id,
+      description: `Copied ${copiedText.length} characters`,
+      data: {
+        length: copiedText.length,
+      },
+    };
+    setBehaviorLogs(prev => [...prev, log]);
+  };
+
+  // Behavior tracking: Large deletion detection (thinking/rewriting)
+  const handleAnswerChange = (e) => {
+    const newAnswer = e.target.value;
+    const currentLength = newAnswer.length;
+    const lengthDiff = currentLength - previousAnswerLength;
+    
+    // Detect large deletions (more than 20 characters at once)
+    if (lengthDiff < -20) {
+      const log = {
+        type: 'LARGE_DELETION',
+        timestamp: new Date().toISOString(),
+        question_id: question?.question_id,
+        description: `Deleted ${Math.abs(lengthDiff)} characters (possible rethinking/rewriting)`,
+        data: {
+          deleted_chars: Math.abs(lengthDiff),
+          previous_length: previousAnswerLength,
+          new_length: currentLength,
+        },
+      };
+      setBehaviorLogs(prev => [...prev, log]);
+    }
+    
+    setPreviousAnswerLength(currentLength);
+    setAnswer(newAnswer);
+  };
+
   const handleSubmit = async () => {
     setIsSubmitting(true);
-    await onSubmitAnswer(answer, elapsedSeconds);
+    // Include behavior logs in submission
+    await onSubmitAnswer(answer, elapsedSeconds, behaviorLogs);
     setIsSubmitting(false);
   };
 
   const handleTimeUp = async () => {
-    // Auto-submit when time's up
-    await onAutoSubmit(answer, elapsedSeconds);
+    // Auto-submit when time's up with behavior logs
+    await onAutoSubmit(answer, elapsedSeconds, behaviorLogs);
   };
 
   if (!question) return null;
@@ -202,19 +299,24 @@ const QuestionCard = ({
 
             {/* Text Input Mode */}
             {inputMode === 'text' && (
-              <Textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                //onPaste={(e) => {
-                 // e.preventDefault();
-                 // alert('⚠️ Copy-paste is disabled. Please type your answer manually.');
-                //
-                //onCopy={(e) => e.preventDefault()}
-                //onCut={(e) => e.preventDefault()}
-                placeholder="Enter your answer here..."
-                className="min-h-[300px] text-base resize-none focus:ring-2 focus:ring-blue-500 border-2"
-                autoFocus
-              />
+              <div className="relative">
+                <Textarea
+                  value={answer}
+                  onChange={handleAnswerChange}
+                  onPaste={handlePaste}
+                  onCopy={handleCopy}
+                  placeholder="Enter your answer here..."
+                  className="min-h-[300px] text-base resize-none focus:ring-2 focus:ring-blue-500 border-2"
+                  autoFocus
+                />
+                {/* Behavior tracking indicator */}
+                {behaviorLogs.length > 0 && (
+                  <div className="absolute top-2 right-2 flex items-center gap-2 text-xs text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
+                    <span className="inline-block w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
+                    <span>Activity monitored</span>
+                  </div>
+                )}
+              </div>
             )}
 
             {/* Voice Input Mode */}

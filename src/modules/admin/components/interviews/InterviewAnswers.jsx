@@ -22,6 +22,7 @@ import {
 import { toast } from 'react-toastify';
 import employerInterviewService from '@/services/employerInterviewService';
 import AIEvaluationPanel from './AIEvaluationPanel';
+import BehaviorLogsPanel from './BehaviorLogsPanel';
 
 export default function InterviewAnswers({ interview }) {
   const [candidates, setCandidates] = useState([]);
@@ -32,6 +33,8 @@ export default function InterviewAnswers({ interview }) {
   const [aiEvaluation, setAiEvaluation] = useState(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [showAIPanel, setShowAIPanel] = useState(false);
+  const [behaviorLogs, setBehaviorLogs] = useState([]);
+  const [behaviorLoading, setBehaviorLoading] = useState(false);
 
   useEffect(() => {
     loadCandidates();
@@ -72,6 +75,8 @@ export default function InterviewAnswers({ interview }) {
     await loadCandidateAnswers(candidate.candidate_interview_id);
     // Auto-load AI evaluation if it exists
     loadAIEvaluation(candidate.candidate_interview_id);
+    // Load behavior logs from backend
+    loadBehaviorLogs(candidate.candidate_interview_id);
   };
 
   const handleBackToList = () => {
@@ -79,6 +84,7 @@ export default function InterviewAnswers({ interview }) {
     setAnswers([]);
     setAiEvaluation(null);
     setShowAIPanel(false);
+    setBehaviorLogs([]);
   };
 
   const loadAIEvaluation = async (candidateInterviewId) => {
@@ -90,6 +96,30 @@ export default function InterviewAnswers({ interview }) {
       // Silently fail - evaluation might not exist yet
       setAiEvaluation(null);
       setShowAIPanel(false);
+    }
+  };
+
+  const loadBehaviorLogs = async (candidateInterviewId) => {
+    try {
+      setBehaviorLoading(true);
+      const data = await employerInterviewService.getBehaviorLogs(
+        interview.interview_id,
+        candidateInterviewId
+      );
+      console.log('Behavior Logs Response:', data);
+      // Backend returns { logs: [...], behavior_summary: {...}, risk_score: ... }
+      if (data && data.logs) {
+        setBehaviorLogs(data.logs);
+      } else if (Array.isArray(data)) {
+        setBehaviorLogs(data);
+      } else {
+        setBehaviorLogs([]);
+      }
+    } catch (error) {
+      console.warn('Could not load behavior logs:', error.message);
+      setBehaviorLogs([]);
+    } finally {
+      setBehaviorLoading(false);
     }
   };
 
@@ -131,8 +161,8 @@ export default function InterviewAnswers({ interview }) {
       <div className="space-y-6">
         {/* Header */}
         <div>
-          <h2 className="text-2xl font-bold text-gray-900">Candidate Answers & Grading</h2>
-          <p className="text-sm text-gray-600 mt-1">
+            <h2 className="text-2xl font-bold text-black">Candidate Answers & Grading</h2>
+            <p className="text-sm text-black mt-1">
             Select a candidate to view and grade their answers for: <span className="font-semibold">{interview.title}</span>
           </p>
         </div>
@@ -140,9 +170,9 @@ export default function InterviewAnswers({ interview }) {
         {/* Candidates List */}
         {candidates.length === 0 ? (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-            <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">No Submissions Yet</h3>
-            <p className="text-gray-600">
+              <MessageSquare className="h-16 w-16 text-black mx-auto mb-4" />
+              <h3 className="text-lg font-semibold text-black mb-2">No Submissions Yet</h3>
+              <p className="text-black">
               No candidates have completed this interview yet
             </p>
           </div>
@@ -170,15 +200,11 @@ export default function InterviewAnswers({ interview }) {
           onClick={handleBackToList}
           className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
         >
-          <ArrowLeft className="h-5 w-5 text-gray-700" />
+          <ArrowLeft className="h-5 w-5 text-black" />
         </button>
         <div className="flex-1">
-          <h2 className="text-2xl font-bold text-gray-900">
-            Grading: {selectedCandidate.candidate?.full_name || 'Candidate'}
-          </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Review and grade answers for <span className="font-semibold">{interview.title}</span>
-          </p>
+          <h2 className="text-2xl font-bold text-black">Grading: {selectedCandidate.candidate?.full_name || 'Candidate'}</h2>
+          <p className="text-sm text-black mt-1">Review and grade answers for <span className="font-semibold">{interview.title}</span></p>
         </div>
       </div>
 
@@ -252,6 +278,15 @@ export default function InterviewAnswers({ interview }) {
         />
       )}
 
+      {/* Behavior Logs Panel */}
+      {selectedCandidate && (
+        <BehaviorLogsPanel
+          behaviorLogs={behaviorLogs}
+          candidateName={selectedCandidate.candidate?.full_name || 'Candidate'}
+          loading={behaviorLoading}
+        />
+      )}
+
       {/* Answers List */}
       {answersLoading ? (
         <div className="flex items-center justify-center py-12">
@@ -259,9 +294,9 @@ export default function InterviewAnswers({ interview }) {
         </div>
       ) : answers.length === 0 ? (
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <FileQuestion className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No Answers Found</h3>
-          <p className="text-gray-600">
+          <FileQuestion className="h-16 w-16 text-black mx-auto mb-4" />
+          <h3 className="text-lg font-semibold text-black mb-2">No Answers Found</h3>
+          <p className="text-black">
             This candidate has not submitted any answers
           </p>
         </div>
@@ -316,32 +351,32 @@ function CandidateCard({ candidate, onSelect }) {
             </div>
           )}
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900">
+            <h3 className="text-lg font-bold text-black">
               {candidate.candidate?.full_name || 'Unknown Candidate'}
             </h3>
             {candidate.candidate?.email && (
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-black">
                 {candidate.candidate.email}
               </p>
             )}
             {candidate.candidate?.phone && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-black">
                 {candidate.candidate.phone}
               </p>
             )}
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-black mt-1">
               Completed: {candidate.completed_at ? new Date(candidate.completed_at).toLocaleDateString() : '-'}
             </p>
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">Score</span>
+            <div className="flex items-center justify-between text-sm">
+            <span className="text-black">Score</span>
             <span className={`font-bold ${
               candidate.total_score !== null
-                ? candidate.total_score >= 70 ? 'text-green-600' : candidate.total_score >= 50 ? 'text-yellow-600' : 'text-red-600'
-                : 'text-gray-400'
+                ? candidate.total_score >= 25 ? 'text-green-600' : candidate.total_score >= 50 ? 'text-yellow-600' : 'text-red-600'
+                : 'text-black'
             }`}>
               {candidate.total_score !== null ? `${candidate.total_score}%` : 'Not graded'}
             </span>
@@ -407,10 +442,10 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
             {index + 1}
           </div>
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-gray-900 mb-2">
+            <h3 className="text-lg font-bold text-black mb-2">
               {answer.question|| 'Question'}
             </h3>
-            <div className="flex items-center gap-4 text-sm text-gray-600">
+            <div className="flex items-center gap-4 text-sm text-black">
               {answer.max_score && (
                 <div className="flex items-center gap-1">
                   <Award className="h-4 w-4 text-yellow-600" />
@@ -430,17 +465,17 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
 
       {/* Answer Section */}
       <div className="p-6">
-        <h4 className="text-sm font-semibold text-gray-700 mb-2">Candidate's Answer:</h4>
+        <h4 className="text-sm font-semibold text-black mb-2">Candidate's Answer:</h4>
         <div className="bg-gray-50 rounded-lg p-4 mb-4 border border-gray-200">
-          <p className="text-gray-900 whitespace-pre-wrap leading-relaxed">
-            {answer.answer_text || <span className="text-gray-400 italic">No answer provided</span>}
+          <p className="text-black whitespace-pre-wrap leading-relaxed">
+            {answer.answer_text || <span className="text-black italic">No answer provided</span>}
           </p>
         </div>
 
         {/* Grading Section */}
         <div className="border-t border-gray-200 pt-4">
           <div className="flex items-center justify-between mb-4">
-            <h4 className="text-sm font-semibold text-gray-700">Grading:</h4>
+            <h4 className="text-sm font-semibold text-black">Grading:</h4>
             {isGraded && !isEditing && (
               <span className="flex items-center gap-1 text-green-600 text-sm font-semibold">
                 <CheckCircle className="h-4 w-4" />
@@ -452,7 +487,7 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
           {isEditing || !isGraded ? (
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Score (out of {answer.max_score || 100})
                 </label>
                 <input
@@ -468,7 +503,7 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-black mb-2">
                   Feedback
                 </label>
                 <textarea
@@ -498,7 +533,7 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
                         feedback: answer.feedback || '',
                       });
                     }}
-                    className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-gray-700 font-semibold rounded-lg transition-colors"
+                    className="px-6 py-2 bg-gray-200 hover:bg-gray-300 text-black font-semibold rounded-lg transition-colors"
                   >
                     Cancel
                   </button>
@@ -509,14 +544,14 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
             <div className="space-y-3">
               <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-lg p-4">
                 <div>
-                  <span className="text-sm text-gray-600">Score:</span>
+                  <span className="text-sm text-black">Score:</span>
                   <span className="ml-2 text-2xl font-bold text-green-700">
                     {answer.score} / {answer.max_score || 100}
                   </span>
                 </div>
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 font-semibold rounded-lg border border-gray-300 transition-colors"
+                  className="px-4 py-2 bg-white hover:bg-gray-50 text-black font-semibold rounded-lg border border-gray-300 transition-colors"
                 >
                   Edit Grade
                 </button>
@@ -524,8 +559,8 @@ function AnswerCard({ answer, index, interview, candidateInterviewId, onGradeSuc
               
               {answer.feedback && (
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                  <h5 className="text-sm font-semibold text-gray-700 mb-2">Feedback:</h5>
-                  <p className="text-gray-900 text-sm leading-relaxed">{answer.feedback}</p>
+                  <h5 className="text-sm font-semibold text-black mb-2">Feedback:</h5>
+                  <p className="text-black text-sm leading-relaxed">{answer.feedback}</p>
                 </div>
               )}
             </div>

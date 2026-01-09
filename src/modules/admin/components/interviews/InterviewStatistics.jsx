@@ -21,6 +21,7 @@ import employerInterviewService from '@/services/employerInterviewService';
 export default function InterviewStatistics({ interview }) {
   const [statistics, setStatistics] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [sendLoadingId, setSendLoadingId] = useState(null);
 
   useEffect(() => {
     loadStatistics();
@@ -49,8 +50,8 @@ export default function InterviewStatistics({ interview }) {
   if (!statistics) {
     return (
       <div className="text-center py-12">
-        <BarChart3 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <p className="text-gray-600">No statistics available</p>
+        <BarChart3 className="h-16 w-16 text-black mx-auto mb-4" />
+        <p className="text-black">No statistics available</p>
       </div>
     );
   }
@@ -118,9 +119,9 @@ export default function InterviewStatistics({ interview }) {
                 <div className={`p-1.5 rounded-lg ${stat.color}`}>
                   <Icon className={`h-4 w-4 ${stat.iconColor}`} />
                 </div>
-                <h3 className="text-[10px] font-medium text-gray-600 uppercase tracking-wide">{stat.label}</h3>
+                <h3 className="text-[10px] font-medium text-black uppercase tracking-wide">{stat.label}</h3>
               </div>
-              <p className="text-xl font-bold text-gray-900">{stat.value}</p>
+              <p className="text-xl font-bold text-black">{stat.value}</p>
             </motion.div>
           );
         })}
@@ -131,7 +132,7 @@ export default function InterviewStatistics({ interview }) {
         <div className="px-6 py-4 border-b border-gray-200 bg-gradient-to-r from-blue-50 to-indigo-50">
           <div className="flex items-center gap-2">
             <Users className="h-5 w-5 text-blue-600" />
-            <h2 className="text-lg font-bold text-gray-900">Candidate Results</h2>
+            <h2 className="text-lg font-bold text-black">Candidate Results</h2>
           </div>
         </div>
 
@@ -139,19 +140,19 @@ export default function InterviewStatistics({ interview }) {
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-semibold text-black uppercase tracking-wider">
                   Candidate
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider">
                   Score
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider">
                   Result
                 </th>
-                <th className="px-6 py-3 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th className="px-6 py-3 text-center text-xs font-semibold text-black uppercase tracking-wider">
                   Action
                 </th>
               </tr>
@@ -178,11 +179,11 @@ export default function InterviewStatistics({ interview }) {
                           </div>
                         )}
                         <div className="ml-3">
-                          <div className="text-sm font-semibold text-gray-900">
+                          <div className="text-sm font-semibold text-black">
                             {candidate.candidate_name || 'Unknown'}
                           </div>
                           {candidate.candidate_email && (
-                            <div className="text-xs text-gray-500 flex items-center gap-1">
+                            <div className="text-xs text-black flex items-center gap-1">
                               <Mail className="h-3 w-3" />
                               {candidate.candidate_email}
                             </div>
@@ -194,13 +195,13 @@ export default function InterviewStatistics({ interview }) {
                       <StatusBadge status={candidate.status} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      <div className="text-sm font-bold text-gray-900">
+                      <div className="text-sm font-bold text-black">
                         {candidate.total_score !== null ? (
                           <span className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-blue-50 text-blue-700">
                             {candidate.total_score}%
                           </span>
                         ) : (
-                          <span className="text-gray-400">-</span>
+                          <span className="text-black">-</span>
                         )}
                       </div>
                     </td>
@@ -208,16 +209,21 @@ export default function InterviewStatistics({ interview }) {
                       <ResultStatusBadge score={candidate.total_score} />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center">
-                      {(candidate.total_score !== null && candidate.total_score >= 25) ? (
+                        {(candidate.total_score !== null && candidate.total_score >= 25) ? (
                         <button
                           onClick={() => handleSendEmail(candidate)}
-                          className="inline-flex items-center justify-center p-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-600 transition-colors"
+                          disabled={sendLoadingId === candidate.candidate_interview_id}
+                          className={`inline-flex items-center justify-center p-2 rounded-lg ${sendLoadingId === candidate.candidate_interview_id ? 'bg-blue-100 text-blue-600' : 'bg-blue-50 hover:bg-blue-100 text-blue-600'} transition-colors`}
                           title="Send email to candidate"
                         >
-                          <Mail className="h-4 w-4" />
+                          {sendLoadingId === candidate.candidate_interview_id ? (
+                            <div className="animate-spin h-4 w-4 border-2 border-current rounded-full border-t-transparent" />
+                          ) : (
+                            <Mail className="h-4 w-4" />
+                          )}
                         </button>
-                      ) : (
-                        <span className="text-sm text-gray-400">-</span>
+                        ) : (
+                        <span className="text-sm text-black">-</span>
                       )}
                     </td>
                   </tr>
@@ -225,8 +231,8 @@ export default function InterviewStatistics({ interview }) {
               ) : (
                 <tr>
                   <td colSpan="5" className="px-6 py-12 text-center">
-                    <Users className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-sm text-gray-500 font-medium">No candidates have taken this interview yet</p>
+                    <Users className="h-12 w-12 text-black mx-auto mb-3" />
+                    <p className="text-sm text-black font-medium">No candidates have taken this interview yet</p>
                   </td>
                 </tr>
               )}
@@ -239,8 +245,30 @@ export default function InterviewStatistics({ interview }) {
 
   // Handler for sending email (to be implemented)
   function handleSendEmail(candidate) {
-    toast.info(`Email feature for ${candidate.candidate_name} - Coming soon!`);
-    // TODO: Implement email sending functionality
+    // Prevent sending if candidate clearly hasn't passed per stricter server rule
+    if (candidate.total_score === null || candidate.total_score < 40) {
+      toast.error('Candidate score is below the required pass threshold. Email not sent.');
+      return;
+    }
+
+    // Send congratulations email to candidate
+    (async () => {
+      try {
+        setSendLoadingId(candidate.candidate_interview_id);
+        toast.info('Sending email...', { autoClose: 1000 });
+        const res = await employerInterviewService.sendCongratulations(interview.interview_id, candidate.candidate_interview_id);
+        if (res && res.success) {
+          toast.success(res.message || `Congratulations email sent to ${res.sentTo || candidate.candidate_email}`);
+        } else {
+          toast.error(res?.message || 'Failed to send email');
+        }
+      } catch (err) {
+        console.error('Error sending congratulations email', err);
+        toast.error(err.message || 'Failed to send email');
+      } finally {
+        setSendLoadingId(null);
+      }
+    })();
   }
 }
 
@@ -252,7 +280,7 @@ function StatusBadge({ status }) {
     timeout: { color: 'bg-red-100 text-red-700', label: 'Timeout' },
   };
 
-  const badge = badges[status] || { color: 'bg-gray-100 text-gray-700', label: status };
+  const badge = badges[status] || { color: 'bg-gray-100 text-black', label: status };
 
   return (
     <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${badge.color}`}>
@@ -264,10 +292,10 @@ function StatusBadge({ status }) {
 function ResultStatusBadge({ score }) {
   if (score === null || score === undefined) {
     return (
-      <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
-        N/A
-      </span>
-    );
+    <span className="inline-flex px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-black">
+      N/A
+    </span>
+  );
   }
 
   let status, color, label;

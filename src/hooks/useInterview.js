@@ -32,6 +32,7 @@ export const useInterview = (candidateInterviewId) => {
             question_id: q.question_id,
             answer_text: '',
             elapsed_seconds: 0,
+            behavior_logs: [],
           }))
         );
       }
@@ -42,7 +43,7 @@ export const useInterview = (candidateInterviewId) => {
       }
     } catch (error) {
       console.error('Error loading interview:', error);
-      toast.error('Không thể tải thông tin bài interview');
+      toast.error('Unable to load interview details');
     } finally {
       setLoading(false);
     }
@@ -56,10 +57,10 @@ export const useInterview = (candidateInterviewId) => {
       setLoading(true);
       await interviewService.startInterview(candidateInterviewId);
       setSessionStarted(true);
-      toast.success('Bắt đầu làm bài interview');
+      toast.success('Interview session started');
     } catch (error) {
       console.error('Error starting interview:', error);
-      toast.error('Không thể bắt đầu interview');
+      toast.error('Unable to start interview');
       throw error;
     } finally {
       setLoading(false);
@@ -69,13 +70,14 @@ export const useInterview = (candidateInterviewId) => {
   /**
    * Update answer for current question
    */
-  const updateAnswer = (answerText, elapsedSeconds) => {
+  const updateAnswer = (answerText, elapsedSeconds, behaviorLogs = []) => {
     setAnswers((prev) => {
       const updated = [...prev];
       updated[currentQuestionIndex] = {
         ...updated[currentQuestionIndex],
         answer_text: answerText,
         elapsed_seconds: elapsedSeconds,
+        behavior_logs: behaviorLogs,
       };
       return updated;
     });
@@ -98,12 +100,18 @@ export const useInterview = (candidateInterviewId) => {
     try {
       setLoading(true);
       const answersToSubmit = updatedAnswers || answers;
+      console.log('Submitting interview with answers:', answersToSubmit);
+      console.log('Behavior logs check:', answersToSubmit.map(a => ({
+        question_id: a.question_id,
+        has_behavior_logs: !!a.behavior_logs,
+        behavior_logs_count: a.behavior_logs?.length || 0
+      })));
       await interviewService.submitInterview(candidateInterviewId, answersToSubmit);
       setSessionCompleted(true);
-      toast.success('Đã nộp bài thành công!');
+      toast.success('Interview submitted successfully!');
     } catch (error) {
       console.error('Error submitting interview:', error);
-      toast.error('Không thể nộp bài');
+      toast.error('Unable to submit interview');
       throw error;
     } finally {
       setLoading(false);
@@ -151,7 +159,7 @@ export const useInterviewPreview = (interviewId) => {
       setPreviewData(data);
     } catch (error) {
       console.error('Error loading preview:', error);
-      toast.error('Không thể tải thông tin interview');
+      toast.error('Unable to load interview details');
     } finally {
       setLoading(false);
     }
@@ -161,11 +169,11 @@ export const useInterviewPreview = (interviewId) => {
     try {
       setLoading(true);
       const result = await interviewService.acceptInterview(interviewId, applicationId);
-      toast.success('Đã chấp nhận làm bài interview');
+      toast.success('Interview accepted');
       return result;
     } catch (error) {
       console.error('Error accepting interview:', error);
-      toast.error('Không thể chấp nhận interview');
+      toast.error('Unable to accept interview');
       throw error;
     } finally {
       setLoading(false);
