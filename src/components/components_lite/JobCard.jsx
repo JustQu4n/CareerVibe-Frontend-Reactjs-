@@ -38,12 +38,12 @@ const JobCard = ({ job }) => {
                         <div className="flex flex-wrap gap-2 items-center">
                             {job.highlight && (
                                 <span className="inline-flex items-center gap-1 bg-blue-600 text-white px-2.5 py-1 rounded-full text-xs font-semibold">
-                                    <span>📌</span> Tìm mới
+                                    <span>📌</span> New
                                 </span>
                             )}
                             {job.status === 'active' && (
-                                <span className="inline-flex items-center gap-1 bg-orange-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold">
-                                    <span>🔥</span> Nổi bật
+                                <span className="inline-flex items-center gap-1 bg-blue-500 text-white px-2.5 py-1 rounded-full text-xs font-semibold">
+                                    <span></span> Featured
                                 </span>
                             )}
                         </div>
@@ -56,7 +56,7 @@ const JobCard = ({ job }) => {
                         {/* Salary and status */}
                         <div className="flex items-center gap-2 flex-wrap">
                             <span className="text-base text-gray-600">
-                                {!job.salary_range || job.salary_range === 0 ? 'Thỏa thuận' : job.salary_range}
+                                {!job.salary_range || job.salary_range === 0 ? 'Negotiable' : job.salary_range}
                             </span>
                         
                         </div>
@@ -73,12 +73,12 @@ const JobCard = ({ job }) => {
                         <div className="flex items-center gap-3 text-sm text-gray-600">
                             <div className="flex items-center gap-1">
                                 <MapPin size={14} className="text-blue-500" />
-                                <span>{job.location || 'Không xác định'}</span>
+                                <span>{job.location || 'Not specified'}</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <Clock size={14} className="text-gray-400" />
                                 <span>
-                                    {job.created_at ? formatDistanceToNow(new Date(job.created_at), { addSuffix: false }) : 'Gần đây'}
+                                    {job.created_at ? formatDistanceToNow(new Date(job.created_at), { addSuffix: false }) : 'Recently'}
                                 </span>
                             </div>
                         </div>
@@ -90,13 +90,13 @@ const JobCard = ({ job }) => {
                             onClick={handleQuickView}
                             className="text-blue-600 hover:text-blue-700 font-semibold text-sm flex items-center gap-1 transition-colors"
                         >
-                            Xem nhanh
+                            Quick View
                             <ChevronRight size={16} />
                         </button>
                         {job.status === 'active' && (
                             <span className="inline-flex items-center gap-1 text-blue-600 text-xs font-bold">
                                 <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                                {job.status === 'active' ? 'Đang tuyển' : 'Hết hạn'}
+                                {job.status === 'active' ? 'Hiring' : 'Expired'}
                             </span>
                         )}
                     </div>

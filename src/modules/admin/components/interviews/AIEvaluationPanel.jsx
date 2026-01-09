@@ -106,16 +106,16 @@ export default function AIEvaluationPanel({ evaluation, loading }) {
       className="space-y-6"
     >
       {/* Header with AI Badge */}
-      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+      <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-xl shadow-lg p-4 text-white">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-white/20 flex items-center justify-center">
-              <Brain className="h-7 w-7" />
+          <div className="flex items-center gap-2">
+            <div className="h-10 w-10 rounded-full bg-white/20 flex items-center justify-center">
+              <Brain className="h-6 w-6" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold">AI Evaluation Results</h3>
-              <p className="text-purple-100 text-sm">
-                Analyzed by {modelUsed || 'AI Model'} • {createdAt ? new Date(createdAt).toLocaleDateString() : ''}
+              <h3 className="text-xl font-bold">AI Evaluation Results</h3>
+              <p className="text-purple-100 text-xs">
+                Analyzed by OpenAI model • {createdAt ? new Date(createdAt).toLocaleDateString() : ''}
               </p>
             </div>
           </div>
