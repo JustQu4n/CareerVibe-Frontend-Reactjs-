@@ -328,7 +328,7 @@ function AppContent() {
     <div>
       <RouterProvider router={appRouter}></RouterProvider>
       <ToastContainer position="top-right" autoClose={3000} />
-      <ChatPopup userId={userId} />
+      {/* <ChatPopup userId={userId} /> */}
       
       {/* Toast notification for real-time notifications */}
       {toastNotification && (

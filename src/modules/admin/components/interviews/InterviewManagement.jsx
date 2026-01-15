@@ -343,13 +343,26 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all h-full flex flex-col"
+      className="group bg-white rounded-2xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-xl overflow-hidden transition-all duration-300 h-full flex flex-col"
     >
+      {/* Top Colored Bar - Status Indicator */}
+      <div className={`h-1.5 w-full ${
+        interview.status === 'active' ? 'bg-green-500' : 
+        interview.status === 'inactive' ? 'bg-red-500' : 
+        'bg-gray-400'
+      }`} />
+      
       <div className="p-6 flex flex-col flex-1">
-        {/* Header */}
-        <div className="flex items-start justify-between mb-3">
+        {/* Header with Icon & Status */}
+        <div className="flex items-start gap-4 mb-4">
+          {/* Interview Icon */}
+          <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-blue-50 border-2 border-blue-100 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+            <Video className="w-6 h-6 text-blue-600" />
+          </div>
+          
+          {/* Title & Status */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-lg font-bold text-gray-900 mb-2 line-clamp-1" title={interview.title}>
+            <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight" title={interview.title}>
               {interview.title}
             </h3>
             {getStatusBadge(interview.status)}
@@ -357,34 +370,55 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
         </div>
 
         {/* Description */}
-        <p className="text-sm text-gray-600 mb-4 line-clamp-2 min-h-[2.5rem]">
-          {interview.description || 'No description'}
+        <p className="text-sm text-gray-600 mb-5 line-clamp-3 leading-relaxed min-h-[4rem]">
+          {interview.description || 'No description available'}
         </p>
 
-        {/* Meta Info - Fixed height container */}
-        <div className="space-y-2 mb-4 min-h-[4.5rem]">
-          {interview.total_time_minutes && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Clock className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">{interview.total_time_minutes} minutes</span>
-            </div>
-          )}
-          {interview.deadline && (
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <Calendar className="h-4 w-4 flex-shrink-0" />
-              <span className="truncate">Deadline: {new Date(interview.deadline).toLocaleDateString()}</span>
-            </div>
-          )}
+        {/* Meta Information Grid */}
+        <div className="space-y-3 mb-5">
+          {/* Time & Deadline Row */}
+          <div className="grid grid-cols-2 gap-3">
+            {interview.total_time_minutes ? (
+              <div className="flex items-center gap-2 px-3 py-2 bg-blue-50 rounded-lg">
+                <Clock className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-blue-900 truncate">
+                  {interview.total_time_minutes} min
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                <Clock className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="text-sm text-gray-500">No time limit</span>
+              </div>
+            )}
+            
+            {interview.deadline ? (
+              <div className="flex items-center gap-2 px-3 py-2 bg-orange-50 rounded-lg">
+                <Calendar className="h-4 w-4 text-orange-600 flex-shrink-0" />
+                <span className="text-sm font-medium text-orange-900 truncate">
+                  {new Date(interview.deadline).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 px-3 py-2 bg-gray-50 rounded-lg">
+                <Calendar className="h-4 w-4 text-gray-400 flex-shrink-0" />
+                <span className="text-sm text-gray-500">No deadline</span>
+              </div>
+            )}
+          </div>
+
+          {/* Job Post Link */}
           {interview.job_post_id && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-2">
-              <div className="flex items-start gap-2 text-sm">
-                <LinkIcon className="h-4 w-4 text-green-600 flex-shrink-0 mt-0.5" />
+            <div className="bg-emerald-50 border-2 border-emerald-200 rounded-lg p-3">
+              <div className="flex items-start gap-2.5">
+                <LinkIcon className="h-4 w-4 text-emerald-600 flex-shrink-0 mt-0.5" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-green-800 font-medium truncate">
+                  <p className="text-emerald-900 font-semibold text-sm truncate">
                     {interview.jobPost?.title || 'Linked to Job Post'}
                   </p>
                   {interview.jobPost?.location && (
-                    <p className="text-green-600 text-xs truncate mt-0.5">
+                    <p className="text-emerald-700 text-xs mt-1 truncate flex items-center gap-1">
+                      <span>📍</span>
                       {interview.jobPost.location}
                     </p>
                   )}
@@ -394,46 +428,57 @@ function InterviewCard({ interview, onDelete, onEdit, onViewDetails, onAttachJob
           )}
         </div>
 
-        {/* Actions - Push to bottom */}
-        <div className="flex items-center gap-2 mt-auto pt-4 border-t border-gray-100">
+        {/* Action Buttons - Spacer to push to bottom */}
+        <div className="mt-auto pt-5 border-t-2 border-gray-100">
+          {/* Primary Action */}
           <button
             onClick={() => onViewDetails(interview)}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition-colors"
+            className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl transition-all shadow-sm hover:shadow-md mb-3"
           >
             <Eye className="h-4 w-4" />
             View Details
           </button>
-          <button
-            onClick={() => onEdit(interview)}
-            className="p-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex-shrink-0"
-            title="Edit"
-          >
-            <Edit className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => onDelete(interview.interview_id)}
-            className="p-2 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg transition-colors flex-shrink-0"
-            title="Delete"
-          >
-            <Trash2 className="h-4 w-4" />
-          </button>
-          {interview.job_post_id ? (
+          
+          {/* Secondary Actions */}
+          <div className="grid grid-cols-3 gap-2">
             <button
-              onClick={() => onDetachJobPost(interview)}
-              className="p-2 bg-orange-100 hover:bg-orange-200 text-orange-700 rounded-lg transition-colors flex-shrink-0"
-              title="Detach from Job Post"
+              onClick={() => onEdit(interview)}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-medium rounded-lg transition-colors"
+              title="Edit Interview"
             >
-              <Unlink className="h-4 w-4" />
+              <Edit className="h-3.5 w-3.5" />
+              Edit
             </button>
-          ) : (
+            
             <button
-              onClick={() => onAttachJobPost(interview)}
-              className="p-2 bg-green-100 hover:bg-green-200 text-green-700 rounded-lg transition-colors flex-shrink-0"
-              title="Attach to Job Post"
+              onClick={() => onDelete(interview.interview_id)}
+              className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-medium rounded-lg transition-colors"
+              title="Delete Interview"
             >
-              <LinkIcon className="h-4 w-4" />
+              <Trash2 className="h-3.5 w-3.5" />
+              Delete
             </button>
-          )}
+            
+            {interview.job_post_id ? (
+              <button
+                onClick={() => onDetachJobPost(interview)}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-orange-100 hover:bg-orange-200 text-orange-700 text-xs font-medium rounded-lg transition-colors"
+                title="Detach from Job Post"
+              >
+                <Unlink className="h-3.5 w-3.5" />
+                Unlink
+              </button>
+            ) : (
+              <button
+                onClick={() => onAttachJobPost(interview)}
+                className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-emerald-100 hover:bg-emerald-200 text-emerald-700 text-xs font-medium rounded-lg transition-colors"
+                title="Attach to Job Post"
+              >
+                <LinkIcon className="h-3.5 w-3.5" />
+                Link
+              </button>
+            )}
+          </div>
         </div>
       </div>
     </motion.div>

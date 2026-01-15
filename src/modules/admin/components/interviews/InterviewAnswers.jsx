@@ -325,70 +325,113 @@ export default function InterviewAnswers({ interview }) {
 // Candidate Card Component
 // ========================================
 function CandidateCard({ candidate, onSelect }) {
+  const score = candidate.total_score;
+  const hasScore = score !== null && score !== undefined;
+  
+  // Score color logic
+  const getScoreColor = () => {
+    if (!hasScore) return 'bg-gray-100 text-gray-600';
+    if (score >= 25) return 'bg-emerald-100 text-emerald-700 border-emerald-200';
+    return 'bg-red-100 text-red-700 border-red-200';
+  };
+
+  const getScoreBadge = () => {
+    if (!hasScore) return { icon: '⏳', label: 'Not graded', color: 'text-gray-500' };
+    if (score >= 25) return { icon: '✅', label: 'Passed', color: 'text-emerald-600' };
+    return { icon: '❌', label: 'Failed', color: 'text-red-600' };
+  };
+
+  const scoreBadge = getScoreBadge();
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      whileHover={{ scale: 1.02 }}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition-all cursor-pointer"
+      className="group bg-white rounded-2xl border-2 border-gray-200 hover:border-blue-500 hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
       onClick={() => onSelect(candidate)}
     >
+      {/* Score Badge at Top */}
+      <div className={`h-2 w-full ${hasScore ? (score >= 25 ? 'bg-emerald-500' : 'bg-red-500') : 'bg-gray-300'}`} />
+      
       <div className="p-6">
-        <div className="flex items-center gap-4 mb-4">
+        {/* Header with Avatar */}
+        <div className="flex items-start gap-4 mb-5">
           {candidate.candidate?.avatar_url ? (
             <img
               src={candidate.candidate.avatar_url}
               alt={candidate.candidate.full_name}
-              className="h-12 w-12 rounded-full object-cover"
+              className="h-16 w-16 rounded-xl object-cover border-2 border-gray-200 group-hover:border-blue-500 transition-colors"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(candidate.candidate.full_name || 'User')}&background=random`;
               }}
             />
           ) : (
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-lg">
+            <div className="h-16 w-16 rounded-xl bg-blue-100 border-2 border-blue-200 flex items-center justify-center text-blue-700 font-bold text-2xl group-hover:bg-blue-200 transition-colors">
               {candidate.candidate?.full_name?.charAt(0)?.toUpperCase() || 'C'}
             </div>
           )}
+          
+          {/* Score Display */}
           <div className="flex-1">
-            <h3 className="text-lg font-bold text-black">
-              {candidate.candidate?.full_name || 'Unknown Candidate'}
-            </h3>
-            {candidate.candidate?.email && (
-              <p className="text-sm text-black">
-                {candidate.candidate.email}
-              </p>
-            )}
-            {candidate.candidate?.phone && (
-              <p className="text-xs text-black">
-                {candidate.candidate.phone}
-              </p>
-            )}
-            <p className="text-xs text-black mt-1">
-              Completed: {candidate.completed_at ? new Date(candidate.completed_at).toLocaleDateString() : '-'}
+            <div className={`inline-flex items-center justify-center px-4 py-2 rounded-xl text-2xl font-bold border-2 ${getScoreColor()}`}>
+              {hasScore ? `${score}%` : '—'}
+            </div>
+          </div>
+        </div>
+
+        {/* Candidate Info */}
+        <div className="mb-4">
+          <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-1">
+            {candidate.candidate?.full_name || 'Unknown Candidate'}
+          </h3>
+          
+          {candidate.candidate?.email && (
+            <p className="text-sm text-gray-600 mb-1 flex items-center gap-2 truncate">
+ 
+              {candidate.candidate.email}
+            </p>
+          )}
+          
+          {candidate.candidate?.phone && (
+            <p className="text-sm text-gray-600 mb-1 flex items-center gap-2">
+           
+              {candidate.candidate.phone}
+            </p>
+          )}
+        </div>
+
+        {/* Status Badge */}
+        <div className="flex items-center gap-2 mb-4 px-3 py-2 bg-slate-50 rounded-lg border border-slate-200">
+          <span className="text-lg">{scoreBadge.icon}</span>
+          <div className="flex-1">
+            <p className={`text-xs font-semibold ${scoreBadge.color}`}>
+              {scoreBadge.label}
             </p>
           </div>
         </div>
 
-        <div className="space-y-2">
-            <div className="flex items-center justify-between text-sm">
-            <span className="text-black">Score</span>
-            <span className={`font-bold ${
-              candidate.total_score !== null
-                ? candidate.total_score >= 25 ? 'text-green-600' : candidate.total_score >= 50 ? 'text-yellow-600' : 'text-red-600'
-                : 'text-black'
-            }`}>
-              {candidate.total_score !== null ? `${candidate.total_score}%` : 'Not graded'}
+        {/* Completion Date */}
+        <div className="mb-4 px-3 py-2 bg-blue-50 rounded-lg border border-blue-100">
+          <div className="flex items-center gap-2 text-xs text-blue-700">
+            <Calendar className="h-3.5 w-3.5" />
+            <span className="font-medium">
+              Completed: {candidate.completed_at ? new Date(candidate.completed_at).toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              }) : 'Not completed'}
             </span>
           </div>
-          
-          <div className="pt-3 border-t border-gray-100">
-            <button className="w-full px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transition-colors flex items-center justify-center gap-2">
-              <MessageSquare className="h-4 w-4" />
-              View & Grade Answers
-            </button>
-          </div>
         </div>
+
+        {/* Action Button */}
+        <button className="w-full px-4 py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 group-hover:bg-blue-700">
+          <MessageSquare className="h-4 w-4" />
+          View & Grade Answers
+        </button>
       </div>
     </motion.div>
   );
